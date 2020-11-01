@@ -1,7 +1,7 @@
 # R-za-neprogramerje
-Materiali za delavnico **R za neprogramerje** v sklopu DataScience@UL-FRI.
+Gradiva za delavnico **R za neprogramerje** v sklopu DataScience@UL-FRI.
 
-Predlagamo da udeleženci izvajajo programsko kodo soèasno s predavateljem in tako že tekom delavnice pridobijo praktiène izkušnje z R. Vsi materiali bodo naloženi na ta repozitorij vnaprej, tako da ne bo potrebno veliko zapisovanja. Za prenos celotne mape z materiali, kliknite na zeleno obarvan gumb *Code* in potem *Download ZIP*.
+Predlagamo da udeleženci izvajajo programsko kodo soèasno s predavateljem in tako že tekom delavnice pridobijo praktiène izkušnje z R. Vsa gradiva bodo naložena na ta repozitorij vnaprej, tako da ne bo potrebno veliko zapisovanja. Za prenos celotne mape z gradivi kliknite na zeleno obarvan gumb *Code* in potem *Download ZIP*.
 
 ![](/img/download_repo.png?raw=true "Slika 1: Kako prenesti datoteke na repozitoriju.")
 

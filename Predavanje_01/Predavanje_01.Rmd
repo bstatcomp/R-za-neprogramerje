@@ -1,5 +1,5 @@
 ---
-title: "Predavanje 01 - Uvod, matematične operacije, vektorji"
+title: "Predavanje 01 -- Uvod, matematične operacije, vektorji"
 output:
   pdf_document: default
   html_document: default
@@ -79,6 +79,7 @@ Pri zadnjih dveh izrazih velja omeniti, da R da prednost deljenju pred množenje
 
 ```{r}
 3^2
+sqrt(4)
 log10(100)
 sin(0)
 cos(0)
@@ -207,10 +208,11 @@ x * y
 ```
 
 
-Prav tako R vsebuje mnogo uporabnih funkcij nad vektorji, začenši s povprečjem, mediano, minimumom, maksimumom in standardnim odklonom:
+Prav tako R vsebuje mnogo uporabnih funkcij nad vektorji, začenši z vsoto, povprečjem, mediano, minimumom, maksimumom in standardnim odklonom:
 
 ```{r}
 x <- c(1, 2, 2, 5)
+sum(x)
 mean(x)
 median(x)
 min(x)
