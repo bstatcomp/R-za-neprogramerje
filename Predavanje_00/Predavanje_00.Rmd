@@ -57,5 +57,5 @@ ggplot(df, aes(x = Opis, y = Razmerje)) + geom_bar(stat = "identity") +
 
 Podatki, ki smo jih uporabili v tem poglavju, so del znanstvenega članka @Martiniano2012.
 
-# REFERENCES
+# Reference
 
