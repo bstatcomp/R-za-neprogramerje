@@ -1,0 +1,329 @@
+---
+title: "Predavanja 3 -- data.frame, indeksiranje"
+output: pdf_document
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+# Indeksiranje vektorjev
+V praksi nas pogosto ne zanima celoten vektor ali celotna tabela, ampak samo določeni elementi, npr. operacijo želimo izvesti samo na nekem stolpcu ali izbrati samo vrstice, ki ustrezajo nekemu pogoju. Do posameznih elementov največkrat dostopamo preko t. i. indeksiranja -- navajanja elementov, ki jih želimo izbrati. Pogledali si bomo dva načina indeksiranja:
+
+1. Podamo vektor z zaporednimi številkami elementov, ki jih želimo izbrati.
+2. Podamo vektor enake dolžine kot elementi, ki jih izbiramo, pri čemer vsak element tega vektorja pove, ali istoležni element izberemo ali ne.
+
+Najprej ustvarimo nov vektor:
+```{r, error = TRUE}
+vek <- c(1, 2, 3, 4, 5, 6)
+```
+
+Kako dostopamo do posameznih elementov oziroma do podmnožic tega vektorja? Lahko uporabimo prvi način, se pravi z zaporednimi številkami elementov, ki jih želimo izbrati.
+ 
+Izberemo četrti elementa vektorja.
+```{r, error = TRUE}
+vek[4]
+```
+
+Izberemo od drugega do petega elementa vektorja.
+```{r, error = TRUE}
+vek[2:5]
+```
+
+Vse, kar smo se naučili pri vektorjih, pride tudi v poštev pri indeksiranju, npr. `c()` ali `seq()`
+
+```{r, error = TRUE}
+vek[c(2, 4, 6)]
+vek[seq(2, 6, by = 2)]
+```
+
+Pri drugem načinu potrebujemo nov vektor, enake dolžine kot `vek`, kjer bodo istoležeči elementi povedali, katere elemente v `vek` želimo izbrati. Pri tem se srečamo s posebnim tipom spremenljivke, ki se ji reče **logična spremenljivka** ali **boolean**. Elementi tega vektorja lahko zavzamejo samo vrednosti `TRUE` in `FALSE`, ali skrajšano `T` in `F`. Izbrani bodo tisti elementi vektorja `vek`, kjer bodo vrednosti tega novega vektorja enake `TRUE`.
+
+Izberemo drugi, četrti in šesti element vektorja na drugi način, z uporabo logičnega vektorja.
+
+```{r, error = TRUE}
+lv <- c(F, T, F, T, F, T)
+vek[lv]
+```
+Izbrani so tisti elementi vektorja `vek`, kjer ima istoležni element vektorja `lv` vrednosti `T`.
+
+Navajanje `T` in `F` za vsak element vektorja je v praksi zelo nepraktično, saj imamo običajno opravka z vektorji dolžine reda velikosti 100, 1000 ali več. V tem primeru je navajanje številskih indeksov veliko bolj praktično. Prednost tega pristopa se pokaže, ko `T`/`F` ne navajamo ročno, ampak gre za rezultate neke logične operacije (pogoja). Na primer, ustvarimo logičen vektor na podlagi pogoja:
+
+```{r, error = TRUE}
+po <- vek > 3 
+print(po)
+```
+
+Ta vekor lahko uporabimo kot argument vektorja `vek`.
+```{r, error = TRUE}
+po <- vek > 3 
+vek[po]
+
+vek[vek > 3]
+```
+
+Poznamo več logičnih operatorjev:
+
+- `>` Je večje.
+- `<` Je manjše.
+- `==` Je enako. Potrebno je biti pozoren, da potrebujemo dva enačaja, saj je en enačaj rezerviran za prirejanje vrednosti!
+- `>=` Je večje ali enako.
+- `<=` Je manjše ali enako.
+- `|` Ali.
+- `&` In.
+- `!` Negiranje.
+- `!=` Ni enako.
+
+Vsi standardni matematični in logični operatorji so nepogrešljivi pri programiranju.
+
+Poglejmo si nekaj primerov logičnih operatorjev.
+```{r, error = TRUE}
+x <- c(1, 2, 5, 6, 3, 2, 2, 1)
+x == 2
+x >= 3
+x == 2 | x == 3
+x > 1 & x < 6
+x != 5
+```
+
+Če želimo izbrati na primer vse elemente, kjer je `x` večji od 1 in manjši od `6` lahko uporabimo:
+
+```{r, error = TRUE}
+x[x > 1 & x < 6]
+```
+
+Poglejmo si še posebno funkcijo `which()`, ki pretvori logični vektor v indekse elementov, ki imajo vrednost `T`.
+
+```{r, error = TRUE}
+which(x == 2)
+```
+
+
+# data.frame
+
+V R-ju je **data.frame** dvodimenzionalna podatkovna struktura, sestavljena z vrstic in stolpcev. Poznamo sicer tudi druge dvodimenzionalne strukture (**matrix**, **table**, **tibble**), ampak data.frame je najpogosteje uporabljena. data.frame si lahko predstavljamo kot nekakšno Excel tabelo shranjeno v R.
+
+
+Kako naredimo data.frame? Naredimo več vektorjev iste dolžine in jih združimo.
+```{r, error = TRUE}
+visina  <- c(179, 185, 183, 172, 174, 185, 193, 169, 173, 168)
+teza <- c(75, 89, 70, 80, 58, 86, 73, 63, 72, 70)
+spol <- c("f", "m", "m", "m", "f", "m", "f", "f", "m", "f")
+df <- data.frame(spol, visina, teza)
+print(df)
+```
+Vsak vektor predstavlja en stolpec data.frame-a. Vektorji morajo biti iste dolžine. Če vektorji niso iste dolžine, R vrne napako:
+```{r, error = TRUE}
+visina  <- c(179, 185, 183, 172, 174, 185, 193, 169, 173, 168)
+teza <- c(75, 89, 70, 80, 58, 86, 73, 63)
+spol <- c("f", "m", "m", "m", "f", "m", "f", "f", "m")
+df <- data.frame(spol, visina, teza)
+```
+
+Podatke lahko tudi preberemo iz datoteke:
+```{r, error = TRUE}
+dat <- read.csv('./data_raw/president_county_candidate.csv')
+```
+Tabela je velika in je ne moremo izpisati v celoti.
+
+Če želimo pogledati samo nekaj začetnih vrstic:
+```{r, error = TRUE}
+head(dat)
+```
+
+Že želimo pogledati 20 začetnih vrstic:
+```{r, error = TRUE}
+head(dat, 20)
+```
+Če želimo pogledati zadnjih nekaj vrstic:
+```{r, error = TRUE}
+tail(dat)
+```
+
+Če želimo pogledati zadnjih 20 vrstic:
+```{r, error = TRUE}
+tail(dat, 20)
+```
+
+Če nas zanima velikost data.frame-a:
+```{r, error = TRUE}
+dim(dat)
+```
+
+Če nas zanima koliko vrstic ima data.frame:
+```{r, error = TRUE}
+nrow(dat)
+```
+
+Če nas zanima koliko stolpcev ima data.frame:
+```{r, error = TRUE}
+ncol(dat)
+```
+
+Imena stolpcev data.frame-a:
+```{r, error = TRUE}
+names(dat)
+```
+
+Osnovno statistiko posameznih stolpcev v data.frame-u dobimo z ukazom `summary`:
+```{r, error = TRUE}
+summary(dat)
+```
+
+data.frame ni samo 2D tabela, ampak nosi tudi podatke o tem, kakšen tip spremenljivke je posamezen stolpec. Vsak stolpec je lahko drug tip spremenljivke,  vsi elementi v stolpcu morajo biti istega tipa (kot pri vektorjih). Opazimo, da so vsi razen zadnjega stolpca besedilni (v R-ju **character**), zadnji pa je številski (**numeric**).
+
+
+## Indeksiranje **data.frame**
+Včasih želimo dostopati samo do posameznih stolpcev ali vrstic data.frame-a (ali do neke podmnožice vrstic in/ali stolpcev). Zaradi lažjega razumevanja bomo kot primer uporabili kar majhen, na roke ustvarjen data.frame `df` (glej zgoraj). S spodaj navedenimi ukazi samo izpišemo izbrane elemente, v `df` so še vedno shranjeni vsi elementi. Kako izbrisati vrstice ali stolpce iz spremenljivke `df` ali pa shraniti podmnožico tega data.frame, bomo spoznali kasneje.
+
+
+Izberemo tretjo vrstico 
+```{r, error = TRUE}
+ df[3, ]
+```
+
+Izberemo od tretje do šeste vrstice:
+```{r, error = TRUE}
+ df[3:6, ]
+```
+
+Izberemo tretji stolpec:
+```{r, error = TRUE}
+ df[ , 3]
+```
+Izberemo prvi do drugi stolpec:
+```{r, error = TRUE}
+ df[, 1:2]
+```
+
+Izberemo prvi in tretji stolpec:
+```{r, error = TRUE}
+ df[, c(1, 3)]
+```
+
+Izberemo prvi in tretji stolpec in drugo, četrto in šesto vrstico:
+```{r, error = TRUE}
+ df[c(2, 4, 6), c(1, 3)]
+```
+Stolpce lahko "pokličemo" kar z njihovim imenom:
+```{r, error = TRUE}
+ df[, "spol"]
+```
+```{r, error = TRUE}
+ df[,c("spol", "teza")]
+```
+
+Posamezen stolpec v R-ju lahko izberemo tudi z operatorjem `$`:
+
+```{r, error = TRUE}
+df$spol
+```
+To nam pomaga pri iskanju podatkov, ki nas zanimajo. Naredimo podobno kot smo naredili pri vektorjih.
+Želimo samo osebe višje od 180 cm. Uporabili bomo logično indeksiranje:
+
+```{r, error = TRUE}
+ df[df$visina > 180, ]
+```
+Želimo samo osebe, ki so višje od 175 cm in so ženske:
+```{r, error = TRUE}
+ df[df$visina > 175 & df$spol == "f", ]
+```
+Za zgoraj izbrano skupino žensk želim vedeti koliko so težke:
+```{r, error = TRUE}
+ df[df$visina > 175 & df$spol == "f", "teza"]
+```
+
+Lahko tudi:
+```{r, error = TRUE}
+ df[df$visina > 175 & df$spol == "f", ]$teza
+```
+
+Pazljivi moramo biti, da med pogojem za vrstice in stolpce napišemo vejico, tudi če pogoja za stolpce ni. To vrne `Error`.
+```{r, error = TRUE}
+ df[df$visina > 180]
+```
+
+## Odstranjevanje in dodajanje vrstic in stolpcev
+V R-ju lahko **odstranimo** stolpec kar z operatorjem `-`. Uporabimo izraz **odstranimo**, ampak v bistvu s spodaj opisanimi postopki samo prikažemo del `df` brez določenih vrstic ali stolpcev (`df` ostane kakršen je bil). S temi izrazi izberemo vse stolpce/vrstice, razen tistih, ki so navedeni za operatorjem `-`.
+ 
+Želimo odstraniti drugi stolpec:
+```{r, error = TRUE}
+ df[ , -2]
+```
+
+Odstranimo tretjo vrstico:
+```{r, error = TRUE}
+ df[-3, ]
+```
+
+Odstranimo od tretje do šeste vrstice:
+```{r, error = TRUE}
+ df[-(3:6), ]
+```
+Odstranimo od tretje do šeste vrstice in prvi do drugi stolpec:
+```{r, error = TRUE}
+ df[-(3:6), -(1:2)]
+```
+
+Odstranimo drugo, četrto in šesto vrstico in prvi stolpec:
+```{r, error = TRUE}
+ df[-c(2,4,6), -1]
+```
+Ne deluje pa z imeni:
+```{r, error = TRUE}
+ df[ ,-c("spol", "teza")]
+```
+
+Stolpec dodamo tako, da najprej ustvarimo vektor, ki je take dolžine, kolikor ima data.frame vrstic:
+ 
+```{r, error = TRUE}
+ dim(df)
+ imena <- c('Micka', 'Marko', 'Gregor', 'Tomaz', 'Ana', 'Peter', 
+            'Mojca', 'Katja', 'Anze', 'Alja')
+ print(imena)
+ length(imena)
+ df$imena <- imena
+ print(df)
+```
+Vrstico ustvarimo tako, da najprej ustvarimo data.frame, ki ima iste atribute kot `df` in vrstico dodamo na konec `df`:
+ 
+```{r, error = TRUE}
+vrstica <- data.frame(spol = "m", visina = 170, teza = 60, imena = "Samo")
+dim(df)
+df[11, ] <- vrstica
+print(df)
+```
+
+Oziroma če želimo, da dela vedno, ne samo, ko dodajamo enajsto vrstico:
+```{r, error = TRUE}
+df[nrow(df) + 1, ] <- vrstica
+print(df)
+```
+
+Sedaj smo na konec še enkrat dodali Samo. Kako ga odstranimo?
+```{r, error = TRUE}
+df <- df[-nrow(df), ]
+print(df)
+```
+Z zgornjo kodo smo spremenili `df` (`df <- df[-nrow(df),]`). Torej v `df` smo prepisali `df` brez zadnje vrstice.
+
+
+## Domača naloga
+Preberite podatke v mapi *data_raw* o ameriških volitvah. Podatke smo pobrali 6. novembra iz: https://www.kaggle.com/unanimad/us-election-2020?select=president_county_candidate.csv. Podatke preberite v data.frame in preverite:
+
+- Izberite stolpec **candidate**.
+- Izberite vrstico številka 500, kaj predstavlja?
+- Kaj piše v stolpcu **party** in vrstici 645?
+- Odstranite zadnjih 100 vrstic-
+- Odstranite podatke o okraju (**county**).
+- Izberite podatke samo za zvezno državo Georgia.
+- Izberite podatke za zvezno državo Georgia in okraj Clarke County.
+- Izberite vse vrstice, kjer je nekdo dobil več kot 100000 glasov.
+- (Težje) Izberi vstico, kjer so Libertariani dobili največ glasov. Namig: vrstico **party** == "LIB", kjer je **votes** največji izmed vseh vrstic **party** == "LIB".
+
+
+
