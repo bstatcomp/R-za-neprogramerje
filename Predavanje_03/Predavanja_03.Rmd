@@ -316,14 +316,52 @@ Z zgornjo kodo smo spremenili `df` (`df <- df[-nrow(df),]`). Torej v `df` smo pr
 Preberite podatke v mapi *data_raw* o ameriških volitvah. Podatke smo pobrali 6. novembra iz: https://www.kaggle.com/unanimad/us-election-2020?select=president_county_candidate.csv. Podatke preberite v data.frame in preverite:
 
 - Izberite stolpec **candidate**.
+```{r echo = FALSE}
+head(dat$candidate)
+```
+Prikazanih je prvih 6 vnosov.
+
 - Izberite vrstico številka 500, kaj predstavlja?
+```{r echo = FALSE}
+dat[500, ]
+```
 - Kaj piše v stolpcu **party** in vrstici 645?
-- Odstranite zadnjih 100 vrstic-
+```{r echo = FALSE}
+dat[645, 'party']
+```
+- Odstranite zadnjih 100 vrstic.
+```{r echo = FALSE}
+print(tail(dat[-(length(dat$party)-100 : length(dat$party)),]))
+```
+Izpisanihje zadnjih 6 vrstic.
+
 - Odstranite podatke o okraju (**county**).
+```{r echo = FALSE}
+print(head(dat[, -2]))
+```
+Izpisanih je prvih 6 vrstic.
+
 - Izberite podatke samo za zvezno državo Georgia.
+```{r echo = FALSE}
+print(head(dat[dat$state == 'Georgia',]))
+```
+Izpisanih je prvih 6 vrstic.
+
 - Izberite podatke za zvezno državo Georgia in okraj Clarke County.
+```{r echo = FALSE}
+print(head(dat[dat$state == 'Georgia' & dat$county == 'Clarke County',]))
+```
+
 - Izberite vse vrstice, kjer je nekdo dobil več kot 100000 glasov.
+```{r echo = FALSE}
+print(head(dat[dat$votes > 100000, ]))
+```
+Izpisanih je prvih 6 vrstic.
+
 - (Težje) Izberi vstico, kjer so Libertariani dobili največ glasov. Namig: vrstico **party** == "LIB", kjer je **votes** največji izmed vseh vrstic **party** == "LIB".
+```{r echo = FALSE}
+dat[dat$votes == max(dat[dat$party == 'LIB', 'votes']), ]
+```
 
 
 
