@@ -168,7 +168,7 @@ datPM10n <- datPM10[, setdiff(names(datPM10), c('Datum','kraj'))]
 Na primer želimo izračunati največje vrednosti vsakega stolpca posebej.
 
 ```{r, error = TRUE}
-apply(datPM10n, 2, 'max')
+apply(datPM10n, 2, max)
 ```
 Funkciji apply podamo 3 argumente: 
 
@@ -179,21 +179,21 @@ Funkciji apply podamo 3 argumente:
 
 Izračunamo najmanjše vrednosti stolpcev.
 ```{r, error = TRUE}
-apply(datPM10n, 2, 'min')
+apply(datPM10n, 2, min)
 ```
 Izračunamo povprečne vrednosti stolpcev:
 ```{r, error = TRUE}
-apply(datPM10n, 2, 'mean')
+apply(datPM10n, 2, mean)
 ```
 
 Seštejemo vrednosti v stolpcih:
 ```{r, error = TRUE}
-apply(datPM10n, 2, 'sum')
+apply(datPM10n, 2, sum)
 ```
 
 Podobno lahko uporabimo `apply()` na vrsticah. Izračunaj seštevka PM10 in drugih snovi v vsaki vrstici:
 ```{r, error = TRUE}
-datPM10$PM10total <- apply(datPM10n, 1, 'sum')
+datPM10$PM10total <- apply(datPM10n, 1, sum)
 head(datPM10)
 ```
 
@@ -203,38 +203,38 @@ Poleg funkcije `setdiff()` poznamo še nekaj funkcij za delo z množicami kot so
 Vzamemo množico **mn1**, ki vsebuje vsa imena stolpcev data.frame-a `df`. 
 Naredimo še množico **mn3**, ki je enaka:
 ```{r, error = TRUE}
- mn3 <- c('spol', 'imena', 'starost', 'st_noge')
+mn3 <- c('spol', 'imena', 'starost', 'st_noge')
 ```
 
 Če naredimo unijo množic  **mn1** in **mn3**, dobimo:
 ```{r, error = TRUE}
- print(union(mn1, mn3))
+print(union(mn1, mn3))
 ```
 Kaj pa če vrstni red obrnemo?
 ```{r, error = TRUE}
- print(union(mn3, mn1))
+print(union(mn3, mn1))
 ```
 Dobimo enako.
 
 Ča naredimo presek, dobimo:
 ```{r, error = TRUE}
- print(intersect(mn1, mn3))
+print(intersect(mn1, mn3))
 ```
 
 Kaj pa če vrstni red obrnemo?
 ```{r, error = TRUE}
- print(intersect(mn3, mn1))
+print(intersect(mn3, mn1))
 ```
 Dobimo enako.
 
 Če pogledamo razliko, dobimo:
 ```{r, error = TRUE}
- print(setdiff(mn1, mn3))
+print(setdiff(mn1, mn3))
 ```
 
 Kaj pa če tukaj zamenjamo vrstni red?
 ```{r, error = TRUE}
- print(setdiff(mn3, mn1))
+print(setdiff(mn3, mn1))
 ```
 V tem primeru pa ne dobimo enako. Funkcijo  `setdiff(mn1, mn3)` si lahko predstavljamo, da vrne elemente, ki so v **nm1** in jih ni v **nm3**. To pa ni enako elementom, ki so v **nm3** in jih ni v **nm1**.
 
