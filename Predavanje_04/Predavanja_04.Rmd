@@ -1,0 +1,253 @@
+---
+title: "Predavanja 4 -- data.frame, operacije nad vrsticami in stolpci"
+output: pdf_document
+---
+  
+  
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Odstranjevanje stolpca po imenu
+V R-ju lahko odstranimo stolpec, tudi če poznamo le njegovo ime. Poglejmo si ponovno primer data.frama-a od zadnjič.
+```{r, error = TRUE}
+visina  <- c(179, 185, 183, 172, 174, 185, 193, 169, 173, 168)
+teza <- c(75, 89, 70, 80, 58, 86, 73, 63, 72, 70)
+spol <- c("f", "m", "m", "m", "f", "m", "f", "f", "m", "f")
+imena <- c('Micka', 'Marko', 'Gregor', 'Tomaz', 'Ana', 'Peter', 
+            'Mojca', 'Katja', 'Anze', 'Alja')
+df <- data.frame(spol, visina, teza, imena)
+print(df)
+```
+
+Če želimo odstraniti stolpec z imenom **teza**, najprej poiščemo indeks tega stolpca. Pri tem si pomagamo s funkcijo `which()`, ki nam vrne indeks iskanega elementa v zaporedju.
+  
+  ```{r, error = TRUE}
+ind <- which(names(df) == 'teza')
+```
+Vidimo, da je stolpec **teza** tretji v data.frame-u. V spremenljivko **ind** smo shranili njegov indeks. Sedaj ga lahko odstranimo:
+```{r, error = TRUE}
+df[ , -ind]
+```
+
+Ko želimo odstraniti več stolpcev katerih imena poznamo, si ponavadi pomagamo s funkcijo `setdiff()`, ki nam vrne razliko v elementih dveh množic.
+Naša prva množica bodo vsa imena stolpcev v data.framu-u.
+```{r, error = TRUE}
+mn1 <- names(df)
+print(mn1)
+```
+
+Druga množica pa bodo imena, ki jih ne želimo prikazati.
+```{r, error = TRUE}
+mn2 <- c('spol', 'imena')
+print(mn2)
+```
+
+Sedaj pogledamo, katera imena so v množici **mn1** in jih v **mn2** ni. V bistvu nekako iz množice **mn1** odstranimo imena, ki so **mn2**.
+```{r, error = TRUE}
+mnd <- setdiff(mn1, mn2)
+print(mnd)
+```
+Prikažemo data.frame brez stolpcev **spol** in **imena**.
+```{r, error = TRUE}
+print(df[,mnd])
+```
+
+# Operacije nad vrsticami ali stolpci data.frame-a
+Numerične vrstice ali stoplce lahko med seboj seštevamo, odštevamo, množimo ali delimo.
+
+Lahko izračunamo BMI udeležencev:
+```{r, error = TRUE}
+ df$teza / df$visina^2 
+```
+
+
+Ne moremo pa izvajati aritmetičnih operacij med numeričnimi in znakovnimi stolpci ali vrsticami.
+
+```{r, error = TRUE}
+ df$visina + df$spol
+```
+
+Ne moremo npr. sešteti celotnih vrstic med seboj, ker se znakovni tipi ne seštevajo med seboj:
+```{r, error = TRUE}
+ df[1, ] +  df[2, ]
+```
+
+Izvajamo lahko matematične operacije nad posameznimi stolpci.
+
+Stolpcu **visina** prištejemo 5 cm.
+```{r, error = TRUE}
+ df$visina + 5
+```
+
+Stolpec lahko logaritmiramo.
+```{r, error = TRUE}
+ log(df$teza)
+```
+
+
+## Obdelava podatkov o delcih PM10 v Kranju
+
+Poglejmo si podatke o vrednostih raznih snovi v delcih PM10. Podatki so priloženi v repozitoriju.
+
+```{r, error = TRUE, echo = FALSE, eval = FALSE}
+ setwd('/home/jana/delavnica/R-za-neprogramerje/Predavanje_04/')
+```
+
+```{r, error = TRUE}
+dat <- read.csv('./data_raw/delci2.csv')
+```
+
+Pogledamo kakšen je prebrani data.frame:
+```{r, error = TRUE}
+head(dat)
+summary(dat)
+```
+
+Recimo, da želimo izbrati vrednosti PM10 v Celju.
+
+Če nas zanimajo imena krajev v data.fram-u in ne želimo izpisati večkrat istih imen, uporabimo funkcijo `unique()`.
+Če imamo vektor:
+```{r, error = TRUE}
+vek <- c(8, 8, 8, 9, 9, 9, 9, 7, 7, 7, 2)
+unique(vek)
+```
+```{r, error = TRUE}
+unique(dat$kraj)
+```
+
+Poleg tega, da izberemo podatke za Celje, izberemo le tiste, kjer je vrednost PM10 večja od 30 in jih shranimo kot drugi data.frame (`datPM10`)
+```{r, error = TRUE}
+datPM10 <- dat[dat$kraj == 'Celje' & dat$PM10 > 30, ]
+```
+
+
+Recimo, da merilnik izmeri 22% nižjo vrednost, ko so vrednosti nad 30. To napako želimo popraviti. Izračunamo vrednost napake:
+```{r, error = TRUE}
+datPM10$PM10err <-  datPM10$PM10 * 0.22
+```
+Preverimo data.frame:
+```{r, error = TRUE}
+head(datPM10)
+summary(datPM10)
+```
+Izračunamo še vrednosti PM10 s popravkom:
+```{r, error = TRUE}
+datPM10$PM10corr <- datPM10$PM10 + datPM10$PM10err
+```
+
+Zanima nas še vrednost soli (NaCl) v delcih, zato seštejemo vrednosti Na in Cl in to vrednost shranimo:
+```{r, error = TRUE}
+datPM10$NaCl <- datPM10$Na + datPM10$Cl
+```
+
+
+Posodobljeni data.frame shranimo.
+```{r, error = TRUE}
+write.csv(datPM10, './data_clean/delci_popravljeni.csv')
+```
+
+# Funkcija `apply()`
+
+Funkcija `apply()` nam omogoča, da apliciramo neko funkcijo na vse vrstice ali stolpce.
+Recimo, da želimo izračunati maksimalne vrednosti vseh stolpcev našega data.frama-a. Zato lahko uporabimo funkcijo `max()`:
+Npr. izračunamo maksimalno vrednost kalcija: 
+```{r, error = TRUE}
+max(datPM10$Ca)
+```
+Glede na to, da je stolpcev različnih snovi 9, je uporaba fukcije  `max()` na vsakem stolpcu posebej dolgotrajna. Tukaj nam pomaga funkcija `apply()`, da funkcijo `max()` apliciramo na vseh stolpcih hkrati.
+
+Funkcijo `apply()` uporabimo samo na numeričnih elementih, zato odstranimi nenumerične stolpce. Odstraniti moramo stolpca **datum** in **kraj**:
+
+
+```{r, error = TRUE}
+datPM10n <- datPM10[, setdiff(names(datPM10), c('Datum','kraj'))]
+```
+Na primer želimo izračunati največje vrednosti vsakega stolpca posebej.
+
+```{r, error = TRUE}
+apply(datPM10n, 2, 'max')
+```
+Funkciji apply podamo 3 argumente: 
+
+1) Numerični data.frame, za katerega želimo izračun.
+2) Število 1 ali 2. Če želimo izračun za vsak stolpec, uporabimo 2. Če želimo izračun za vsako vrstico, uporabimo 1.
+3) Ime funkcije, katere vrednost želimo izračunati (v narekovajih).
+
+
+Izračunamo najmanjše vrednosti stolpcev.
+```{r, error = TRUE}
+apply(datPM10n, 2, 'min')
+```
+Izračunamo povprečne vrednosti stolpcev:
+```{r, error = TRUE}
+apply(datPM10n, 2, 'mean')
+```
+
+Seštejemo vrednosti v stolpcih:
+```{r, error = TRUE}
+apply(datPM10n, 2, 'sum')
+```
+
+Podobno lahko uporabimo `apply()` na vrsticah. Izračunaj seštevka PM10 in drugih snovi v vsaki vrstici:
+```{r, error = TRUE}
+datPM10$PM10total <- apply(datPM10n, 1, 'sum')
+head(datPM10)
+```
+
+# Operacije nad množicami
+Poleg funkcije `setdiff()` poznamo še nekaj funkcij za delo z množicami kot so `union()` (unija) in `intersec()` (presek). 
+
+Vzamemo množico **mn1**, ki vsebuje vsa imena stolpcev data.frame-a `df`. 
+Naredimo še množico **mn3**, ki je enaka:
+```{r, error = TRUE}
+ mn3 <- c('spol', 'imena', 'starost', 'st_noge')
+```
+
+Če naredimo unijo množic  **mn1** in **mn3**, dobimo:
+```{r, error = TRUE}
+ print(union(mn1, mn3))
+```
+Kaj pa če vrstni red obrnemo?
+```{r, error = TRUE}
+ print(union(mn3, mn1))
+```
+Dobimo enako.
+
+Ča naredimo presek, dobimo:
+```{r, error = TRUE}
+ print(intersect(mn1, mn3))
+```
+
+Kaj pa če vrstni red obrnemo?
+```{r, error = TRUE}
+ print(intersect(mn3, mn1))
+```
+Dobimo enako.
+
+Če pogledamo razliko, dobimo:
+```{r, error = TRUE}
+ print(setdiff(mn1, mn3))
+```
+
+Kaj pa če tukaj zamenjamo vrstni red?
+```{r, error = TRUE}
+ print(setdiff(mn3, mn1))
+```
+V tem primeru pa ne dobimo enako. Funkcijo  `setdiff(mn1, mn3)` si lahko predstavljamo, da vrne elemente, ki so v **nm1** in jih ni v **nm3**. To pa ni enako elementom, ki so v **nm3** in jih ni v **nm1**.
+
+
+
+# Domača naloga
+Med podatki o delcih PM10 izberite podatke za Ljubljano.
+
+- Izberite samo tiste, ki imajo vrednost kalcija (Ca) večje od 0.3 in vrednosti natrija (Na) manjše od 0.05.
+- V izbranih podatkih izračunajte povprečne vrednosti za vse snovi.
+- Dodajte stolpec, ki ponazarja seštevek Na in Cl.
+- Za vsako vrstico izračunajte seštevek vseh meritev.
+
+
+
+

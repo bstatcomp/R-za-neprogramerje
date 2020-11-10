@@ -186,13 +186,28 @@ act_contracts <- read.table("./data_raw/active-contracts2.txt", sep = ":", dec =
 head(act_contracts)
 ```
 
-Super, zadeva deluje! Sedaj znamo naložiti podatke iz tekstovne datoteke v R!
+Super, zadeva deluje! Sedaj znamo naložiti podatke iz tekstovne datoteke v R! Pri uporabi funkcije `read.table` je potrebno biti pozoren na narekovaje. Velikokrat z narekovaji označimo besedilne spremenljivke. Funkcije `read.csv`, `read.csv2`, `read.delim` in `read.delim2` vse uporabljajo kot narekovaj znak `"`. Funkcija `read.table` pa poleg tega znaka uporablja tudi znak `'`. V kolikor na to nismo pozorni, lahko pride do težav, če imamo na primer podatke, kjer se `'` pojavi v besedi. Za primer poizkusimo prebrati *active-contracts.txt* s funkcijo `read.table`.
+
+```{r}
+act_contracts <- read.table("./data_raw/active-contracts.txt", sep = "\t", dec = ".", 
+                            header = TRUE)
+head(act_contracts)
+```
+
+S pogledom v **Environment** opazimo, da ta tabela nima istega števila vrstic kot tabele, ki smo jih prebrali prej. Težava je v tem, da je R razumel znak `'`, ki se je pojavil v enem od stolpcev, kot znak za besedilo. Zaradi tega je vse med tem znakom in med naslednjim takšnim znakom prebral v eno celico, kot dolgo besedilo. Da se temu izognemo moramo dodati parameter `quote = "\""`, ki bo dopuščal samo `"` kot narekovaj.
+
+```{r}
+act_contracts <- read.table("./data_raw/active-contracts.txt", sep = "\t", dec = ".", 
+                            header = TRUE, quote = "\"")
+head(act_contracts)
+```
 
 Potrebno je omeniti, da R hrani spremenljivke v različnih formatih, odvisno od njihovih vrednosti (na primer številke imajo drugačen tip od besed). Tipe bomo podrobneje spoznali v prihodnjih predavanjih. Poseben tip spremenljivk so **faktorji** in kadar beremo podatke iz tekstovnih datotek R privzeto določi besednim spremenljivkam tip faktor. Tega trenutno ne želimo, zato bomo morali vnesti dodaten parameter v funkcijo `read.csv`, in sicer `stringsAsfactors = FALSE`. Več o faktorjih bomo izvedeli čez nekaj predavanj. Funkcijam, ki smo jih uporabili v tem poglavju torej dodamo ta argument, na primer:
 
 ```{r, eval = FALSE}
 act_contracts <- read.csv("./data_raw/active-contracts.csv", stringsAsFactors = FALSE)
 ```
+
 
 
 ## Branje iz excelovih datotek
@@ -313,9 +328,37 @@ saveWorkbook(wb, file = "./data_saved/several-sheets-example.xlsx")
 
 # Domača naloga
 
-1) V mapi *data\_raw* se nahajajo podatki o popularnosti posameznih novic v tekstovni datoteki. Podatki so bili del znanstvene raziskave @Fernandes2015 in so dostopni na https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity. Vaša naloga je, da pripravite skripto, ki bo nastavila pot do delovnega direktorija, naložila ustrezne pakete, naložila te podatke v spremenljivko v R. Nato shranite te podatke v xlsx datoteko z imenom *online-news-popularity.xlsx* v list z imenom *mashable* (ime spletne strani, ki je vir teh novic). Preverite ali so se datoteke shranile pravilno.
+1) V mapi *data\_raw* se nahajajo podatki o popularnosti posameznih novic v tekstovni datoteki. Podatki so bili del znanstvene raziskave @Fernandes2015 in so dostopni na https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity. Vaša naloga je, da pripravite skripto, ki bo nastavila pot do delovnega direktorija, naložila ustrezne pakete, naložila te podatke v spremenljivko v R. Nato shranite te podatke v xlsx datoteko z imenom *online-news-popularity.xlsx* v list z imenom *mashable* (ime spletne strani, ki je vir teh novic).
 
-2) V mapi *data\_raw* se nahajajo podatki o spletnih nakupih darilnih in zabavnih izdelkov v Excelovi datoteki. Podatki so bili del znanstvene raziskave @Chen2012 in so dostopni na https://archive.ics.uci.edu/ml/datasets/Online+Retail. Datoteka ima 3 liste, v vsakem se nahajajo podatki o nakupih iz ene izmed treh držav. Vaša naloga je, da pripravite skripto, ki bo nastavila pot do delovnega direktorija, naložila ustrezne pakete in prebrala vsak list posebej ter ga shranila kot spremenljivko z ustreznim imenom. Nato shranite razpredelnico za Avstrijo v tekstovno datoteko s separatorjem vejico in decimalno piko, za Italijo s separatorjem podpičjem in decimalno vejico in za Grčijo v tekstovno datoteko s separatorjem dvopičjem in decimalno vejico. Preverite ali so se datoteke shranile pravilno.
+V kolikor smo podatke pravilno prebrali v R, bi s klicem `head(<ime spremenljivke>)` morali dobiti:
+
+```{r, echo = FALSE}
+news_pop <- read.table("./data_raw/online-news-popularity.csv", sep = ";", dec = ".", 
+                            header = TRUE)
+```
+```{r}
+head(news_pop)
+```
+
+Ali smo podatke shranili pravilno v xlsx datoteko preverite tako, da jo odprete in pogledate, ali tabela izgleda enako kot ta v R.
+
+
+2) V mapi *data\_raw* se nahajajo podatki o spletnih nakupih darilnih in zabavnih izdelkov v Excelovi datoteki. Podatki so bili del znanstvene raziskave @Chen2012 in so dostopni na https://archive.ics.uci.edu/ml/datasets/Online+Retail. Datoteka ima 3 liste, v vsakem se nahajajo podatki o nakupih iz ene izmed treh držav. Vaša naloga je, da pripravite skripto, ki bo nastavila pot do delovnega direktorija, naložila ustrezne pakete in prebrala vsak list posebej ter ga shranila kot spremenljivko z ustreznim imenom. Nato shranite razpredelnico za Avstrijo v tekstovno datoteko s separatorjem vejico in decimalno piko, za Italijo s separatorjem podpičjem in decimalno vejico in za Grčijo v tekstovno datoteko s separatorjem dvopičjem in decimalno vejico.
+
+V kolikor smo podatke pravilno prebrali v R, bi s klicem `head(<ime spremenljivke>)` morali dobiti:
+
+```{r, echo = FALSE}
+retail_aus <- read.xlsx("./data_raw/online-retail.xlsx", sheet = "Austria")
+retail_ita <- read.xlsx("./data_raw/online-retail.xlsx", sheet = "Italy")
+retail_gre <- read.xlsx("./data_raw/online-retail.xlsx", sheet = "Greece")
+```
+```{r}
+head(retail_aus)
+head(retail_ita)
+head(retail_gre)
+```
+
+Ali smo podatke shranili pravilno v tekstovne datoteke preverite tako, da jih odprete in pogledate, ali so shranjene v pravem formatu.
 
 
 # Reference
