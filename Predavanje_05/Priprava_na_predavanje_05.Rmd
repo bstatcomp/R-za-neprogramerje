@@ -1,0 +1,95 @@
+---
+output:
+  pdf_document:
+    dev: cairo_pdf
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+library(tidyr)
+library(ggplot2)
+```
+
+
+Tu so 3 naloge, s katerimi bomo osvežili nekaj konceptov iz risanja statističnih grafov. **Za reševanje nalog ne uporabimo računalnika, ampak jih rešujemo na list papirja!**
+
+\vspace{-3truemm}
+
+
+### Naloga A
+\vspace{-3truemm}
+
+Pri tej nalogi bomo uporabili te podatke o petih različnih osebah:
+
+```{r echo = FALSE}
+
+height <- c(171, 185, 165, 190, 152)
+weight <- c(70, 78, 64, 95, 67)
+sex    <- c("m", "m", "ž", "m", "ž")
+name   <- c("Alen", "Bojan", "Cvetka", "Dejan", "Eva")
+age    <- c(41, 35, 28, 52, 22)
+
+df     <- data.frame(Ime = name, 
+                     Visina = height, 
+                     Teza = weight, 
+                     Spol = sex, 
+                     Starost = age)
+
+print(df)
+write.csv(df, "./data_raw/osebe.csv", row.names = F)
+
+
+```
+Narišite razsevni diagram (angl. scatterplot). Na x-osi naj bo višina, na y-osi teža, z barvo točke pa predstavite spol osebe.
+
+\vspace{-3truemm}
+
+
+### Naloga B
+\vspace{-3truemm}
+
+
+Ponovno uporabite podatke iz Naloge A, a tokrat narišite stolpični diagram (angl. bar chart). Na x-osi naj bo spol, na y-osi pa število oseb v podatkih, ki so tistega spola.
+
+\vspace{-3truemm}
+
+
+### Naloga C
+\vspace{-3truemm}
+
+
+Pri tej nalogi bomo uporabili te podatke o končnem številu točk treh angleških nogometnih klubov za zadnjih 5 sezon angleške nogometne lige:
+
+```{r echo = FALSE}
+df <- data.frame(Klub = "Tottenham", Mesto = "London", Sez_2015 = 70, Sez_2016 = 86, 
+                 Sez_2017 = 77, Sez_2018 = 71, Sez_2019 = 59)
+df <- rbind(df, data.frame(Klub = "Manchester United", Mesto = "Manchester", Sez_2015 = 66, Sez_2016 = 69, 
+                           Sez_2017 = 81, Sez_2018 = 66, Sez_2019 = 66))
+df <- rbind(df, data.frame(Klub = "Arsenal", Mesto = "London", Sez_2015 = 71, Sez_2016 = 75, 
+                           Sez_2017 = 63, Sez_2018 = 70, Sez_2019 = 56))
+
+print(df)
+write.csv(df, "./data_raw/klubi.csv", row.names = F)
+
+df <- pivot_longer(df, cols = 3:7)
+names(df) <- c("Klub", "Mesto", "Sezona", "Tocke")
+write.csv(df, "./data_raw/klubi_dolga.csv", row.names = F)
+
+```
+
+Del podatkov smo predstavili s tem grafom:
+
+```{r echo = FALSE, warning = FALSE, fig.width = 6, fig.height = 3}
+ggplot(df,
+       aes(x = Sezona, y = Tocke, colour = Klub, group = Klub)) +
+  geom_line() +
+  geom_point() +
+  xlab("") + 
+  ylab("število točk")
+
+```
+
+Kako bi nekomu, ki vidi podatke, a ne vidi tega grafa, s čim manj besedami sporočili minimalne potrebne informacije, da nariše vsebinsko enak graf?
+
+
+Z drugimi besedami, ta naloga je obratna od nalog A in B, kjer smo imeli podatke in navodila, cilj pa je bil narisati graf. Tu imamo podatke in graf, naloga pa je napisati navodila.
