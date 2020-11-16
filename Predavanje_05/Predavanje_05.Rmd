@@ -321,7 +321,7 @@ ggplot(df, aes(x = Datum, y = PM10)) +
   xlab("") + 
   theme_bw() +
   geom_hline(yintercept = 50, lty = "dashed", colour = "red") + 
-  geom_point(data = df, aes(colour = weekdays(Datum) == "Saturday" | weekdays(Datum) == "Sunday")) +
+  geom_point(data = df, aes(colour = weekdays(Datum) == "sobota" | weekdays(Datum) == "nedelja")) +
   ggtitle("Vrednosti meritev PM10 za tri slovenska mesta. Rdeča črta predstavlja kritično mejo dnevne onesnaženosti.") +
   labs(color = "Vikend?") + theme(legend.position = "bottom",
                                   axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1)) +
