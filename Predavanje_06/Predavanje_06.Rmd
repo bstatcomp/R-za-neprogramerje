@@ -1,0 +1,391 @@
+---
+title: "Predavanje 05 -- Programski tok, if, for, seznami"
+output:
+  pdf_document: default
+  html_document: default
+bibliography: P06.bib
+---
+
+
+# Programski tok
+
+Skripte, ki jih napišemo, izvajajo ukaze zaporedno iz vrha navzdol. Včasih želimo nekatere ukaze preskočiti, druge pa ponoviti večkrat. To lahko storimo ročno, če uporabljamo bližnjico **Ctrl** + **Enter**, če pa uporabimo ukaz `source()` se skripta izvede v celoti. Če želimo, da se nekateri deli skripte avtomatsko preskočijo oziroma ponovijo, potrebujemo nekaj ukazov, ki nam bodo to omogočili. Primere, kjer bi to potrebovali, bomo spoznali v nadaljevanju. 
+
+# Ukaz if
+
+Ukaz **if** nam omogoča, da se izbrani ukazi izvedejo samo, če velja določen pogoj. V R-ju to napišemo takole.
+
+```{r eval = FALSE}
+if (<pogoj>) {
+  # ukazi, ki se poženejo, če velja pogoj
+}
+```
+
+V zgornjem primeru je `<pogoj>` lahko spremenljivka ali izraz, katerega rezultat je **TRUE** ali **FALSE**, torej tipa **boolean**. Ukazi znotraj zavitih oklepajev **\{\}** se izvedejo le v primeru, če je pogoj **TRUE**.
+
+V mapi *data\_raw* se nahajajo podatki o spletnih nakupih darilnih in zabavnih izdelkov v Excelovih datotekah. Podatki so bili del znanstvene raziskave @Chen2012, dostopni so na https://archive.ics.uci.edu/ml/datasets/Online+Retail. V mapi sta dve datoteki s temi podatki in sicer *online-retail.xlsx*, ki ste jo spoznali že na drugih predavanjih in vsebuje 3 liste, ter *online-retail-large.xlsx*, ki vsebuje veliko listov. Izmed vseh držav je iz originala odstranjena samo Velika Britanija, ker ima nekaj sto tistoč izdelkov in bi zato imeli težavi pri odpiranju datoteke v Excelu. 
+
+Odprimo najprej prvi list krajše datoteke.
+
+```{r error = T}
+library(openxlsx)
+podatki <- read.xlsx("./data_raw/online-retail.xlsx", 1)
+head(podatki)
+```
+
+V zgornji tabeli lahko opazimo, da je v podatkih kvantiteta v prvi vrstici negativna, kar je mogoče tudi napaka v podatkih. R takšnih napak seveda avtomatsko ne more odkriti, si pa lahko napišemo ukaze, ki bodo zaznali te nepravilnosti.
+
+Najprej si poglejmo kako bi ugotovili katere vrednosti so negativne.
+
+```{r error = T}
+logicni_vektor <- podatki$Quantity < 0
+head(logicni_vektor)
+```
+
+Zgornja ukaza preverita vse vrednosti *Quantity* in za vsako vrednost, ki je negativna, vrneta **TRUE**. Nas pa zanima, če je vsaj ena vrednost **TRUE**. To lahko preprosto naredimo z vgrajeno funkcijo `any()`, ki vrne **TRUE**, če je katerakoli vrednost v podanem vektorju **TRUE**. Sorodno deluje `all()`, ki vrne **TRUE**, če so vse podane vrednosti **TRUE**.
+
+Poglejmo si to na primerih.
+
+```{r error = T}
+any(FALSE, FALSE, FALSE)
+all(FALSE, FALSE, FALSE)
+
+any(TRUE, TRUE, FALSE)
+all(TRUE, TRUE, FALSE)
+
+any(TRUE, TRUE, TRUE)
+all(TRUE, TRUE, TRUE)
+
+any(podatki$Quantity < 0)
+```
+
+
+To sta uporabni funkciji za varno delo z **if** stavkom, ker drugače nam bo R zajamral, da zna uporabiti le prvo vrednost vetorja.
+
+```{r error = T}
+if (podatki$Quantity < 0) {
+  print("Opozorilo: Podatki vsebujejo negativne količine.")
+}
+```
+
+S funkcijo `any()` pa deluje brez opozorila.
+
+```{r error = T}
+if (any(podatki$Quantity < 0)) {
+  print("Opozorilo: Podatki vsebujejo negativne količine.")
+}
+```
+
+Preverimo še, če so mogoče negativne tudi cene izdelkov.
+
+```{r error = T}
+if (any(podatki$UnitPrice < 0)) {
+  print("Opozorilo: Podatki vsebujejo negativne cene.")
+}
+```
+
+Na izpisu ni ničesar, ker se je ukaz `print()` preskočil. Če želimo obvestilo, da je bilo vse OK lahko uporabimo **if-else** stavek.
+
+```{r eval = FALSE}
+if (<pogoj>) {
+  # ukazi, ki se poženejo, če velja pogoj
+} else {
+  # ukazi, ki se poženejo, če ne velja pogoj
+}
+```
+
+V našem primeru bi to uporabili na naslednji način.
+
+```{r error = T}
+if (any(podatki$UnitPrice < 0)) {
+  print("Opozorilo: Podatki vsebujejo negativne cene.")
+} else {
+  print("Cene so OK.")
+}
+```
+
+# Seznami
+
+V tej skripti smo sedaj vedno prebrali le en list iz Excelove datoteke. Preden nadaljujemo z branjem vseh listov si oglejmo podatkovno strukturo, ki je primerna za hranjenje več tabel hkrati. Struktura je podobna **vektorju** in se imenuje **seznam** oziroma **list**. **List** se od **vektorja** razlikuje predvsem po tem, da lahko hrani različne tipe spremenljivk in tudi druge strukture različnih dolžin. 
+
+```{r error = T}
+seznam <- list(1, "dva", c(TRUE, FALSE), c(5,6,7), "šest")
+seznam
+```
+
+Indeksiranje seznama je podobno kot pri vektorjih le da uporabljamo dvojne oglate oklepaje `[[]]`.
+
+```{r error = T}
+seznam[[2]]
+```
+
+Vrednosti seznama lahko tudi poimenujemo podobno, kot stolpce `data.frame`. 
+
+```{r error = T}
+seznam <- list(stevilo1 = 1, niz1 = "dva", bool1 = c(TRUE, bool = FALSE), 
+               vektor = c(5,6,7), niz2 = "šest")
+seznam[['niz2']]
+seznam[['bool1']]
+```
+
+Seznamu lahko tudi preprosto dodajamo nove vredosti.
+
+```{r error = T}
+seznam[['stevilo2']] <- 5
+seznam[[7]] <- 'konec'
+seznam
+```
+
+Vsak element seznama lahko shrani tudi celotno tabelo. Zato bomo seznam uporabili, da bo vsak element shranil svoj list Excelove datoteke! Kako bi sedaj naložili vse liste datoteke 'online-retail.xlsx'?
+
+```{r error = T}
+podatki <- list() #Ustvarimo prazen seznam
+podatki[[1]] <- read.xlsx("./data_raw/online-retail.xlsx", 1)
+podatki[[2]] <- read.xlsx("./data_raw/online-retail.xlsx", 2)
+podatki[[3]] <- read.xlsx("./data_raw/online-retail.xlsx", 3)
+head(podatki[[1]])
+head(podatki[[2]])
+head(podatki[[3]])
+```
+
+Super, deluje! Sedaj pa ponovimo enako za datoteko 'online-retail-large.xlsx'. Imamo res voljo pisati enak stavek nekaj 10x? Obstajati mora boljša rešitev!
+
+# Ukaz for
+
+Vidimo, da smo v prejšnjem primeru za branje podatkov praktično isti stavek ponovili trikrat. R nam omogoča, da se ponovnemu pisanju lahko izognemo z uporabo **for** zanke. For zanka v R-ju zgleda takole.
+
+```{r eval = FALSE}
+for (i in <vektor>) {
+  # ukazi, ki se ponavljajo
+}
+```
+
+Zgornji primer ponovi vse ukaze znotraj zavitih oklepajev \{\} za vsako vrednost v **\<vektor\>**. Poglejmo si preprost primer.
+
+```{r error = T}
+for (i in 1:3) {
+  print("Ponovitev!")
+}
+```
+
+Vsaka ponovitev zanke ni popolnoma enaka. V vsaki ponovitvi je drugačna vrednost spremenljivke *i*. To lahko ponazorimo z naslednjim primerom. 
+
+```{r error = T}
+for (i in 1:3) {
+  print("Ponovitev!")
+  print(i)
+}
+```
+
+Sedaj pa imamo dovolj znanja, da preprosteje preberemo vse liste Excelovih datotek.
+
+```{r error = T}
+podatki <- list()
+for (i in 1:3) {
+  podatki[[i]] <- read.xlsx("./data_raw/online-retail.xlsx", i)
+}
+head(podatki[[1]])
+head(podatki[[3]])
+```
+
+In še večja datoteka. Vidimo, da je vse, kar moramo spremeniti število listov in ime vhodne datoteke.
+
+```{r error = T}
+podatki <- list()
+for (i in 1:37) {
+  podatki[[i]] <- read.xlsx("./data_raw/online-retail-large.xlsx", i)
+}
+head(podatki[[1]])
+head(podatki[[37]])
+```
+
+Deluje! Vedno potrebujemo le 3-4 vrstice kode, da odpremo poljubno število listov. V tem primeru je sicer nekoliko moteče, da ne moremo preprosto dostopati do na primer podatkov Kanade. Zakaj ne? Ker ne poznamo njenega indeksa. Z uporabo ukaza `getSheetNames()` lahko branje podatkov še nekoliko izboljšamo. Funkcija `getSheetNames()` nam vrne vsa imena listov v Excelovem zvezku. Potem lahko prebermo vsakega, tako da v **\<vektor\>** vstavimo ta imena, in bo for zanka šla skozi vse njegove vrednosti. Potem lahko shranjujemo v seznam kar z imeni držav, in ne s številskimi indeksi, kar nam bo olajšalo dostop do držav po imenih!
+
+```{r error = T}
+podatki <- list()
+sheetNames <- getSheetNames("./data_raw/online-retail-large.xlsx")
+for (imeLista in sheetNames) {
+  podatki[[imeLista]] <- read.xlsx("./data_raw/online-retail-large.xlsx", imeLista)
+}
+head(podatki[[1]])
+head(podatki[["Canada"]])
+```
+
+Sedaj lahko tabele znotraj lista indeksiramo preko številk ali kar preko imen njenih držav.
+
+Kaj pa če želimo odpreti vse liste do lista z imenom 'Canada'? Uporabimo lahko prejšnjo zanko in jo predčasno prekinemo z besedo **break**!
+
+```{r error = T}
+podatki <- list()
+sheetNames <- getSheetNames("./data_raw/online-retail-large.xlsx")
+for (imeLista in sheetNames) {
+  podatki[[imeLista]] <- read.xlsx("./data_raw/online-retail-large.xlsx", imeLista)
+  if (imeLista == "Canada") {
+    break
+  }
+}
+head(podatki[[1]])
+head(podatki[["Canada"]])
+length(podatki)
+```
+
+Kaj pa če želimo list z imenom 'Canada' le preskočiti? V tem primeru uporabimo privzeto besedo **next**. **Next** prekine izvajanja jedra zanke. Lahko si predstavljate, da se vrne nazaj na prvo vrstico zanke.
+
+```{r error = T}
+podatki <- list()
+sheetNames <- getSheetNames("./data_raw/online-retail-large.xlsx")
+for (imeLista in sheetNames) {
+  if (imeLista == "Canada") {
+    next
+  }
+  podatki[[imeLista]] <- read.xlsx("./data_raw/online-retail-large.xlsx", imeLista)
+}
+head(podatki[[1]])
+head(podatki[["Canada"]])
+length(podatki)
+```
+
+
+Poglejmo si še en primer. V dateki *stroskiDelavnica.xlsx* imamo zapisane stroške gospodninjstva. Vsak list predstavlja svoj mesec. Prvi list ima opozorilo, da se poleg treh stalnih stroškov včasih pojavi tudi strošek za plin. Naložimo vse podatke brez prvega lista, ki se imenuje 'Opozorilo'.
+
+```{r error = T}
+podatki <- list()
+sheetNames <- getSheetNames("./data_raw/stroskiDelavnica.xlsx")
+for (imeLista in sheetNames) {
+  if (imeLista == "Opozorilo") {
+    next # preskočimo prvi list
+  }
+  podatki[[imeLista]] <- read.xlsx("./data_raw/stroskiDelavnica.xlsx", imeLista)
+}
+head(podatki[[1]])
+length(podatki)
+```
+
+Izrišimo stroške elektrike po mesecih. Najprej naredimo tabelo, ki izloči samo potrebne podatke.
+
+```{r error = T}
+mesecni_podatki <- data.frame(mesec = character(0), 
+                              stroski_elektrike = numeric(0), 
+                              stringsAsFactors = FALSE)
+vrstica <- 1
+for (imeLista in sheetNames) {
+  if (imeLista == "Opozorilo") {
+    next #Preskočimo prvi list
+  }
+  podatki_temp <- podatki[[imeLista]]
+  mesecni_podatki[vrstica, 1] <- imeLista
+  mesecni_podatki[vrstica, 2] <- 
+    podatki_temp[podatki_temp$Strosek == "Elektrika", "Vrednost"]
+  vrstica = vrstica + 1
+}
+# dodamo datume
+datumi <- seq.Date(as.Date("2014-12-01"), as.Date("2020-10-01"), by = "months")
+mesecni_podatki$datum <- datumi
+head(mesecni_podatki)
+
+```
+
+Sedaj pa preprosto z `ggplot()` izrišemo krivuljo.
+
+```{r error = T}
+library(ggplot2)
+ggplot(mesecni_podatki, aes(x = datum, y = stroski_elektrike, group = 1)) + 
+  geom_point() + geom_line()
+
+```
+
+
+# Domača naloga
+
+a) Preberite podatke v mapi *data_raw* o ameriških volitvah. Podatke smo pobrali 6. novembra iz: https://www.kaggle.com/unanimad/us-election-2020?select=president_county_candidate.csv. Za vsako zvezno državo posebej izračunajte število glasov, ki sta jih dobila glavna kandidata Joe Biden in Donald Trump in jih izpišite na konzolo.
+
+Primer rešitve:
+
+```{r error = T, echo = F}
+glasovi <- read.csv("./data_raw/president_county_candidate.csv")
+i <- 1
+for (drzava in unique(glasovi$state)) {
+  biden_glasovi <- sum(glasovi[glasovi$state == drzava & glasovi$candidate == "Joe Biden", "votes"])
+  trump_glasovi <- sum(glasovi[glasovi$state == drzava & glasovi$candidate == "Donald Trump", "votes"])
+  print(paste("Zvezna država: ", drzava, sep = ""))
+  print(paste("Joe Biden: ", biden_glasovi, " - Donald Trump: ", trump_glasovi, sep = ""))
+  print("")
+  print("Zvezna država:")
+  print(drzava)
+  print("Joe Biden:")
+  print(biden_glasovi)
+  print("Donald Trump:")
+  print(trump_glasovi)
+  print("------------------")
+  i = i + 1 #samo za prikaz rešitve
+  if(i == 3){
+    break
+  }
+}
+```
+
+b) Za vsako zvezno državo posebej izračunajte število glasov, ki so jih dobili kandidati in jih shranite v datoteko rezultati.csv. Rezultat zapišite le, če ima kandidat vsaj en glas v zvezni državi. Namig 1: da dobite unikatne vrednosti zveznih držav in kandidatov uporabite funkcijo `unique()`. Namig 2: najlažje bo to rešiti z dvema for zankama, kjer naj bo ena znotraj druge. **Težja!**
+
+Primer shranjene tabele:
+
+```{r error = T, echo = F}
+glasovi <- read.csv("./data_raw/president_county_candidate.csv", stringsAsFactors = F)
+rezultat <- data.frame(drzava = "A", kandidat = "B", glasovi = 0, stringsAsFactors = F)
+vrstica <- 1
+for (drzava in unique(glasovi$state)) {
+  for (kandidat in unique(glasovi$candidate)) {
+    kandidat_glasovi <- sum(glasovi[glasovi$state == drzava & glasovi$candidate == kandidat, "votes"])
+    if(kandidat_glasovi > 0){
+    rezultat[vrstica, ] <- data.frame(drzava = drzava, kandidat = kandidat, glasovi = kandidat_glasovi, stringsAsFactors = F)
+      vrstica <- vrstica + 1
+    }
+    
+  }
+}
+head(rezultat)
+```
+
+
+c) Preberite podatke datoteke *stroskiDelavnica.xlsx* in ustvarite tabelo, ki vsebuje poleg stroškov elektrike še stroške za Komunala+voda in Internet ter skupne mesečne stroške.
+
+```{r error = T, echo = F}
+mesecni_podatki <- data.frame(mesec = character(0), 
+                              stroski_elektrike = numeric(0), 
+                              stroski_komunale = numeric(0),
+                              stroski_internet = numeric(0),
+                              stroski_skupaj = numeric(0),
+                              stringsAsFactors = FALSE)
+vrstica <- 1
+for (imeLista in sheetNames) {
+  if (imeLista == "Opozorilo") {
+    next #Preskočimo prvi list
+  }
+  mesecni_podatki[vrstica, 1] = imeLista
+  mesecni_podatki[vrstica, 2] = podatki[[imeLista]][podatki[[imeLista]]$Strosek == "Elektrika","Vrednost"]
+  mesecni_podatki[vrstica, 3] = podatki[[imeLista]][podatki[[imeLista]]$Strosek == "Komunala+voda","Vrednost"]
+  mesecni_podatki[vrstica, 4] = podatki[[imeLista]][podatki[[imeLista]]$Strosek == "Internet","Vrednost"]
+  mesecni_podatki[vrstica, 5] = sum(podatki[[imeLista]][,2])
+    
+  vrstica = vrstica + 1
+}
+#dodamo datume
+datumi <- seq.Date(as.Date("2014-12-01"),as.Date("2020-10-01"),by = "months")
+mesecni_podatki$datum <- datumi
+head(mesecni_podatki)
+
+```
+
+d) Poskušajte vse štiri stroške tudi izrisati na en graf. Če ne gre, pa naredite štiri posamezne grafe.
+
+```{r error = T, echo = F}
+ggplot(mesecni_podatki, aes(x = datum)) + 
+  geom_line(aes(y = stroski_elektrike, group = 1), colour = "blue") +
+  geom_line(aes(y = stroski_komunale, group = 1), colour = "green") +
+  geom_line(aes(y = stroski_internet, group = 1), colour = "yellow") +
+  geom_line(aes(y = stroski_skupaj, group = 1), colour = "red") + 
+  ylab("Stroski")
+
+```
+
+#Reference
+
