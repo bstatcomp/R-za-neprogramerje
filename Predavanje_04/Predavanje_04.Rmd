@@ -60,7 +60,7 @@ Numerične vrstice ali stoplce lahko med seboj seštevamo, odštevamo, množimo 
 
 Lahko izračunamo BMI udeležencev:
 ```{r, error = TRUE}
- df$teza / df$visina^2 
+df$teza / (df$visina / 100)^2 
 ```
 
 

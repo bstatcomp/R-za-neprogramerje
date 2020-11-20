@@ -1,5 +1,5 @@
 ---
-title: "Predavanje 05 -- Programski tok, if, for, seznami"
+title: "Predavanje 06 -- Programski tok, if, for, seznami"
 output:
   pdf_document: default
   html_document: default
