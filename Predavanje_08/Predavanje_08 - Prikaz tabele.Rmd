@@ -1,0 +1,57 @@
+---
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+# knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r echo = F}
+# hypothetical dataset
+set.seed(0)
+tmp   <- seq(as.Date("2020/1/1"), as.Date("2020/1/4"), "days")
+dates <- sort(sample(tmp, 20, rep = T))
+df    <- data.frame(Date = dates,
+                    ID   = sample(c("a", "b", "c"), 20, rep = T),
+                    Val1 = round(100 * runif(20)),
+                    Val2 =  round(100 * runif(20)))
+```
+
+
+```{r echo = F}
+df <- df[order(df$Date),]    # nič ne predpostavljamo, če ni potrebno
+
+df$Date <- as.character(df$Date)
+new_df  <- NULL
+for (d in unique(df$Date)) { # datum po datum
+  tmp <- df[df$Date == d,]
+  # obstajajo nekoliko bolj elegantni načini, kjer za vse stolpce naredimo hkrati,
+  # ampak ta je lažji za razumeti
+  tmp <- rbind(tmp, data.frame(Date = "", 
+                              ID = "", 
+                              Val1 = as.character(sum(tmp$Val1)),
+                              Val2 = as.character(sum(tmp$Val2))))
+  tmp <- rbind(tmp, data.frame(Date = "&nbsp;", ID = "", Val1 = "", Val2 = ""))
+  new_df <- rbind(new_df, tmp)
+}
+
+new_df <- rbind(new_df, data.frame(Date = "", ID = "", 
+                                   Val1 = as.character(sum(df$Val1)), 
+                                   Val2 = as.character(sum(df$Val2))))
+row.names(new_df) <- NULL 
+```
+
+
+```{r echo = F, warning = F}
+# Lep uvod v kable / kableExtra: 
+# https://haozhu233.github.io/kableExtra/awesome_table_in_html.html
+library(kableExtra)
+new_df %>%
+  kbl(escape = F, align='llrr') %>%
+  kable_styling(fixed_thead = T)  %>%
+  row_spec(which(new_df$ID == "" & new_df$Val1 != ""), bold = T, color = "black", background = "#DDDDDD") %>%
+  row_spec(nrow(new_df), bold = T, color = "black", background = "#5555DD")
+```

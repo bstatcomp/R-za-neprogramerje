@@ -1,0 +1,140 @@
+---
+title: "Predavanje 08 -- Odgovori na vprašanja"
+output:
+  pdf_document:
+    dev: cairo_pdf
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+# knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Iskanje in zamenjava podnizov v nizih znakov
+
+Podnize v nizih iščemo in menjamo s funkcijama `grep()` in `gsub()`. Obe funkciji delujeta na vektorju nizov, zato ju lahko uporabimo tudi npr. na imenih stolpcev ali na nekem stolpcu data.frame-a. Obe funkciji podpirata ujemanje s pomočjo regularnih izrazov, kar nam omogoča napredna iskanja, kot je npr. določeno število alfanumeričnih znakov ali pa številke.
+
+```{r}
+grep("ana", c("Anakonda", "Banana", "Ananas", "Kolo"))
+gsub("Predpona", "", c("Predpona1", "Predpona2"))
+gsub("Predpona", "Prefix", c("Predpona1", "Predpona2"))
+```
+
+# ggplot2 -- boxplot
+
+Diagram s *škatlami in brčicami* (angl. boxplot) je del nabora geom-ov ggplot2.
+
+```{r}
+data("iris")
+head(iris)
+```
+
+Primer bomo izkoristili, da pokažemo, kako spremeniti pisavo v ggplot2:
+
+```{r fig.width = 3, fig.height = 3, eval = F}
+library(ggplot2)
+library(extrafont)
+font_import("c:/Windows/Fonts/", pattern = "TitilliumWeb-Light", prompt = F)
+loadfonts(device = "win")
+```
+```{r fig.width = 3, fig.height = 3, include = F}
+library(ggplot2)
+library(extrafont)
+font_import("c:/Windows/Fonts/", pattern = "TitilliumWeb-Light", prompt = F)
+loadfonts(device = "win", quiet = TRUE)
+```
+```{r fig.width = 3, fig.height = 3}
+ggplot(iris, aes(x = Species, y = Petal.Length)) + 
+  geom_boxplot(width = 0.5) +
+  theme(text=element_text(size=16,  family="Titillium Web Light"))
+```
+
+# ggplot2 -- errorbar
+
+Na statističnih grafih, ki vsebujejo opisne statistike, kot je npr. povprečje, pogosto prikažemo še negotovost v obliki standardnih odklonov ali standardnih napak. S knjižnico ggplot2 to storimo z uporabo geom-a `errorbar`. Pred tem moramo ustrezno pripraviti podatke tako, da dodamo še stolpec s spodnjo in zgornjo mejo napake. Če je napaka simetrična, potrebujemo le en stolpec.
+
+```{r}
+data("mtcars")
+head(mtcars)
+
+mus <- aggregate(mpg ~ cyl, mtcars, FUN = mean)
+sds <- aggregate(mpg ~ cyl, mtcars, FUN = function(x) {sd(x) / sqrt(length(x))})
+df  <- cbind(mus, SE = sds$mpg)
+df$cyl <- as.character(df$cyl)
+
+head(df)
+```
+
+
+```{r fig.width = 3, fig.height = 3}
+library(ggplot2)
+ggplot(df, aes(x = cyl, y = mpg, colour = cyl)) + 
+  geom_point() + 
+  geom_errorbar(aes(ymin = mpg - SE, ymax = mpg + SE), width = 0.5) +
+  theme(legend.position = "none")
+```
+
+Priložnost lahko izkoristimo se za uporabo lastne palete barv:
+
+```{r fig.width = 3, fig.height = 3}
+ggplot(df, aes(x = cyl, y = mpg, colour = cyl)) + 
+  geom_point() + 
+  geom_errorbar(aes(ymin = mpg - SE, ymax = mpg + SE), width = 0.5) +
+  theme(legend.position = "none") +
+  scale_colour_manual(values = c("#FF0000", "#00FF00", "#0000FF"))
+```
+
+# Kako v ggplot2 narediti graf z dvema y-osema?
+
+Ne uporabljati grafov z dvema y-osema (https://blog.datawrapper.de/dualaxis/).
+
+# Formatiranje nizov
+
+Kadar želimo bolj strukturiran izpis nizov, si pomagamo s funkcijo `sprintf()` in izpisom s funkcijo `cat()`.
+
+```{r}
+for (i in unique(mtcars$cyl)) {
+  tmp <- mtcars[mtcars$cyl == i, ] 
+  mu  <- mean(tmp$mpg)
+  med <- median(tmp$mpg)
+  # C-jevsko formatiranje
+  cat(sprintf("cyl = %d | mean mpg = %3.2f | median mpg = %3.2f\n", i, mu, med)) 
+}
+```
+
+# Statistični testi
+
+Večina klasičnih statističnih testov in modelov je vgrajenih že v osnovni R. Poglejmo si uporabo dveh izmed najbolj popularnih, t-testa in linearne regresije.
+
+```{r}
+# modelirajmo porabo goriva, pri cemer kot neodvisne spremenljivke uporabimo:
+# stevilo cilindrov, konjsko moc in tezo
+lr <- lm(mpg ~ cyl + hp + wt, data = mtcars)
+summary(lr)
+```
+
+
+```{r}
+# t-test uporabimo za statisticno primerjavo pricakovane sirine listov
+# dveh vrst perunike
+
+x_vir <- iris$Sepal.Width[iris$Species == "virginica"]
+x_ver <- iris$Sepal.Width[iris$Species == "versicolor"]
+
+t.test(x_vir, x_ver)
+```
+
+
+# Č
+
+```{r fig.width = 3, fig.height = 3, eval = FALSE}
+Sys.setlocale("LC_ALL", "Slovenian")
+```
+
+```{r fig.width = 3, fig.height = 3}
+options(encoding = "UTF-8")
+g1 <- ggplot() + ggtitle("ČŽŠ test \u010C")
+plot(g1)
+ggsave("test.jpg", g1) # device = cairo_pdf for pdf
+```
