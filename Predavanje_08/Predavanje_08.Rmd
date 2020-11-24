@@ -87,7 +87,26 @@ ggplot(df, aes(x = cyl, y = mpg, colour = cyl)) +
 
 # Kako v ggplot2 narediti graf z dvema y-osema?
 
-Ne uporabljati grafov z dvema y-osema (https://blog.datawrapper.de/dualaxis/).
+Predlagamo, da ne uporabljate grafov z dvema y-osema: (https://blog.datawrapper.de/dualaxis/).
+
+V kolikor zadeve ne morete rešiti drugače, pa se lahko poslužite sledečega trika:
+
+```{r fig.width = 3, fig.height = 3}
+x  <- c("0-18", "19-30", "30-50", "50+")
+y1 <- c(1, 1.2, 2, 4)
+y2 <- c(32, 10, 15, 10)
+df <- data.frame(x = x, y1 = y1, y2 = y2)
+
+ggplot(df) +
+  geom_line(aes(x = x, y = y1, group = 1)) +
+  geom_bar(aes(x = x, y = y2 / 8 / 6), stat = "identity") +
+  scale_y_continuous(
+    name = "Vrednost",
+    sec.axis = sec_axis(trans=~. * 8 * 6, name="Stevilo v skupini")
+  )
+```
+
+Kar smo naredili je, da smo drugo spremenljivko `y2` transformirali, da je bila na enakem razponu, kot prva spremenljivka `y` (deljenje z 8). Potem smo jo še nekoliko zmanjšali, da smo dobili škatle pod črto, za lepši izgled (deljenje s 6, ta korak bi lahko preskočili). Potem moramo samo še dodati drugo os, kjer definiramo obratno transformacijo z `sec_axis(trans=~. * 8 * 6)`. Torej, če želite imeti dve osi, je najprej potrebno drugo spremenljivko ustrezno transformirati in nato dodati obratno transformacijo v argument `sec.axis` funkcije `scale_y_continuous`. 
 
 # Formatiranje nizov
 

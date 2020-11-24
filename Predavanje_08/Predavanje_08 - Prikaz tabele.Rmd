@@ -10,6 +10,7 @@ output:
 
 
 ```{r echo = F}
+library(openxlsx)
 # hypothetical dataset
 set.seed(0)
 tmp   <- seq(as.Date("2020/1/1"), as.Date("2020/1/4"), "days")
@@ -42,6 +43,7 @@ new_df <- rbind(new_df, data.frame(Date = "", ID = "",
                                    Val1 = as.character(sum(df$Val1)), 
                                    Val2 = as.character(sum(df$Val2))))
 row.names(new_df) <- NULL 
+write.xlsx(new_df, "./data_clean/nova_tabela.xlsx")
 ```
 
 
