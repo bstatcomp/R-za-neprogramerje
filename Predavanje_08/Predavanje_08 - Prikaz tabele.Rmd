@@ -35,7 +35,7 @@ for (d in unique(df$Date)) { # datum po datum
                               ID = "", 
                               Val1 = as.character(sum(tmp$Val1)),
                               Val2 = as.character(sum(tmp$Val2))))
-  tmp <- rbind(tmp, data.frame(Date = "&nbsp;", ID = "", Val1 = "", Val2 = ""))
+  tmp <- rbind(tmp, data.frame(Date = "", ID = "", Val1 = "", Val2 = ""))
   new_df <- rbind(new_df, tmp)
 }
 
