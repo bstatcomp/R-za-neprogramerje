@@ -637,6 +637,44 @@ summary {
 </div>
 
 
+<pre class="r"><code>library(openxlsx)
+# hypothetical dataset
+set.seed(0)
+tmp   &lt;- seq(as.Date(&quot;2020/1/1&quot;), as.Date(&quot;2020/1/4&quot;), &quot;days&quot;)
+dates &lt;- sort(sample(tmp, 20, rep = T))
+df    &lt;- data.frame(Date = dates,
+                    ID   = sample(c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;), 20, rep = T),
+                    Val1 = round(100 * runif(20)),
+                    Val2 =  round(100 * runif(20)))</code></pre>
+<pre class="r"><code>df &lt;- df[order(df$Date),]    # nič ne predpostavljamo, če ni potrebno
+
+df$Date &lt;- as.character(df$Date)
+new_df  &lt;- NULL
+for (d in unique(df$Date)) { # datum po datum
+  tmp &lt;- df[df$Date == d,]
+  # obstajajo nekoliko bolj elegantni načini, kjer za vse stolpce naredimo hkrati,
+  # ampak ta je lažji za razumeti
+  tmp &lt;- rbind(tmp, data.frame(Date = &quot;&quot;, 
+                              ID = &quot;&quot;, 
+                              Val1 = as.character(sum(tmp$Val1)),
+                              Val2 = as.character(sum(tmp$Val2))))
+  tmp &lt;- rbind(tmp, data.frame(Date = &quot;&quot;, ID = &quot;&quot;, Val1 = &quot;&quot;, Val2 = &quot;&quot;))
+  new_df &lt;- rbind(new_df, tmp)
+}
+
+new_df &lt;- rbind(new_df, data.frame(Date = &quot;&quot;, ID = &quot;&quot;, 
+                                   Val1 = as.character(sum(df$Val1)), 
+                                   Val2 = as.character(sum(df$Val2))))
+row.names(new_df) &lt;- NULL 
+write.xlsx(new_df, &quot;./data_clean/nova_tabela.xlsx&quot;)</code></pre>
+<pre class="r"><code># Lep uvod v kable / kableExtra: 
+# https://haozhu233.github.io/kableExtra/awesome_table_in_html.html
+library(kableExtra)
+new_df %&gt;%
+  kbl(escape = F, align=&#39;llrr&#39;) %&gt;%
+  kable_styling(fixed_thead = T)  %&gt;%
+  row_spec(which(new_df$ID == &quot;&quot; &amp; new_df$Val1 != &quot;&quot;), bold = T, color = &quot;black&quot;, background = &quot;#DDDDDD&quot;) %&gt;%
+  row_spec(nrow(new_df), bold = T, color = &quot;black&quot;, background = &quot;#5555DD&quot;)</code></pre>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>

@@ -9,7 +9,7 @@ output:
 ```
 
 
-```{r echo = F}
+```{r echo = T}
 library(openxlsx)
 # hypothetical dataset
 set.seed(0)
@@ -22,7 +22,7 @@ df    <- data.frame(Date = dates,
 ```
 
 
-```{r echo = F}
+```{r echo = T}
 df <- df[order(df$Date),]    # nič ne predpostavljamo, če ni potrebno
 
 df$Date <- as.character(df$Date)
@@ -47,7 +47,7 @@ write.xlsx(new_df, "./data_clean/nova_tabela.xlsx")
 ```
 
 
-```{r echo = F, warning = F}
+```{r echo = T, warning = F}
 # Lep uvod v kable / kableExtra: 
 # https://haozhu233.github.io/kableExtra/awesome_table_in_html.html
 library(kableExtra)
