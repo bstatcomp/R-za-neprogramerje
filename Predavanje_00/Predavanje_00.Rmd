@@ -26,13 +26,13 @@ Slabosti dela z Excel (v primerjavi z R):
 ```{r fig.height = 4}
 library(xlsx)
 library(ggplot2)
-dat <- xlsx::read.xlsx("odsotnosti_R.xls", sheetIndex = 1)
-rsn <- xlsx::read.xlsx("sifrant_odsotnosti.xlsx", sheetIndex = 1)
+dat <- xlsx::read.xlsx("./data_raw/odsotnosti_R.xlsx", sheetIndex = 1)
+rsn <- xlsx::read.xlsx("./data_raw/odsotnosti_R.xlsx", sheetIndex = 2)
 # Podatki so dostopni na https://archive.ics.uci.edu/ml/datasets/Absenteeism+at+work.
 
 df <- data.frame(rsn, 
                  Stevilo = tapply(dat$Razlog, dat$Razlog, length),
-                 Vsota = tapply(dat$Ure, dat$Razlog, sum))
+                 Vsota   = tapply(dat$Ure, dat$Razlog, sum))
 df$Opis <- factor(df$Opis, levels = df$Opis[order(df$Stevilo)])
 ggplot(df, aes(x = Opis, y = Stevilo)) + geom_bar(stat = "identity") +
   coord_flip()
