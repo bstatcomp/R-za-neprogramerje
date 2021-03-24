@@ -35,33 +35,29 @@ V rumeno označenem okencu so za nas pomembni zavihki **Files**, **Plots**, **Pa
 1) **Files**. Tukaj lahko brskamo po računalniku, odpiramo datoteke v RStudiu in ustvarjamo nove mape.
 2) **Plots**. Tukaj se nam bodo prikazovali grafi, ki jih bomo ustvarili. Vizualizacijo bomo spoznali v prihodnjih predavanjih.
 3) **Packages**. Zavihek namenjen namestitvi in nalaganju paketov (knjižnic). Te bomo spoznali kasneje v tem poglavju.
-4) **Help**. Vsaka funkcija v R ima t.i. help file, kjer so navedene podrobnosti funkcije, katere argumente lahko vnesemo in primer uporabe ali dva. Uporabo tega bomo spoznali v prihodnjih predavanjih.
+4) **Help**. Vsaka funkcija v R ima t. i. help file, kjer so navedene podrobnosti funkcije, katere argumente lahko vnesemo in primer uporabe ali dva. Uporabo tega bomo spoznali v prihodnjih predavanjih.
 
 
 # Delovni direktorij (working directory)
-Preden začnemo z delom v R je dobro določiti mapo, ki bo predstavljala naš delovni direktorij. To nam bo omogočilo lažji dostop do datotek v tej mapi (na primer podatkov) in lažje shranjevanje rezultatov v to mapo. Da določimo delovni direktorij uporabimo ukaz `setwd(<pot-do-mape>)`. Na primer, recimo da želimo delovni direktorij v mapi *C:\\Users\\Gregor\\Documents\\workshops\\R-za-neprogramerje\\P02*. Potem uporabimo
+Preden začnemo z delom v R je dobro določiti mapo, ki bo predstavljala naš delovni direktorij. To nam bo omogočilo lažji dostop do datotek v tej mapi (na primer podatkov) in lažje shranjevanje rezultatov v to mapo. Da določimo delovni direktorij uporabimo ukaz `setwd(<pot-do-mape>)`. Na primer, recimo da želimo delovni direktorij v mapi *C:\\Users\\Gregor\\Documents\\R-za-neprogramerje-marec-2021\\Predavanje_02*. Potem uporabimo
 
 ```{r, error = TRUE}
-setwd("C:\Users\Gregor\Documents\workshops\R-za-neprogramerje\P02")
+setwd("C:\Users\Gregor\Documents\R-za-neprogramerje-marec-2021\Predavanje_02")
 ```
 
 Opazimo, da je R vrnil napako. Ampak, kot smo že rekli, napak se ne bojimo. Poizkusimo ugotoviti, kaj nam R želi s svojim sporočilom povedati. V kolikor nam sporočilo ni razumljivo je najbolje da ga kar pogooglamo. V večini primerov je že nekdo naletel na isto težavo in je postavil vprašanje na enem izmed za to namenjenih portalov (na primer https://stackoverflow.com/). V zgornjem primeru bi hitro ugotovili da je problem v uporabi leve poševnice (backslash). R ima backslash namreč rezerviran za posebne funkcije, tako da ga je treba zamenjati ali z dvojno levo poševnico
 
 ```{r}
-setwd("C:\\Users\\Gregor\\Documents\\workshops\\R-za-neprogramerje\\P02")
+setwd("C:\\Users\\Gregor\\Documents\\R-za-neprogramerje-marec-2021\\Predavanje_02")
 ```
 
 ali s poševnico
 
 ```{r}
-setwd("C:/Users/Gregor/Documents/workshops/R-za-neprogramerje/P02")
+setwd("C:/Users/Gregor/Documents/R-za-neprogramerje-marec-2021/Predavanje_02")
 ```
 
-V kolikor kdaj nismo prepričani, katera mapa predstavlja naše trenutno delovno okolje, uporabimo ukaz `getwd()`
-
-```{r}
-getwd()
-```
+V kolikor kdaj nismo prepričani, katera mapa predstavlja naše trenutno delovno okolje, uporabimo ukaz `getwd()`.
 
 
 # Skripte
@@ -97,9 +93,39 @@ Osnovna različica R nam nudi veliko možnosti za delo s podatki. Vendar včasih
 4) Povezave med R in drugimi orodji (kot na primer Microsoft Excel).
 5) Avtomatsko generiranje poročil.
 
-V sklopu te delavnice bomo spoznali paketa **openxlsx** za delo z Excelovimi datotekami in **ggplot2** za vizualizacijo.
+V sklopu te delavnice bomo spoznali pakete **openxlsx** za delo z Excelovimi datotekami, **tidyr** za specifične operacije nad razpredelnicami in **ggplot2** za vizualizacijo.
 
-Pakete lahko namestimo s funkcijo `install.packages("<ime paketa>")` ali s klikom na zavihek **Packages** in nato **install**, kjer nato poiščemo ustrezen paket.
+Pakete lahko namestimo s funkcijo `install.packages("<ime-paketa>")` ali s klikom na zavihek **Packages** in nato **install**, kjer nato poiščemo ustrezen paket.
+
+
+# Parametri funkcij
+Spoznali smo že nekaj funkcij, na primer `sqrt()`, `sin()`, `mean()`. Nekatere med njimi so prejele tudi več kot 1 argument, na primer `rep()`. Pri teh funkcijah lahko argumente podamo na dva načina:
+
+1) V vrstnem redu. Funkcije imajo vnaprej določen vrstni red argumentov, ki ga moramo poznati. Lahko si tudi pomagamo z `?<ime-funkcije>`.
+2) Uporabimo vgrajena imena parametrov. V tem primeru ne rabimo poznati pravega vrstnega reda, ampak samo imena posameznih argumentov. Takšna programska koda je tudi bolj robustna in načeloma bolj pregledna. Imena argumentov lahko prav tako najdemo s klicem `?<ime-funkcije>`.
+
+Poglejmo si različne pristope k podajanju argumentov na primeru funkcije `rep()`. Recimo, da želimo 10 krat ponoviti število 2:
+
+```{r}
+rep(2, 10)
+```
+
+Pri tem je pomemben vrsti red argumentov. Na primer
+
+```{r}
+rep(10, 2)
+```
+
+2 krat ponovi število 10. Namesto izbire argumentov glede na vrstni red lahko posamezne argumente poimenujemo:
+
+```{r}
+rep(x = 2, times = 10)
+rep(times = 10, x = 2)
+```
+
+V tem primeru je bralcu kode bolj jasno, kaj smo želeli računalniku sporočiti. Poleg tega je takšna koda neodvisna od vrstnega reda in zmanjša možnosti za napake. Prav tako lahko nekatere funkcije prejmejo veliko število parametrov, mi pa želimo nastaviti le nekatere in pri ostalih uporabiti privzeto vrednost (vrednost, ki je v funkciji nastavljena, če uporabnik ne poda druge vrednosti eksplicitno). Na primer, če bi želeli pri neki funkciji nastaviti samo osmi parameter, bi s prvim pristopom (vrstni red parametrov) morali vnesti vseh prvih 8 parametrov. Z drugim pristopom pa bi lahko enostavno podali samo osmega. 
+
+<!-- To funkcionalnost si lahko pogledamo na funkciji `seq()`, ki zgenerira sekvenco (vektor) števil med dvema številoma, kjer lahko nastavimo razdaljo med dvema zaporednima elementoma v sekvenci. Tej funkciji načeloma priredimo 3 parametre -- spodnjo mejo, zgornjo mejo in razdaljo med zaporednima elementoma. Na primer -->
 
 
 # Branje podatkov
@@ -114,12 +140,13 @@ Podatkovne datoteke lahko srečamo v veliko različnih formatih. Dva najbolj pog
 
 
 ## Branje iz tekstovnih datotek
-Za branje podatkov iz standardnih txt ali csv zapisov imamo v R na voljo 4 funkcije:
+Za branje podatkov iz standardnih txt ali csv zapisov imamo v R na voljo funkcijo `read.table()`. Ta funkcija lahko prejme veliko število parametrov. Za nas so pomembni sledeči:
 
-1) `read.csv()`. Kadar so elementi ločeni z vejico in imamo decimalno piko.
-2) `read.csv2()`. Kadar so elementi ločeni s podpičjem in imamo decimalno vejico.
-3) `read.delim()`. Kadar so elementi ločeni s tabulatorjem in imamo decimalno piko.
-4) `read.delim2()`. Kadar so elementi ločeni s tabulatorjem in imamo decimalno vejico.
+1) `file`. Pot do datoteke, katero želimo naložiti v trenutno sejo R.
+2) `sep`. Določa simbol, ki loči posamezne elemente.
+3) `dec`. Določa decimalni simbol.
+4) `header`. Ali imajo podatki podana imena stolpcev. Vnesemo lahko vrednosti `TRUE` če je to res in `FALSE` če ni.
+5) `quote`. Kateri simbol je uporabljen za narekovaje, ki označujejo besede v tekstovni datoteki. 
 
 Kadar so elementi ločeni z vejico ali podpičjem imamo običajno opravka s csv (comma separated value) končnico, čeprav bi lahko te podatke shranili tudi v txt formatu. Kadar imamo elemente ločene kako drugače se običajno uporabi txt končnica.
 
@@ -131,12 +158,17 @@ Preden se lotimo pisanja programske kode, moramo preveriti, kako so podatki shra
 ![](./img/05_csv.jpg){width=100%}
 </center>
 
-
-Opazimo, da imamo decimalno piko in elemente ločene z vejico, torej bomo uporabili `read.csv()`.
+Opazimo, da imamo decimalno piko, elemente ločene z vejico, prva vrstica predstavlja glavo podatkov in besede so označene z `"`. Da lahko preberemo podatke, moramo ustrezno nastaviti argumente funkcije `read.table()`. Kjer nastavljamo znake, oziroma besede, moramo okoli njih uporabiti narekovaje, saj jih R drugače ne prepozna:
 
 ```{r}
-act_contracts <- read.csv("./data_raw/active-contracts.csv")
+act_contracts <- read.table(file = "./data_raw/active-contracts.csv",
+                            dec = ".",
+                            sep = ",",
+                            header = TRUE,
+                            quote = "\"")
 ```
+
+Pri tem smo pri parametru `quote` znotraj narekovajev uporabili kombinacijo znakov `\"`. Sam znak `"` ima posebno mesto v R-ju -- nakazuje besede -- in ga ne moremo enostavno uporabiti kot del besede. Da lahko naredimo to, moramo uporabiti to kombinacijo z levo poševnico.
 
 Potrebno je omeniti, da pika v zgornji poti predstavlja trenutni direktorij. Celotno besedilo znotraj narekovajev torej kaže na datoteko, relativno glede na naš delovni direktorij. R avtomatsko shrani prebrane podatke v **podatkovno razpredelnico** oziroma `data.frame`. Ta objekt si lahko predstavljamo kot Excelovo tabelo, ki jo R hrani v obliki spremenljivke, v našem primeru `act_contracts`. Za ogled celotne razpredelnice lahko uporabimo funkcijo `View()`.
 
@@ -152,62 +184,54 @@ head(act_contracts)
 
 Ko imamo razpredelnico shranjeno kot spremenljivko v R, lahko nad njo izvajamo operacije in manipulacije, ki jih bomo spoznali v prihodnjih predavanjih. Dobra stran R-ja je v tem, da to razpredelnico spreminjamo lokalno znotraj R in originalna datoteka, iz katere smo prebrali podatke, ostane nespremenjena.
 
-Za vajo naložimo še podatke *active-contracts.txt*, *active-contracts2.csv* in *active-contracts2.txt*. Pri vseh datotekah gre za iste podatke shranjene v različnih formatih. Opazimo da ima datoteka *active-contracts2.csv* elemente ločene s tabulatorjem in decimalno piko, uporabimo torej
+Za vajo naložimo še podatke *active-contracts.txt*, *active-contracts2.csv* in *active-contracts2.txt*. Pri vseh datotekah gre za iste podatke shranjene v različnih formatih. 
+
+Opazimo da ima datoteka *active-contracts.txt* elemente ločene s tabulatorjem in decimalno piko. Prav tako niso besede označene z narekovaji. Če želimo to sporočiti funkciji `read.table()` uporabimo prazno besedo `""`. Tudi za tabulator imamo posebno kombinacijo simbolov in sicer `\t`. Uporabimo vse zapisano, da preberemo te podatke:
 
 ```{r}
-act_contracts <- read.delim("./data_raw/active-contracts.txt")
+act_contracts <- read.table(file = "./data_raw/active-contracts.txt",
+                            dec = ".",
+                            sep = "\t",
+                            header = TRUE,
+                            quote = "")
 ```
 
-Pri *active-contracts.txt* imamo elemente ločene s podpičjem in decimalno vejico, uporabimo torej
+Datoteka *active-contracts2.csv* ima elemente ločene s podpičjem in decimalno vejico.
 
 ```{r}
-act_contracts <- read.csv2("./data_raw/active-contracts2.csv")
+act_contracts <- read.table(file = "./data_raw/active-contracts2.csv",
+                            dec = ",",
+                            sep = ";",
+                            header = TRUE,
+                            quote = "\"")
 ```
 
-V *active-contracts2.txt* opazimo nestandarden separator in sicer dvopičje. Kako se lotiti tega? Lahko pozkusimo z eno od nam že znanih funkcij, na primer `read.csv2()`. 
+Datoteka *active-contracts2.txt* ima elemente ločene z dvopičjem in decimalno vejico.
 
 ```{r}
-act_contracts <- read.csv("./data_raw/active-contracts2.txt")
+act_contracts <- read.table(file = "./data_raw/active-contracts2.txt",
+                            dec = ",",
+                            sep = ":",
+                            header = TRUE,
+                            quote = "\"")
 ```
 
-R ni vrnil napake, torej je morda vse v redu. Vsekakor moramo zadevo preveriti. Prvi znak, da je šlo nekaj narobe je, če pogledamo v zavihek **Environment**. Opazimo da je spremenljivka *act_contracts* razpredelnica s samo enim stolpcem. Zaradi izbire napačnega separatorja R ni znal razdeliti stolpcev, zato je v edini stolpec zapisal kar celo vrstico kot besedilo. Potrebujemo torej neko drugo funkcijo.
+V kolikor kljub pravilnim nastavitvam argumentov R razpredelnice ne prebere pravilno, moramo to nadalje raziskati. Velikokrat gre v tem primeru za kakšne posebne znake v besedilnih stolpcih in moramo zadevo reševati od primera do primera.
 
-Funkcije, ki smo jih spoznali do sedaj so vse specifične različice bolj splošne funkcije `read.table()`, kjer so določeni argumenti (separator, decimalni simbol) vneseni že vnaprej. V kolikor se srečamo s podatki, ki ne ustrezajo nobeni izmed 4 standardnih formatov, se moramo poslužiti te bolj splošne funkcije in vnesti nekoliko več truda v izbiro njenih argumentov. Za nas so trenutno pomembni trije:
 
-1) `sep`. Določa separator.
-2) `dec`. Določa decimalni simbol.
-3) `header`. Ali imajo podatki podana imena stolpcev. Vnesemo lahko vrednosti `TRUE` če je to res in `FALSE` če ni.
+### Variante `read.table()`
+Obstajajo standardni formati, v katerih največkrat najdemo podatke. Da ne potrebujemo vsakič ročno nastavljati vseh argumentov v funkciji `read.table()` imamo na voljo 4 funkcije, ki že imajo ustrezno podane privzete vrednosti argumentov in jim moramo podati samo pot do datoteke:
 
-Poizkusimo sedaj prebrati podatke s to funkcijo in ustrezno nastavitvijo parametrov.
+1) `read.csv()`. Kadar so elementi ločeni z vejico in imamo decimalno piko.
+2) `read.csv2()`. Kadar so elementi ločeni s podpičjem in imamo decimalno vejico.
+3) `read.delim()`. Kadar so elementi ločeni s tabulatorjem in imamo decimalno piko.
+4) `read.delim2()`. Kadar so elementi ločeni s tabulatorjem in imamo decimalno vejico.
+
+Na primer
 
 ```{r}
-act_contracts <- read.table("./data_raw/active-contracts2.txt", sep = ":", dec = ",", 
-                            header = TRUE)
-head(act_contracts)
+act_contracts <- read.csv("./data_raw/active-contracts.csv")
 ```
-
-Super, zadeva deluje! Sedaj znamo naložiti podatke iz tekstovne datoteke v R! Pri uporabi funkcije `read.table` je potrebno biti pozoren na narekovaje. Velikokrat z narekovaji označimo besedilne spremenljivke. Funkcije `read.csv`, `read.csv2`, `read.delim` in `read.delim2` vse uporabljajo kot narekovaj znak `"`. Funkcija `read.table` pa poleg tega znaka uporablja tudi znak `'`. V kolikor na to nismo pozorni, lahko pride do težav, če imamo na primer podatke, kjer se `'` pojavi v besedi. Za primer poizkusimo prebrati *active-contracts.txt* s funkcijo `read.table`.
-
-```{r}
-act_contracts <- read.table("./data_raw/active-contracts.txt", sep = "\t", dec = ".", 
-                            header = TRUE)
-head(act_contracts)
-```
-
-S pogledom v **Environment** opazimo, da ta tabela nima istega števila vrstic kot tabele, ki smo jih prebrali prej. Težava je v tem, da je R razumel znak `'`, ki se je pojavil v enem od stolpcev, kot znak za besedilo. Zaradi tega je vse med tem znakom in med naslednjim takšnim znakom prebral v eno celico, kot dolgo besedilo. Da se temu izognemo moramo dodati parameter `quote = "\""`, ki bo dopuščal samo `"` kot narekovaj.
-
-```{r}
-act_contracts <- read.table("./data_raw/active-contracts.txt", sep = "\t", dec = ".", 
-                            header = TRUE, quote = "\"")
-head(act_contracts)
-```
-
-Potrebno je omeniti, da R hrani spremenljivke v različnih formatih, odvisno od njihovih vrednosti (na primer številke imajo drugačen tip od besed). Tipe bomo podrobneje spoznali v prihodnjih predavanjih. Poseben tip spremenljivk so **faktorji** in kadar beremo podatke iz tekstovnih datotek R privzeto določi besednim spremenljivkam tip faktor. Tega trenutno ne želimo, zato bomo morali vnesti dodaten parameter v funkcijo `read.csv`, in sicer `stringsAsfactors = FALSE`. Več o faktorjih bomo izvedeli čez nekaj predavanj. Funkcijam, ki smo jih uporabili v tem poglavju torej dodamo ta argument, na primer:
-
-```{r, eval = FALSE}
-act_contracts <- read.csv("./data_raw/active-contracts.csv", stringsAsFactors = FALSE)
-```
-
 
 
 ## Branje iz excelovih datotek
@@ -222,7 +246,6 @@ Ter ga naložiti v našo trenutno sejo R.
 ```{r}
 library("openxlsx")
 ```
-
 
 Za branje podatkov iz Exelovih datotek uporabimo funckijo `read.xlsx()`. Funkcija zahteva vsaj dva argumenta:
 
@@ -256,25 +279,33 @@ Dodatna prednost uporabe R skript je v tem, da lahko podatke, ki se spreminjajo 
 
 V prejšnjem poglavju smo se naučili prebrati podatke iz različnih virov. V tem poglavju bomo pogledali kako podatke shraniti.
 
-## Shranjevanje v tekstovne datoteke
-Za shranjevanje v tekstovne datoteke lahko uporabimo eno izmed naslednjih funkcij:
 
-1) `write.csv()`. Shrani podatke ločene z vejico in decimalno piko.
-2) `write.csv2()`. Shrani podatke ločene s podpičjem in decimalno vejico.
-3) `write.table()`. Shrani podatke odvisno od podanih argumentov. Privzeta vrednost za separator je presledek, za decimalni simbol pa pika.
+## Shranjevanje v tekstovne datoteke
+Za shranjevanje v tekstovne datoteke lahko uporabimo funkcijo `write.table()`, ki prav tako prejme veliko število parametrov. Za nas so pomembni:
+
+1) `x`. Spremenljivka (razpredelnica), ki jo želimo shraniti.
+2) `file`. Pot do datoteke, v katero želimo shraniti podatke.
+3) `sep`. Določa simbol, ki loči posamezne elemente.
+4) `dec`. Določa decimalni simbol.
+
+Privzeto ta funkcija shrani tudi imena stolpcev in uporabi dvojne narekovaje za neštevilske celice. Predlagamo, da teh privzetih vrednosti ne spreminjamo.
 
 Shranimo podatke o uspešnosti dijakov pri matematiki v tekstovno datoteko s podpičjem in decimalno vejico.
 
-
 ```{r, eval = FALSE}
-write.csv2(student_math, file = "./data_saved/student-math-scores.csv")
+write.table(x = student_math, 
+            file = "./data_saved/student-math-scores.csv",
+            dec = ",",
+            sep = ";")
 ```
 
-Če želimo kak drug separator, uporabimo `write.table()`. Recimo, da želimo kot separator tabulator, ki ga v R označimo z `\t`. Shranimo sedaj podatke o uspešnosti dijakov pri portugalščini.
+Recimo, da želimo kot separator tabulator, ki ga v R označimo z `\t`. Shranimo sedaj podatke o uspešnosti dijakov pri portugalščini.
 
 ```{r, eval = FALSE}
-write.table(student_port, file = "./data_saved/student-portuguese-scores.txt", 
-            sep = "\t", dec = ".")
+write.table(x = student_port, 
+            file = "./data_saved/student-portuguese-scores.txt", 
+            sep = "\t", 
+            dec = ".")
 ```
 
 
@@ -288,7 +319,10 @@ write.xlsx(act_contracts, "./data_saved/active-contracts.xlsx")
 
 Ta klic bo avtomatsko ustvaril novo Excelovo datoteko z enim listom, v katerem bo ta razpredelnica.
 
-V kolikor želimo v Excelovo datoteko shraniti več listov, se moramo poslužiti sledečega zaporedja ukazov
+## Shranjevanje v več listov iste datoteke
+
+V kolikor želimo v Excelovo datoteko shraniti več listov, se moramo poslužiti sledečega zaporedja ukazov.
+
 ```{r, eval = FALSE}
 wb <- createWorkbook()
 ```
@@ -312,7 +346,7 @@ saveWorkbook(wb, file = "<pot-do-shranjene-datoteke>")
 ```
 
 
-Recimo, da želimo shraniti vse 3 razpredelnice, ki smo jih naložili v R, v eno samo Excelovo datoteko. Potem bi naš program zgledal tako:
+Recimo, da želimo shraniti vse 3 razpredelnice, ki smo jih naložili v R, v eno samo Excelovo datoteko. Potem bi naš program izgledal tako:
 
 ```{r, eval = FALSE}
 wb <- createWorkbook()
@@ -328,9 +362,9 @@ saveWorkbook(wb, file = "./data_saved/several-sheets-example.xlsx")
 
 # Domača naloga
 
-1) V mapi *data\_raw* se nahajajo podatki o popularnosti posameznih novic v tekstovni datoteki. Podatki so bili del znanstvene raziskave @Fernandes2015 in so dostopni na https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity. Vaša naloga je, da pripravite skripto, ki bo nastavila pot do delovnega direktorija, naložila ustrezne pakete, naložila te podatke v spremenljivko v R. Nato shranite te podatke v xlsx datoteko z imenom *online-news-popularity.xlsx* v list z imenom *mashable* (ime spletne strani, ki je vir teh novic).
+1) V mapi *data\_raw* se nahajajo podatki o popularnosti posameznih novic v tekstovni datoteki. Podatki so bili del znanstvene raziskave @Fernandes2015 in so dostopni na https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity. Vaša naloga je, da pripravite skripto, ki bo nastavila pot do delovnega direktorija, naložila ustrezne pakete, naložila te podatke v spremenljivko v R. Nato shranite te podatke v xlsx datoteko z imenom *online-news-popularity.xlsx*.
 
-V kolikor smo podatke pravilno prebrali v R, bi s klicem `head(<ime spremenljivke>)` morali dobiti:
+V kolikor smo podatke pravilno prebrali v R, bi s klicem `head(<ime-spremenljivke>)` morali dobiti:
 
 ```{r, echo = FALSE}
 news_pop <- read.table("./data_raw/online-news-popularity.csv", sep = ";", dec = ".", 
@@ -345,7 +379,7 @@ Ali smo podatke shranili pravilno v xlsx datoteko preverite tako, da jo odprete 
 
 2) V mapi *data\_raw* se nahajajo podatki o spletnih nakupih darilnih in zabavnih izdelkov v Excelovi datoteki. Podatki so bili del znanstvene raziskave @Chen2012 in so dostopni na https://archive.ics.uci.edu/ml/datasets/Online+Retail. Datoteka ima 3 liste, v vsakem se nahajajo podatki o nakupih iz ene izmed treh držav. Vaša naloga je, da pripravite skripto, ki bo nastavila pot do delovnega direktorija, naložila ustrezne pakete in prebrala vsak list posebej ter ga shranila kot spremenljivko z ustreznim imenom. Nato shranite razpredelnico za Avstrijo v tekstovno datoteko s separatorjem vejico in decimalno piko, za Italijo s separatorjem podpičjem in decimalno vejico in za Grčijo v tekstovno datoteko s separatorjem dvopičjem in decimalno vejico.
 
-V kolikor smo podatke pravilno prebrali v R, bi s klicem `head(<ime spremenljivke>)` morali dobiti:
+V kolikor smo podatke pravilno prebrali v R, bi s klicem `head(<ime-spremenljivke>)` morali dobiti:
 
 ```{r, echo = FALSE}
 retail_aus <- read.xlsx("./data_raw/online-retail.xlsx", sheet = "Austria")
