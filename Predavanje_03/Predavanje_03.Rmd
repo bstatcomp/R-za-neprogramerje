@@ -19,7 +19,7 @@ V praksi nas pogosto ne zanima celoten vektor ali celotna tabela, ampak samo dol
 
 Najprej ustvarimo nov vektor:
 ```{r, error = TRUE}
-vek <- c(1, 2, 3, 4, 5, 6)
+vek <- c(4, 2, 3, 6, 7, 1)
 ```
 
 Kako dostopamo do posameznih elementov oziroma do podmnožic tega vektorja? Lahko uporabimo prvi način, se pravi z zaporednimi številkami elementov, ki jih želimo izbrati.
