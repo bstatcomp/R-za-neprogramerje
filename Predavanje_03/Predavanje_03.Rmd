@@ -131,7 +131,7 @@ df <- data.frame(spol, visina, teza)
 
 Podatke lahko tudi preberemo iz datoteke:
 ```{r, error = TRUE}
-dat <- read.csv("./data_raw/president_county_candidate.csv")
+dat <- read.table("./data_raw/president_county_candidate.csv", header=TRUE, sep=",")
 ```
 Tabela je velika in je ne moremo izpisati v celoti.
 
