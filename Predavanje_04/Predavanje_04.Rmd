@@ -197,6 +197,67 @@ datPM10$PM10total <- apply(datPM10n, 1, sum)
 head(datPM10)
 ```
 
+# Delo z datumi
+
+Datum je posebna podatkovna struktura. Prej smo videli, da so datumi v data.frame prebrani kot besedilo. Če želimo delati z datumi moramo R-ju povedati, da nek stolpec vsebuje datume.
+
+
+Če v R-ju želimo definirati datum:
+```{r, error = TRUE}
+as.Date("2020-02-01")
+```
+
+Na tak način poskusimo spremeniti celo stolpec v datume.
+```{r, error = TRUE}
+print(as.Date(datPM10$Datum))
+```
+
+Datum mora biti v ISO formatu, če ni, moramo format definirati.
+```{r, error = TRUE}
+datPM10$Datum <- as.Date(datPM10$Datum, format = "%m/%d/%y")
+print(head(datPM10,10))
+```
+
+Će želimo bolj napredno delati z datumi imamo na voljo paket **lubridate**.
+```{r, error = TRUE}
+library(lubridate)
+```
+Iz datumov lahko izluščimo dneve:
+```{r, error = TRUE}
+day(datPM10$Datum)
+```
+
+-..mesece:
+```{r, error = TRUE}
+month(datPM10$Datum)
+```
+... ali leta
+```{r, error = TRUE}
+year(datPM10$Datum)
+```
+Vrne nam tudi zaporedni dan v letu (Julijanski dan):
+```{r, error = TRUE}
+yday(datPM10$Datum)
+```
+
+S pomočjo funkcije **weekdays** lahko ugotovimo tudi, kateri dan v tednu je bil:
+```{r, error = TRUE}
+weekdays(datPM10$Datum)
+```
+
+Primer izbire podatkov samo za en mesec:
+
+```{r, error = TRUE}
+datPM10[month(datPM10$Datum) == 11,]
+```
+
+Primer izbire podatkov od septembra do začetka decembra:
+```{r, error = TRUE}
+datPM10[month(datPM10$Datum) >= 9 & month(datPM10$Datum)<= 11, ]
+```
+
+
+
 # Operacije nad množicami
 Poleg funkcije `setdiff()` poznamo še nekaj funkcij za delo z množicami kot so `union()` (unija) in `intersec()` (presek). 
 
@@ -243,11 +304,26 @@ V tem primeru pa ne dobimo enako. Funkcijo  `setdiff(mn1, mn3)` si lahko predsta
 # Domača naloga
 Med podatki o delcih PM10 izberite podatke za Ljubljano.
 
-- Izberite samo tiste, ki imajo vrednost kalcija (Ca) večje od 0.3 in vrednosti natrija (Na) manjše od 0.05.
-- V izbranih podatkih izračunajte povprečne vrednosti za vse snovi.
-- Dodajte stolpec, ki ponazarja seštevek Na in Cl.
-- Za vsako vrstico izračunajte seštevek vseh meritev.
 
+- Izberite samo tiste, ki imajo vrednost kalcija (Ca) večje od 0.3 in vrednosti natrija (Na) manjše od 0.05.
+```{r, echo = FALSE}
+dat2 <- dat[dat$kraj == 'Ljubljana', ]
+head(dat2[dat2$Ca > 0.3 & dat2$Na < 0.05, ])
+```
+- V podatkih izračunajte povprečne vrednosti za vse snovi.
+```{r, echo = FALSE}
+da <- dat2[, (colnames(dat2) != 'Datum' & colnames(dat2) != 'kraj')]
+apply(da, 2, mean)
+```
+- Dodajte stolpec, ki ponazarja seštevek Ca in Cl.
+```{r, echo = FALSE}
+dat2$CaCl <- dat2$Ca + dat2$Cl
+print(head(dat))
+```
+- Za vsako vrstico izračunajte seštevek vseh meritev.
+```{r, echo = FALSE}
+apply(da, 1, sum)
+```
 
 
 
