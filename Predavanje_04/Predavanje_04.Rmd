@@ -97,7 +97,7 @@ Poglejmo si podatke o vrednostih raznih snovi v delcih PM10. Podatki so prilože
 ```
 
 ```{r, error = TRUE}
-dat <- read.csv('./data_raw/delci2.csv')
+dat <- read.table('./data_raw/delci2.csv', header=TRUE, sep=',', )
 ```
 
 Pogledamo kakšen je prebrani data.frame:
@@ -146,7 +146,7 @@ datPM10$NaCl <- datPM10$Na + datPM10$Cl
 
 Posodobljeni data.frame shranimo.
 ```{r, error = TRUE}
-write.csv(datPM10, './data_clean/delci_popravljeni.csv')
+write.table(datPM10, './data_clean/delci_popravljeni.csv', sep= ",", row.names=FALSE)
 ```
 
 # Funkcija `apply()`
