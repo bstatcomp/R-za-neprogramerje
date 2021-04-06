@@ -97,7 +97,11 @@ Poglejmo si podatke o vrednostih raznih snovi v delcih PM10. Podatki so prilože
 ```
 
 ```{r, error = TRUE}
-dat <- read.csv('./data_raw/delci2.csv')
+dat <- read.table('./data_raw/delci2.csv',
+                  header = TRUE,
+                  dec = ".",
+                  sep = ",",
+                  quote = "\"")
 ```
 
 Pogledamo kakšen je prebrani data.frame:

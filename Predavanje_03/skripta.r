@@ -103,5 +103,9 @@ df[ , -ncol(df)]
 df <- df[ , -which(names(df) == "stev_noge")]
 
 
+setwd("C:/Users/Gregor/Documents/shared_files/workshops/R-za-neprogramerje/Predavanje_03")
+dat <- read.table("./data_raw/president_county_candidate.csv", header=TRUE, sep=",")
+dat <- read.table("./data_raw/president_county_candidate.csv", header=TRUE, sep=",", quote = "")
+
 
 
