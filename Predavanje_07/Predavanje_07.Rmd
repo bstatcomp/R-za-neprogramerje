@@ -3,28 +3,28 @@ title: "Predavanje 07 -- Funkcije"
 output:
   pdf_document: default
   html_document: default
-bibliography: P07.bib
+#bibliography: P07.bib
 ---
 
 ```{r, setup, include = F}
-knitr::opts_knit$set(root.dir = "F:/projekti/R delavnica za neprogramerje/Predavanje_07")
+knitr::opts_knit$set(root.dir = "/home/jana/git/R-za-neprogramerje/Predavanje_07")
 ```
 
 
-#Funkcije
+# Funkcije
 
-Funkcije kot smo jih spoznali dosedaj so ukazi, ki izvršijo neko določeno nalogo. Kot smo opazlili v R-ju obstajajo mnogi paketi, kot sta naprimer *openxlsx* in *ggplot2*, ki razširijo delovanje R-ja z dodajanjem novih funkcij. V R-ju si lahko napišemo tudi svoje funkcije in si s tem olajšamo delo. 
+Funkcije kot smo jih spoznali do sedaj so ukazi, ki izvršijo neko določeno nalogo. V R-ju obstajajo mnogi paketi, kot sta na primer *openxlsx* in *ggplot2*, ki razširijo delovanje R-ja z dodajanjem novih funkcij. V R-ju si lahko napišemo tudi svoje funkcije in si s tem olajšamo delo. 
 
-#Definicija funkcije
+# Definicija funkcije
 
-Za definicijo funkcije potrebujemo štiri stvari:
+Za definicijo funkcije potrebujemo:
 
 1) Ime funkcije: Ime s katerim bomo klicali funkcijo.
-2) Vhod: Katere vhodne parametre potrebuje funkcija za svoje izvajanje.
+2) Vhod: Katere vhodne parametre sprejme funkcija za svoje izvajanje.
 3) Izhod: Kaj nam funkcija na koncu izvajanja vrne.
-4) Jedro funkcije: Blok ukazov, ki se izvedejo, da iz vhoda dobimo izhod. 
+4) Jedro funkcije: Blok ukazov, ki se izvedejo, s katerimi izdelamo izhod funkcije. 
 
-Vhod je lahko tudi prazen. Primer je funkcija `getwd()`, ki le izpiše trenutni direktorij na konzolo. Izhod je tudi lahko prazen oz. vrne vrednost **NULL**. Izhod vedno vrne samo en vrednost.
+Vhod je lahko tudi prazen. Primer je funkcija `getwd()`, ki le izpiše trenutni direktorij na konzolo. Izhod je tudi lahko prazen oz. vrne vrednost **NULL**. Izhod vedno vrne samo eno vrednost, oziroma vektor, seznam,...
 
 Funkcijo v R-ju definiramo s privzeto besedo `function` na naslednji način:
 
@@ -48,17 +48,16 @@ Poženimo funkcijo:
 ```{r error = T}
 mnenje()
 ```
-
-Kot naj je že znano lahko izhod shranimo v spremenljivko.
+Izhod funkcije lahko shranimo  kot spremenljivko.
 
 ```{r error = T}
 izhod <- mnenje()
 izhod
 ```
 
-#Dodajanje vhodnih parametrov
+# Dodajanje vhodnih parametrov
 
-V prejšnjem primeru funkcija `hello()` nima nobenega vhoda. Napišimo sedaj funkcijo, `bmi()`, ki ima dva vhodna parametra in sicer sta to višina v m in teža v kg. Na izhodu pa nam vrne indeks telesne teže. 
+V prejšnjem primeru funkcija `hello()` nima vhodnih parametrov. Napišimo sedaj funkcijo, `bmi()`, ki ima dva vhodna parametra in sicer  višino v m in težo v kg. Na izhodu pa nam vrne indeks telesne teže. 
 
 ```{r error = T}
 bmi <- function (visina, teza) {
@@ -79,10 +78,10 @@ Izhod funkcije lahko shranimo v spremenljivko:
   bmi_rezultat
 ```
 
-Poglejmo si to še na podatkih iz drugega predavanja:
+Poglejmo si delovanje še na podatkih iz drugega predavanja:
 
 ```{r error = T}
-df <- read.csv("./data_raw/osebe.csv")
+df <- read.table("./data_raw/osebe.csv", header = TRUE, sep=",", quote = "\"", dec = '.')
 df
 ```
 
@@ -100,13 +99,13 @@ V našem primeru bi klic `bmi(df$visina, df$spol)` vrnil napako:
   bmi(df$visina, df$spol)
 ```
 
-V stolpcu `spol` niso številke, zato ne more deliti vektorjev.
+V stolpcu `spol` niso številke. R ne zna deliti takih vektorjev.
 
-#Preverjanje pravilnosti vhoda
+# Preverjanje pravilnosti vhoda
 
-Vsaka funkcija ima predpostavko, da na vhod dobi točno določen tip podatkov. V primeru, da želimo to kodo deliti ali preprečiti tudi nadalnje napake v svojih skriptah je priporočljivo preveriti vrednosti in tip vhoda.
+Vsaka funkcija predpostavlja, da na vhod dobi točno določen tip podatkov. V primeru, da želimo svojo kodo deliti z drugimi programerji, oziroma če želimo preprečiti tudi nadalnje napake v svojih skriptah, je priporočljivo preveriti vrednosti in tip vhoda.
 
-Napišimo sedaj funkcijo, `hipotenuza()`, ki ima dva vhodna parametra in sicer sta to dolžini katet pravokotnega trikotnika. Na izhodu pa nam vrne dolžino hipotenuze  $c = \sqrt{a^2 + b^2}$. 
+Napišimo sedaj funkcijo, `hipotenuza()`, ki ima dva vhodna parametra; dolžini katet pravokotnega trikotnika. Na izhodu pa nam vrne dolžino hipotenuze  $c = \sqrt{a^2 + b^2}$. 
 
 ```{r error = T}
 hipotenuza <- function (a, b) {
@@ -124,7 +123,9 @@ hipotenuza(-3, 2) #Vrne odgovor, čeprav je nesmiselen vhod
 hipotenuza("a", "b") #Vrne napako, ker je tip vhoda napačen
 ```
 
-Funkcija je za lastno uporabo smiselna, če si sami pazimo na to, kaj podamo na vhod. Napišimo sedaj še funkcijo `kateta()`, ki sprejme eno dolžino katete in dolžino hipotenuze ter vrne dolžino druge katete.
+Če pišemo funkcijo le za lastno uporabo predpostavimo, da bomo pazili, kaj podamo na vhod. 
+
+Napišimo sedaj še funkcijo `kateta()`, ki sprejme eno dolžino katete in dolžino hipotenuze ter vrne dolžino druge katete.
 Dolžino manjkajoče katete izračunamo kot $b = \sqrt{c^2 - a^2}$.
 
 ```{r error = T}
@@ -144,16 +145,16 @@ kateta(-1, 2) #Vrne odgovor, čeprav je nesmiselen vhod
 kateta("a", "b") #Vrne napako, ker je tip vhoda napačen
 ```
 
-V primeru `kateta(7, 3)` dobimo le opozorilo, čeprav je izračun vrednost **NaN** (Not A Number). Kar je R-jev znak za definicijo neizračunljivih vrednosti, kot naprimer 0/0.
+V primeru `kateta(7, 3)` dobimo le opozorilo, čeprav je izračun vrednost **NaN** (Not A Number). S to oznako so v R-ju definirane neizračunljive vrednosti, kot na primer 0/0.
 
-Poskušajmo to funkcijo razširiti in popraviti, tako da bo zaznala te težave. V prvem primeru smo funkciji na vhod podali kateto, ki je daljša od hipotenuze, kar ni smiselno. V tem primeru še vedno lahko predpostavimo, da je prvi parameter hipotenuza in še vedno opravimo izračun.
+Poskusimo našo funkcijo razširiti in popraviti, tako da bo zaznala take vrste težav. V prvem primeru smo funkciji kot vhod podali kateto, ki je daljša od hipotenuze, kar ni smiselno. V tem primeru lahko predpostavimo, da je prvi parameter hipotenuza in opravimo izračun.
 
 ```{r error = T}
 kateta <- function (a, c) {
   if (c > a) {
     b <- sqrt(c * c - a * a)
   }else{
-    warning("Kateta je daljša od hipotenuze. Menjam vrednosti.")
+    warning("Kateta je daljša od hipotenuze. Zamenjam vrednosti.")
     b <- sqrt(a * a - c * c)
   }
   return(b)
@@ -166,7 +167,7 @@ kateta(3, 7)
 kateta(7, 3) #Vrne pravilo vrednost in opozorilo
 ```
 
-V zadnjem primeru nam sedaj funkcija naredi pravilni izračun, hkrati pa si še izpišemo opozorilo s funkcijo `warning()`. Funkcija `warning()` nam opozorila izpiše na koncu izvajanja funkcije, lahko pa si jih ogledamo tudi, če v konzolo napišemo `warning()`.
+V zadnjem primeru nam funkcija vrne pravilni izračun, hkrati pa si še izpišemo opozorilo s funkcijo `warning()`. Funkcija `warning()` nam opozorila izpiše na koncu izvajanja funkcije, lahko pa si jih ogledamo tudi, če v konzolo napišemo `warning()`.
 
 Dodajmo še preverjanje negativnih vrednosti. V tem primeru, bi želeli, da se funkcija zaustavi in nam vrne napako. To lahko naredimo z ukazom `stop()`, ki zaustavi funkcijo in nam vrne željeno sporočilo napake. 
 
@@ -194,7 +195,7 @@ kateta(7, 3) #Vrne pravilno vrednost in opozorilo
 kateta(-1, 2) #Vrne napako skupaj z našim opisom napake
 ```
 
-V zadnjem primeru nam R vrne našo napako in njen pripadajoči opis, da lahko v tem primeru hitreje odkrijemo kaj je izvor napake, če se nam to pripeti v prihodnosti.
+V zadnjem primeru nam R vrne napako, ki smo jo sami definirali in pripadajoči opis. Tako lažje odkrijemo, kaj je izvor napake, če se nam to pripeti v prihodnosti.
 
 Nekatere napake R zazna že sam, tako nam klic `kateta("a", "b")` že sam vrne napako, lahko pa ga poskušamo zaznati tudi sami. Za to lahko uporabimo funkcijo `is.numeric()`. 
 
@@ -232,7 +233,7 @@ Obstaja še ena možnost za napako in sicer, če pozabimo podati vhodne parametr
 kateta(1)
 ```
 
-Če želimo, da se naša funkcija lahko kliče tudi z manj parametri lahko dodamo privzete vrednosti tem parametrom. Pazimo, da so vsi obvezni parametri na začetku. Edina sprememba sedaj je v glavi funkcije `function (a = 1, c = 2)`.
+Če želimo, našo funkcijo klicati tudi z manj parametri, lahko dodamo privzete vrednosti tem parametrom. Pazimo, da so vsi obvezni parametri definirani na začetku. Edina sprememba sedaj je v glavi funkcije `function (a = 1, c = 2)`.
 
 ```{r error = T}
 kateta <- function (a = 1, c = 2) {
@@ -257,9 +258,9 @@ kateta(0.5) #izračun za klica kateta(0.5, 2)
 kateta() #izračun za klica kateta(0.5, 1)
 ```
 
-#Vračanje vrednosti funkcije
+# Vračanje vrednosti funkcije
 
-Vračanje vrednosti funkcije se lahko zgodi kjerkoli v funkciji. Po ukazu `return()` se izvajanje funkcije takoj zaključi. To lahko uporabimo za implementacijo svoje funkcije, ki lahko shrani naše podatke v *csv* ali *xlsx* obliki. Ta funkcija si bo pomagala tudi z ukazom `paste()`, ki združi vse parametre v en niz in med njih vrine znak podan s parametrom `sep`. Primer:
+Funkcija lahko vrača vrednosti kjerkoli znotraj funkcije. Po klicu ukaza `return()` se izvajanje funkcije takoj zaključi. To lahko uporabimo za implementacijo svoje funkcije, shrani naše podatke v *csv* ali *xlsx* obliki. V funkciji bomo  uporabili tudi ukaz `paste()`, ki združi vse parametre v en niz in med njih vrine znak podan s parametrom `sep`. Primer:
 
 
 ```{r error = T}
@@ -272,9 +273,12 @@ Napišimo sedaj željeno funkcijo:
 ```{r error = T}
 shraniPodatke <- function (podatki, datoteka, koncnica = "csv") {
   library(openxlsx)
-  celotno_ime <- paste(datoteka, koncnica, sep = ".")
+  wd <- getwd() # prebermo delovni direktorij
+  ime <- paste(wd, datoteka, sep = "/")
+  celotno_ime <- paste(ime, koncnica, sep = ".")
+  print(celotno_ime)
   if (koncnica == "csv") {
-    write.csv2(podatki, file = celotno_ime)
+    write.table(podatki, file = celotno_ime, dec = ".", sep = ",", row.names = FALSE, col.names = TRUE)
     return()
   }
   if (koncnica == "xlsx") {
@@ -288,14 +292,13 @@ shraniPodatke <- function (podatki, datoteka, koncnica = "csv") {
 
 
 ```{r error = T}
-wd <- getwd()
-datoteka <- paste(wd, "osebe", sep = "/")
+datoteka <- "osebe"
 shraniPodatke(df, datoteka)
 shraniPodatke(df, datoteka, koncnica = "xlsx")
 ```
 
 
-#Območje spremenljivk
+# Območje spremenljivk
 
 V prejšnjih funkcijah smo uporabljali spremenljivke `a`, `b` in `c`. Te spremenljivke so dostopne samo znotraj funkcije in enaka imena spremenljivk lahko uporabljamo zunaj funkcije. Prikažimo na preprostem primeru, ki uporablja dve spremenljivki `x` in `y`.
 
@@ -320,11 +323,11 @@ print(x)
 print(y)
 ```
 
-Pred klicem funkcije vidimo, da sta vrednosti `x = 7` in `y = 8`, kar je pričakovano. Takoj znotraj funkcije podvoji sta vrednosti še vedno enaki `x = 7` in `y = 8`. Tukaj je vredost `y` dosegljiva čeprav je nismo podali funkciji. Funkcija lahko dostopa tudi do vseh spremenljivk, ki so nastale v workspacu, ki je to funkcijo klical. Čeprav to deluje se odsvetuje uporaba teh spremenljivk, ker je koda v takem primeru zelo nerazumljiva.
+Pred klicem funkcije vidimo, da sta vrednosti `x = 7` in `y = 8`, kar je pričakovano. Takoj znotraj funkcije **podvoji** sta vrednosti še vedno enaki `x = 7` in `y = 8`. Znotraj funkcije je vredost `y` dosegljiva, čeprav je nismo podali kot vhod. Funkcija lahko dostopa tudi do vseh spremenljivk, ki so nastale v workspacu, ki je to funkcijo klical. Čeprav to deluje, se odsvetuje uporaba teh spremenljivk, ker je koda v takem primeru zelo nerazumljiva.
 
-Pri drugem izpisu se je vrednost `y` spremenila na 14. Po klicu pa spet velja `y = 8`. To je zato, ker ima vsaka funkcija svoje delovno območje in naredi kopijo spremenljivke `y`. Dobra lastnost tega je, da vsaka funcija deluje lokalno in z ukazi znotraj funkcije nikoli ne boste spremenili vrednosti zunaj nje. Edina sprememba, ki se na koncu pozna je `x = 14`, saj to vrednost funkcija dejansko vrne in jo spremenljivki `x` priredimo zunaj funkcije.
+Pri drugem izpisu znotraj funkcije se je vrednost `y` spremenila na 14. Po klicu funckije (v workspace-u) pa spet velja `y = 8`. To je zato, ker ima vsaka funkcija svoje delovno območje in naredi kopijo spremenljivke `y`. Dobra lastnost tega je, da vsaka funcija deluje lokalno in z ukazi znotraj funkcije nikoli ne spremenimo vrednosti zunaj nje. Edina sprememba, ki se je na koncu zgodila, je `x = 14`, saj to vrednost funkcija dejansko vrne in jo spremenljivki `x` priredimo zunaj funkcije.
 
-#Domača naloga
+# Domača naloga
 
 1) Napišite funkcijo `razsevni_diagram(x, y, labelx, labely)`, ki zna z uporabo funkcije `ggplot()` izrisati razsevni diagram teh točk. Če label ne podamo sta privzeti imeni x in y.
 
@@ -332,7 +335,7 @@ Pri drugem izpisu se je vrednost `y` spremenila na 14. Po klicu pa spet velja `y
 razsevni_diagram <- function (x, y, labelx = "x", labely = "y") {
   library(ggplot2)
   g1 <- ggplot(data.frame(x = x, y = y), aes(x = x, y = y)) + geom_point() + xlab(labelx) + ylab(labely)
-  return (g1)
+  return (g1)#
 }
 ```
 
