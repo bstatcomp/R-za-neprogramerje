@@ -242,7 +242,7 @@ Pogosto si želimo spremeniti imena osi. To storimo s funkcijama `xlab()` in `yl
 
 ```{r fig.width = 3.7, fig.height = 2, warning=FALSE}
 ggplot(df.osebe, aes(x = Visina, y = Teza, colour = Spol)) + geom_point() +
-  xlab("visina (v cm)") + ylab("teza (v kg)")
+  xlab("višina (v cm)") + ylab("teza (v kg)")
 ```
 
 Včasih želimo sami nastaviti meje osi. To storimo s funkcijama `xlim` in `ylim`, v katerih nastavimo zgornjo in spodnjo mejo:
