@@ -1,22 +1,27 @@
-# toy dataset
-height <- c(171, 185, 165, 190, 152)
-weight <- c(70, 78, 64, 95, 67)
-sex    <- c("m", "m", "z", "m", "z")
-name   <- c("Alen", "Bojan", "Cvetka", "Dejan", "Eva")
-age    <- c(41, 35, 28, 52, 22)
-df     <- data.frame(Ime = name, 
-                     Visina = height, 
-                     Teza = weight, 
-                     Spol = sex, 
-                     Starost = age)
+library(openxlsx)
+imena_listov <- getSheetNames("./data_raw/online-retail.xlsx")
 
-
-for (i in 1:nrow(df)) {
-  oseba <- df[i,]
+for (ime_lista in imena_listov) {
+  podatki_tmp <- read.xlsx("./data_raw/online-retail.xlsx", sheet = ime_lista)
+  
+  # Shranimo vsoto števila prodanih izdelkov za vsak raèun (InvoiceNo)
+  podatki_agg <- aggregate(x = podatki_tmp$Quantity,
+                           by = list(podatki_tmp$InvoiceNo),
+                           FUN = sum)
+  colnames(podatki_agg) <- c("st_racuna", "st_izdelkov")
+  
+  # S tem klicem poenemo "Predavanje_08 - Porocilo.Rmd". Vse spremenljivke
+  # ki se nahajajo v trenutni ponovitvi zanke, bodo dostopne tudi temu
+  # dokumentu.
   rmarkdown::render("Predavanje_08 - Porocilo.Rmd", 
-                    output_file = paste0("./porocila/oseba_", i, ".pdf"),
+                    output_file = paste0("./porocila/drzava_", ime_lista, 
+                                         ".docx"),
+                    output_format = "word_document")
+  rmarkdown::render("Predavanje_08 - Porocilo.Rmd", 
+                    output_file = paste0("./porocila/drzava_", ime_lista, 
+                                         ".pdf"),
                     output_format = "pdf_document")
+  
 }
-
 
 

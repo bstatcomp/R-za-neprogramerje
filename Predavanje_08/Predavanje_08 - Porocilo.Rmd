@@ -1,14 +1,15 @@
 ---
 title: ""
-output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
 ```
 
-## R Markdown
+## Moje poročilo
+Število izdelkov za vsak račun za državo `r ime_lista`.
 
-```{r}
-print(oseba)
+```{r, echo = FALSE}
+kable(podatki_agg)
 ```
