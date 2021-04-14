@@ -43,7 +43,8 @@ summary(my_anova)
 ```
 
 # ggplot2 -- statistična signifikantnost
-Včasih želimo rezultate statističnega testa prikazati kar na grafu. Poglejmo si sedaj primer t-testa v ggplot2. Za to bomo potrebovali še en paket **ggpubr** in funkcijo iz tega paketa `stat_compare_means`. Tej funkciji bomo poda
+Včasih želimo rezultate statističnega testa prikazati kar na grafu. Poglejmo si sedaj primer t-testa v ggplot2. Za to bomo potrebovali še en paket **ggpubr** in funkcijo iz tega paketa `stat_compare_means`.
+
 
 ```{r}
 library(ggplot2)
@@ -77,9 +78,27 @@ ggplot(iris_longer, aes(x = Species, y = value, color = name)) +
   )
 ```
 
+# Branje iz in uvažanje v SPSS
+SPSS je program za statistično analizo. Datoteke povezane z SPSS imajo običajno končnico .sav. Za branje iz in uvažanje v SPSS lahko uporabimo paket **haven**. V mapi *data_raw* imamo podatke o osebah *osebe.sav*. Za uvoz teh podatkov v R uporabimo funkcijo `read_sav`.
+
+```{r}
+library(haven)
+podatki <- read_sav("./data_raw/osebe.sav")
+podatki
+```
+
+Da shranimo `data.frame` v sav datoteko, uporabimo funkcijo `write_sav`. Shranimo sedaj `iris` `data.frame` v sav datoteko.
+
+```{r}
+write_sav(iris, "./data_clean/iris.sav")
+```
+
+Paket haven ima tudi funkcijo `read_por` ki podpira starejše verzije datotek iz SPSS.
+
+
 
 # Urejanje `data.frame`, izpis števila vrstic, ki ustreza pogoju
-Zgoraj smo naložili podatke o avtih. Pa si poglejmo, kako urediti `data.frame` glede na neko spremenljivko. Recimo, da nas zanima 10 avtomobilov z najmanj konjskimi močmi.
+Vrnimo se k podatkom o avtih `mtcars`. Poglejmo si, kako urediti `data.frame` glede na neko spremenljivko. Recimo, da nas zanima 10 avtomobilov z najmanj konjskimi močmi.
 
 ```{r}
 cars_decreasing <- mtcars[order(mtcars$hp), ]
@@ -98,10 +117,11 @@ cars_increasing <- mtcars[order(mtcars$hp, decreasing = TRUE), ]
 cars_increasing[1:10, ]
 ```
 
-Velikokrat želimo neko podmnožico podatkov, ki ustreza nekemu pogoju. Na primer, želimo vse avtomobile, ki imajo več manj kot 100 konjskih moči.
+Velikokrat želimo neko podmnožico podatkov, ki ustreza nekemu pogoju. Na primer, želimo vse avtomobile, ki imajo manj kot 100 konjskih moči.
 
 ```{r}
 cars_subset <- mtcars[mtcars$hp < 100, ]
+cars_subset
 ```
 
 Če nas zanima samo število takih vrstic, to dobimo tako, da najprej ustvarimo ustrezno podmnožico in nato preštejemo vrstice:
@@ -136,7 +156,7 @@ Kaj se zgodi, če poizkusimo izračunati povprečje `x`?
 mean(x)
 ```
 
-Vrne `NA`. Če želimo, da nam R vseeno vrne povprečje vseh vrednosti, ki niso enake `NA` uporabimo argument `na.rm = TRUE`. Večina funkcij ki povzemajo številske vrednosti ima možnost podati ta argument. Alternativno bi lahko ročno izbrali podmnožico `x` kjer vrednosti niso `NA` in izračunali povprečje.
+Vrne `NA`. Če želimo, da nam R vseeno vrne povprečje vseh vrednosti, ki niso enake `NA`, uporabimo argument `na.rm = TRUE`. Večina funkcij ki povzemajo številske vrednosti ima možnost podati ta argument. Alternativno bi lahko ročno izbrali podmnožico `x`, kjer vrednosti niso `NA`, in izračunali povprečje.
 
 ```{r}
 mean(x, na.rm = TRUE)
@@ -144,7 +164,7 @@ mean(x[!is.na(x)])
 ```
 
 # Nekonsistentni podatki
-Poleg manjkajočih vrednosti se pogosto v podatkih pojavijo tudi nekonsistentnosti zaradi ročnega vnašanja. Na primer v numeričnem stolpcu se pojavijo števila ki imajo decimalno piko ali vejico, ali pa se pojavijo celo besede. V takem primeru je potrebnega nekaj ročnega dela s takšnimi stolpci. Poglejmo si datoteko **nekonsistentni_podatki.csv**, ki je v mapi *data_raw*.
+Poleg manjkajočih vrednosti se pogosto v podatkih pojavijo tudi nekonsistentnosti zaradi ročnega vnašanja. Na primer v numeričnem stolpcu se pojavijo števila ki imajo decimalno piko ali vejico, ali pa se pojavijo celo besede. V takem primeru je potrebnega nekaj ročnega dela s takšnimi stolpci. Poglejmo si datoteko *nekonsistentni_podatki.csv*, ki je v mapi *data_raw*.
 
 ```{r}
 podatki <- read.table("./data_raw/nekonsistentni_podatki.csv", dec = ",", sep = ";", 
@@ -163,12 +183,12 @@ Opazimo, da je R prebral oba stolpca kot besede (character). Če želimo stolpec
 1) Ustrezno popraviti decimalne vejice v decimalne pike (saj R uporablja decimalno piko).
 2) Pretvoriti stolpec v numeričnega.
 
-Decimalne vejice bomo spremenili v decimalne pike z ukazom `gsub`. Ta funkcija se uporablja za zamenjavo dela besede z neko drugo besedo. Na primer:
+Decimalne vejice bomo spremenili v decimalne pike z ukazom `gsub`. Ta funkcija se uporablja za zamenjavo dela niza znakov (beseda, stavek,...) z nekim drugim nizom. Na primer:
 
 
 ```{r}
-beseda <- "Ne maram R!"
-gsub(pattern = "Ne maram", replacement = "Obozujem", x = beseda)
+stavek <- "Ne maram R!"
+gsub(pattern = "Ne maram", replacement = "Obozujem", x = stavek)
 ```
 
 S tem bomo sedaj zamenjali vejice s pikami v stolpcu `vrednost`:
@@ -187,8 +207,8 @@ head(podatki)
 Opazimo, da je R vrstice, ki jih ne zna pretvoriti v številke (na primer tretjo vrstico, kjer imamo besedo v tem stolpcu), avtomatsko pretvoril v `NA` (manjkajoče vrednosti).
 
 
-# Branje podatkov v excelu za določene vrstice in stolpce
-Velikokrat se srečamo z večimi tabelami na enem Excelovem listu. Kako preberemo točno določeno tabelo? V datoteki **podatki_premaknjeni.xlsx** imamo takšen list. Recimo, da želimo prebrati samo drugo tabelo, ki se nahaja v 14. vrstici in stolpcu E. To naredimo tako, da uporabimo argument `startRow = 14`. S tem bo `read.xlsx` začel brati podatke v 14. vrstici. Prebral bo vse podatke, do konca podatkov.
+# Branje podatkov v Excelu za določene vrstice in stolpce
+Velikokrat se srečamo z večimi tabelami na enem Excelovem listu. Kako preberemo točno določeno tabelo? V datoteki *podatki_premaknjeni.xlsx* imamo takšen list. Recimo, da želimo prebrati samo drugo tabelo, ki se nahaja v 14. vrstici in stolpcu E. To naredimo tako, da uporabimo argument `startRow = 14`. S tem bo `read.xlsx` začel brati podatke v 14. vrstici. Prebral bo vse podatke, do konca podatkov.
 
 ```{r}
 library(openxlsx)
@@ -196,7 +216,7 @@ podatki <- read.xlsx("./data_raw/podatki_premaknjeni.xlsx", startRow = 14)
 head(podatki)
 ```
 
-Poglejmo si še datoteko **podatki_premaknjeni2.xlsx**, kjer imamo 2 tabeli v 14. vrstici. Recimo, da želimo prebrati samo drugo. Žal v tem primeru funkcija `read.xlsx` ne dopušča samo nastavitve prvega stolpca, v katerem začeti branje, ampak moramo funkciji ročno podati vse indekse stolpcev, katere želimo prebrati. Te podamo v argument `cols`. Enako lahko naredimo tudi za vrstice z argumentom `rows`.
+Poglejmo si še datoteko *podatki_premaknjeni2.xlsx*, kjer imamo 2 tabeli v 14. vrstici. Recimo, da želimo prebrati samo drugo. Žal v tem primeru funkcija `read.xlsx` ne dopušča samo nastavitve prvega stolpca, v katerem začeti branje, ampak moramo funkciji ročno podati vse indekse stolpcev, katere želimo prebrati. Te podamo v argument `cols`. Enako lahko naredimo tudi za vrstice z argumentom `rows`.
 
 ```{r}
 podatki <- read.xlsx("./data_raw/podatki_premaknjeni2.xlsx", startRow = 14, cols = 9:10)
@@ -205,7 +225,7 @@ head(podatki)
 
 
 # Avtomatsko generiranje poročil in shranjevanje tabel v Word
-V tem poglavju bomo potrebovali paketa **rmarkdown** in **knitr**. Predlagamo, da tabelo v Word prenesemo s pomočjo Rmd datotek. Rmd datoteke, so datoteke, v katerih lahko združujemo tekst in R, kot izhod pa dobimo dokumente v pdf, docx ali html oblikah. S tem so tudi zelo primerni za avtomatsko generiranje poročil. Da v poročilu izpišemo tabelo, ki jo imamo shranjeno v R, lahko uporabimo ukaz `kable(<ime-tabele-v-R>` (glej *Predavanje_08 - Porocilo.Rmd*). Da poženemo Rmd datoteko znotraj R skripte, lahko uporabimo klic
+V tem poglavju bomo potrebovali paketa **rmarkdown** in **knitr**. Predlagamo, da tabelo v Word prenesemo s pomočjo Rmd datotek. Seveda pa se lahko poslužimo tudi bolj preprostih, ampak manj sistematičnih pristopov, kot je na primer shranjevanje tabele v Excel in potem ročno kopiranje v Word. Rmd datoteke so datoteke v katerih lahko združujemo tekst in R, kot izhod pa dobimo dokumente v pdf, docx ali html oblikah. S tem so tudi zelo primerni za avtomatsko generiranje poročil. Da v poročilu izpišemo tabelo, ki jo imamo shranjeno v R, lahko uporabimo ukaz `kable(<ime-tabele-v-R>` (glej *Predavanje_08 - Porocilo.Rmd*). Da poženemo Rmd datoteko znotraj R skripte, lahko uporabimo klic
 
 ```{r, eval = FALSE}
 rmarkdown::render("<ime-Rmd-datoteke>", 
@@ -217,24 +237,28 @@ Za uporabo tega klica glej *Predavanje_08 - Porocilo.R*. Kadar generiramo datote
 
 
 # Dvojna glava (header)
-Včasih dobimo podatke v kakšnih posebnih oblikah, na primer z dvema headerjema. Takšni podatki se na primer nahajajo v datoteki *dvojni_header.csv*. Kako te podatke pretvorimo v dolgo obliko? Najprej bomo prebrali vsak header posebej in jih združili v enoten header. Nato bomo prebrali podatke in jim priredili skupen header. Takšne podatke potem znamo pretvorit v dolgo obliko. Na koncu moramo samo še razdružiti oba headerja. Potrebovali bomo tudi funkcijo **na.locf** iz paketa **zoo**, ki vse `NA` vrednosti v vektorju nadomesti z zadnjo vrednostjo, ki ni bila enaka `NA`.
+Včasih dobimo podatke v kakšnih posebnih oblikah, na primer z dvema headerjema. Takšni podatki se na primer nahajajo v datoteki *dvojni_header.csv*. Kako te podatke pretvorimo v dolgo obliko? Najprej bomo prebrali vsak header posebej in jih združili v enoten header. Nato bomo prebrali podatke in jim priredili skupen header. Takšne podatke potem znamo pretvorit v dolgo obliko. Na koncu moramo samo še razdružiti oba headerja. Potrebovali bomo tudi funkcijo `na.locf` iz paketa **zoo**, ki vse `NA` vrednosti v vektorju nadomesti z zadnjo vrednostjo, ki ni bila enaka `NA`.
 
-```{r, eval = FALSE}
+```{r, eval = TRUE}
 library(zoo)
 # Preberemo samo prvo vrstico (nrow = 1), ki ima prvi header. Funkcija unlist 
 # data.frame spremeni v vektor.
-head2 <- unlist(read.table("./data_raw/dvojni_header.csv", sep = ";", 
+head1 <- unlist(read.table("./data_raw/dvojni_header.csv", sep = ";", 
                            quote = "", nrow = 1))
+head1
 
 # Preberemo samo drugo vrstico (izpustimo prvo -- skip = 1).
-head1 <- unlist(read.table("./data_raw/dvojni_header.csv", sep = ";", 
+head2 <- unlist(read.table("./data_raw/dvojni_header.csv", sep = ";", 
                            quote = "", nrow = 1, skip = 1))
+head2
 
 # Nadomestimo NA vrednosti v head2.
-tmp <- na.locf(unlist(head2), na.rm = FALSE)
+tmp <- na.locf(unlist(head1), na.rm = FALSE)
+tmp
 
 # Združimo oba headerja.
-my_header <- paste(head1, tmp, sep = "_")
+my_header <- paste(head2, tmp, sep = "_")
+my_header
 
 # Preberemo vrednosti v podatkih, jim pripredimo nova imena in pretvorimo v
 # dolgo obliko.
@@ -251,6 +275,7 @@ head(podatki_long)
 podatki_long$spol <- gsub("\\_.*", "", podatki_long$name)
 podatki_long$leto <- gsub(".*\\_", "", podatki_long$name)
 podatki_long$name <- NULL
+head(podatki_long)
 ```
 
 
@@ -266,7 +291,7 @@ df1 <- data.frame(x = pojav_x, y = pojav_y)
 df2 <- data.frame(x = vzorci_x, y = vzorci_y)
 ```
 
-Sedaj imamo 2 `data.frame` enega za pojav in enega za vzorce. Namesto, da podamo podatke in estetike v funkcijo `ggplot`, jih v tem primeru podamo naravnost v **geome**. Torej bomo podali *df1* v geom `geom_line` in *df2* v geom `geom_point`.
+Sedaj imamo 2 `data.frame`, enega za pojav in enega za vzorce. Namesto, da podamo podatke in estetike v funkcijo `ggplot`, jih v tem primeru podamo naravnost v **geome**. Torej bomo podali `df1` v geom `geom_line` in `df2` v geom `geom_point`.
 
 ```{r}
 ggplot() +
@@ -285,10 +310,8 @@ Včasih imamo na voljo podatke, pri katerih vzorčimo vrednosti v določenih int
 
 Lahko se zgodi, da različne vrednosti vzorčimo na različnih frekvencah. Če jih vse želimo pokazati na istem grafu z isto časovno osjo, moramo najprej ustvariti `data.frame` v katerem so vzorci in njihovi časovni zamiki od začetka vzorčenja. Na primer pri 4Hz vzorčenju bi ti bili 0.25, 0.5, 0.75, 1, 1.25 sekunde in tako naprej.
 
-Poglejmo si to na konkretnem primeru, kjer imamo 2 vrednosti, recimo A in B. Obe smo začeli vzorčiti ob istem času, pri vrednosti A smo uporabili 64Hz vzorčenje, pri vrednosti B pa 4Hz vzorčenje. Podatki so v obliki csv (A.csv in B.csv). Prva vrstica predstavlja zakodiran čas začetka vzorčenja, druga vrstica frekvenco vzorčenja. Preostale vrstice predstavljajo vzorce. V takem primeru, bomo potrebovali 3 spremenljivke: čas začetka, frekvenco in vektor vzorcev.
+Poglejmo si to na konkretnem primeru, kjer imamo 2 vrednosti, recimo A in B. Obe smo začeli vzorčiti ob istem času, pri vrednosti A smo uporabili 64Hz vzorčenje, pri vrednosti B pa 4Hz vzorčenje. Podatki so v obliki csv (*A.csv* in *B.csv*). Prva vrstica predstavlja zakodiran čas začetka vzorčenja, druga vrstica frekvenco vzorčenja. Preostale vrstice predstavljajo vzorce. V takem primeru bomo potrebovali 3 spremenljivke: čas začetka, frekvenco in vektor vzorcev.
 
-Najprej preberemo samo prvo vrstico in shranimo v spremenljivko, 
-ki predstavlja začetek vzorčenja. Da preberemo samo 1 vrstico csv datoteke uporabimo arguent `nrows = 1`.
 
 ```{r}
 # Najprej preberemo samo prvo vrstico in shranimo v spremenljivko, ki 
@@ -318,6 +341,7 @@ df1 <- data.frame(x = t_A, y = y_A, type = "A")
 colnames(df1)   <- c("seconds", "measurement", "type")
 # Standardiziramo, da so vrednosti A in B na isti skali.
 df1$measurement <- scale(df1$measurement)
+head(df1)
 ```
 
 Enako ponovimo še za vrednost B:
@@ -333,6 +357,7 @@ df2 <- data.frame(x = t_B, y = y_B, type = "B")
 colnames(df2)   <- c("seconds", "measurement", "type")
 # Standardiziramo, da so vrednosti A in B na isti skali.
 df2$measurement <- scale(df2$measurement)
+head(df2)
 ```
 
 Združimo `data.frame` in izrišemo vrednosti:
@@ -341,6 +366,8 @@ Združimo `data.frame` in izrišemo vrednosti:
 df <- rbind(df1, df2)
 ggplot(df, aes(x = seconds, y = measurement, color = type)) + geom_line()
 ```
+
+Če želimo, lahko vso x os še uredimo v skladu z uro začetka vzorčenja, pri čemer uporabimo podatek shranjen v spremenljivkah `timestamp_A` in `timestamp_B` (v našem primeru je bil začetek enak, zato tega nismo rabili spreminjati).
 
 
 
@@ -354,6 +381,29 @@ Na tej delavnici smo se naučili kako izbrati podmnožico vrstic in stolpcev `da
 
 Najbolje, da si ogledamo te funkcije v uporabi. Hkrati bomo prikazali uporabo z **dplyr** in osnovno različico R.
 
+```{r}
+library(dplyr)
+
+# filter izbere podmnožico vrstic.
+head(filter(mtcars, hp > 90)) # dplyr
+# head(mtcars[mtcars$hp > 90, ]) # base R
+
+# select izbere podmnožico stolpcev.
+head(select(mtcars, mpg, cyl, hp)) # dplyr
+# head(mtcars[ , c("mpg", "cyl", "hp")]) # base R
+
+# mutate doda stolpec.
+head(mutate(mtcars, nov_stolpec = mpg + cyl * hp)) # dplyr
+# tmp <- mtcars # base R -- 3 vrstice
+# tmp$nov_stolpec <- tmp$mpg + tmp$cyl * tmp$hp
+# head(tmp)
+
+# summarize deluje podobno kot aggregate torej povzame numerične vrednosti, 
+# glede na neke kategorije. Pri tem moramo paziti, da ga uporabimo v kombinaciji 
+# z `group_by`, kjer podamo kateri stolpci predstavljajo kategorije.
+summarize(group_by(mtcars, cyl), mean_hp = mean(hp))
+# aggregate(mtcars$hp, by = list(mtcars$cyl), FUN = mean) # base R
+```
 
 
 # Kako v ggplot2 narediti graf z dvema y-osema?
@@ -380,7 +430,7 @@ ggplot(df) +
 Kar smo naredili je, da smo drugo spremenljivko `y2` transformirali, da je bila na enakem razponu, kot prva spremenljivka `y` (deljenje z 8). Potem smo jo še nekoliko zmanjšali, da smo dobili škatle pod črto, za lepši izgled (deljenje s 6, ta korak bi lahko preskočili). Potem moramo samo še dodati drugo os, kjer definiramo obratno transformacijo z `sec_axis(trans=~. * 8 * 6)`. Torej, če želite imeti dve osi, je najprej potrebno drugo spremenljivko ustrezno transformirati in nato dodati obratno transformacijo v argument `sec.axis` funkcije `scale_y_continuous`.
 
 # Kako združiti različne grafe?
-Pogledali si bomo primer, kako združiti dva različna grafa. V bioinformatiki se pojavijo grafi, kjer imamo podatke o koordinatah pokritosti genoma pri sekvenciranju za več skupin, ki jih želimo prikazati kot območje pod krivuljo (`geom_area`). Poleg tega imamo za enak razpon na x osi tudi podatke o anotaciji genomske sekvence (torej za vsako anotacijo imamo začetno in končno točko na x osi). Poglejmo si sedaj, kako prikazati anotacijo in posamezne pokritosti vse na enem grafu. Za združevanje grafov bomo uporabili funkcijo **ggarrange** iz paketa **egg**.
+Pogledali si bomo primer, kako združiti dva različna grafa. V bioinformatiki se pojavijo grafi, kjer imamo podatke o koordinatah pokritosti genoma pri sekvenciranju za več skupin, ki jih želimo prikazati kot območje pod krivuljo (`geom_area`). Poleg tega imamo za enak razpon na x osi tudi podatke o anotaciji genomske sekvence (torej za vsako anotacijo imamo začetno in končno točko na x osi). Poglejmo si sedaj, kako prikazati anotacijo in posamezne pokritosti vse na enem grafu. Za združevanje grafov bomo uporabili funkcijo `ggarrange` iz paketa **egg**.
 
 
 ```{r}
@@ -390,6 +440,7 @@ y1 <- c(1000, 2000, 1000, 1000, 500, 1500, 2500, 2200)
 y2 <- c(1000, 1800, 1200, 1200, 700, 1000, 1500, 1700)
 df <- data.frame(x = x, y1 = y1, y2 = y2)
 df_longer <- pivot_longer(df, y1:y2)
+head(df_longer)
 
 # Graf pokritosti genoma.
 g1 <- ggplot(df_longer, aes(x = x, y = value)) + 
@@ -399,6 +450,7 @@ g1 <- ggplot(df_longer, aes(x = x, y = value)) +
 # Generiramo sintetične podatke, ki ilustrirajo anotacijo genoma.
 tmp2 <- data.frame(x = c("annot_1", "annot_2"), y_start = c(6000, 5000), 
                    y_end = c(7000, 6100))
+tmp2
 
 # Graf anotacije genoma. Potrebno je paziti, da nastavimo isto skalo s
 # scale_y_continuous. Tukaj uprabimo y, namesto x, saj koordinate obrnemo s
@@ -411,28 +463,6 @@ g2 <- ggplot(tmp2, aes(x = x)) +
 
 # Združimo grafa.
 egg::ggarrange(g2, g1, ncol = 1, heights = c(1, 2))
-```
-
-```{r}
-library(dplyr)
-
-# filter izbere podmnožico vrstic.
-head(filter(mtcars, hp > 90)) # dplyr
-# head(mtcars[mtcars$hp > 90, ]) # base R
-
-# select izbere podmnožico stolpcev.
-head(select(mtcars, mpg, cyl, hp)) # dplyr
-# head(mtcars[ , c("mpg", "cyl", "hp")]) # base R
-
-# mutate doda stolpec.
-head(mutate(mtcars, nov_stolpec = mpg + cyl * hp)) # dplyr
-# tmp <- mtcars # base R -- 3 vrstice
-# tmp$nov_stolpec <- tmp$mpg + tmp$cyl * tmp$hp
-# head(tmp)
-
-# summarize deluje podobno kot aggregate torej povzame numerične vrednosti, glede na neke kategorije. Pri tem moramo paziti, da ga uporabimo v kombinaciji z `group_by`, kjer podamo kateri stolpci predstavljajo kategorije.
-summarize(group_by(mtcars, cyl), mean_hp = mean(hp))
-# aggregate(mtcars$hp, by = list(mtcars$cyl), FUN = mean) # base R
 ```
 
 # ggplot2 -- errorbar
