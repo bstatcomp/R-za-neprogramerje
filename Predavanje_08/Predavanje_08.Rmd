@@ -43,7 +43,7 @@ summary(my_anova)
 ```
 
 # ggplot2 -- statistična signifikantnost
-Včasih želimo rezultate statističnega testa prikazati kar na grafu. Poglejmo si sedaj primer t-testa v ggplot2. Za to bomo potrebovali še en paket **ggpubr** in funkcijo iz tega paketa `stat_compare_means`.
+Včasih želimo rezultate statističnega testa prikazati kar na grafu. Poglejmo si sedaj primer t-testa v ggplot2. Za to bomo potrebovali še en paket **ggpubr** in funkcijo iz tega paketa `stat_compare_means`. Poleg statističnega testa bomo izrisali tudi boxplot (Diagram s *škatlami in brčicami*).
 
 
 ```{r}
@@ -56,7 +56,7 @@ ggplot(iris, aes(x = Species, y = Petal.Width)) +
 ```
 
 # Prikaz točk in povprečja na grafu
-Poglejmo si še en zanimiv graf, kjer bomo prikazali točke in povprečja na istem grafu. Pogledali si bomo porazdelitve dolžin in širin listov različnih perunik. Najprej si pripravimo `data.frame`.
+Poglejmo si še en zanimiv graf, kjer bomo prikazali točke in povprečja na istem grafu. Pogledali si bomo porazdelitve dolžin in širin čašnih listov različnih perunik. Najprej si pripravimo `data.frame`.
 
 ```{r}
 library(tidyr)
@@ -77,6 +77,34 @@ ggplot(iris_longer, aes(x = Species, y = value, color = name)) +
     geom = "hpline"
   )
 ```
+
+
+# ggplot2 -- errorbar
+
+Na statističnih grafih, ki vsebujejo opisne statistike, kot je npr. povprečje, pogosto prikažemo še negotovost v obliki standardnih odklonov ali standardnih napak. S knjižnico ggplot2 to storimo z uporabo geom-a `errorbar`. Pred tem moramo ustrezno pripraviti podatke tako, da dodamo še stolpec s spodnjo in zgornjo mejo napake. Če je napaka simetrična, potrebujemo le en stolpec.
+
+```{r}
+data("mtcars")
+head(mtcars)
+
+mus <- aggregate(mpg ~ cyl, mtcars, FUN = mean)
+sds <- aggregate(mpg ~ cyl, mtcars, FUN = function(x) {sd(x) / sqrt(length(x))})
+df  <- cbind(mus, SE = sds$mpg)
+df$cyl <- as.character(df$cyl)
+
+head(df)
+```
+
+
+```{r fig.width = 3, fig.height = 3}
+library(ggplot2)
+ggplot(df, aes(x = cyl, y = mpg, colour = cyl)) + 
+  geom_point() + 
+  geom_errorbar(aes(ymin = mpg - SE, ymax = mpg + SE), width = 0.5) +
+  theme(legend.position = "none")
+```
+
+
 
 # Branje iz in uvažanje v SPSS
 SPSS je program za statistično analizo. Datoteke povezane z SPSS imajo običajno končnico .sav. Za branje iz in uvažanje v SPSS lahko uporabimo paket **haven**. V mapi *data_raw* imamo podatke o osebah *osebe.sav*. Za uvoz teh podatkov v R uporabimo funkcijo `read_sav`.
@@ -183,7 +211,7 @@ Opazimo, da je R prebral oba stolpca kot besede (character). Če želimo stolpec
 1) Ustrezno popraviti decimalne vejice v decimalne pike (saj R uporablja decimalno piko).
 2) Pretvoriti stolpec v numeričnega.
 
-Decimalne vejice bomo spremenili v decimalne pike z ukazom `gsub`. Ta funkcija se uporablja za zamenjavo dela niza znakov (beseda, stavek,...) z nekim drugim nizom. Na primer:
+Decimalne vejice bomo spremenili v decimalne pike z ukazom `gsub`. Ta funkcija se uporablja za zamenjavo dela niza znakov (beseda, stavek, ...) z nekim drugim nizom. Na primer:
 
 
 ```{r}
@@ -260,7 +288,7 @@ tmp
 my_header <- paste(head2, tmp, sep = "_")
 my_header
 
-# Preberemo vrednosti v podatkih, jim pripredimo nova imena in pretvorimo v
+# Preberemo vrednosti v podatkih, jim priredimo nova imena in pretvorimo v
 # dolgo obliko.
 podatki <- read.table("./data_raw/dvojni_header.csv", sep = ";", quote = "", skip = 2,
                       header = FALSE)
@@ -367,7 +395,7 @@ df <- rbind(df1, df2)
 ggplot(df, aes(x = seconds, y = measurement, color = type)) + geom_line()
 ```
 
-Če želimo, lahko vso x os še uredimo v skladu z uro začetka vzorčenja, pri čemer uporabimo podatek shranjen v spremenljivkah `timestamp_A` in `timestamp_B` (v našem primeru je bil začetek enak, zato tega nismo rabili spreminjati).
+Če želimo, lahko vso os x še uredimo v skladu z uro začetka vzorčenja, pri čemer uporabimo podatek shranjen v spremenljivkah `timestamp_A` in `timestamp_B` (v našem primeru je bil začetek enak, zato tega ni bilo potrebno spreminjati).
 
 
 
@@ -430,7 +458,7 @@ ggplot(df) +
 Kar smo naredili je, da smo drugo spremenljivko `y2` transformirali, da je bila na enakem razponu, kot prva spremenljivka `y` (deljenje z 8). Potem smo jo še nekoliko zmanjšali, da smo dobili škatle pod črto, za lepši izgled (deljenje s 6, ta korak bi lahko preskočili). Potem moramo samo še dodati drugo os, kjer definiramo obratno transformacijo z `sec_axis(trans=~. * 8 * 6)`. Torej, če želite imeti dve osi, je najprej potrebno drugo spremenljivko ustrezno transformirati in nato dodati obratno transformacijo v argument `sec.axis` funkcije `scale_y_continuous`.
 
 # Kako združiti različne grafe?
-Pogledali si bomo primer, kako združiti dva različna grafa. V bioinformatiki se pojavijo grafi, kjer imamo podatke o koordinatah pokritosti genoma pri sekvenciranju za več skupin, ki jih želimo prikazati kot območje pod krivuljo (`geom_area`). Poleg tega imamo za enak razpon na x osi tudi podatke o anotaciji genomske sekvence (torej za vsako anotacijo imamo začetno in končno točko na x osi). Poglejmo si sedaj, kako prikazati anotacijo in posamezne pokritosti vse na enem grafu. Za združevanje grafov bomo uporabili funkcijo `ggarrange` iz paketa **egg**.
+Pogledali si bomo primer, kako združiti dva različna grafa. V bioinformatiki se pojavijo grafi, kjer imamo podatke o koordinatah pokritosti genoma pri sekvenciranju za več skupin, ki jih želimo prikazati kot območje pod krivuljo (`geom_area`). Poleg tega imamo za enak razpon na osi x tudi podatke o anotaciji genomske sekvence (torej za vsako anotacijo imamo začetno in končno točko na osi x). Poglejmo si sedaj, kako prikazati anotacijo in posamezne pokritosti vse na enem grafu. Za združevanje grafov bomo uporabili funkcijo `ggarrange` iz paketa **egg**.
 
 
 ```{r}
@@ -464,32 +492,6 @@ g2 <- ggplot(tmp2, aes(x = x)) +
 # Združimo grafa.
 egg::ggarrange(g2, g1, ncol = 1, heights = c(1, 2))
 ```
-
-# ggplot2 -- errorbar
-
-Na statističnih grafih, ki vsebujejo opisne statistike, kot je npr. povprečje, pogosto prikažemo še negotovost v obliki standardnih odklonov ali standardnih napak. S knjižnico ggplot2 to storimo z uporabo geom-a `errorbar`. Pred tem moramo ustrezno pripraviti podatke tako, da dodamo še stolpec s spodnjo in zgornjo mejo napake. Če je napaka simetrična, potrebujemo le en stolpec.
-
-```{r}
-data("mtcars")
-head(mtcars)
-
-mus <- aggregate(mpg ~ cyl, mtcars, FUN = mean)
-sds <- aggregate(mpg ~ cyl, mtcars, FUN = function(x) {sd(x) / sqrt(length(x))})
-df  <- cbind(mus, SE = sds$mpg)
-df$cyl <- as.character(df$cyl)
-
-head(df)
-```
-
-
-```{r fig.width = 3, fig.height = 3}
-library(ggplot2)
-ggplot(df, aes(x = cyl, y = mpg, colour = cyl)) + 
-  geom_point() + 
-  geom_errorbar(aes(ymin = mpg - SE, ymax = mpg + SE), width = 0.5) +
-  theme(legend.position = "none")
-```
-
 
 # Pripenjanje `data.frame` z različnimi stolpci
 Včasih želimo združiti več `data.frame`, ki pa imajo enake samo nekatere stolpce. V tem primeru lahko uporabimo funkcijo `bind_rows` iz paketa dplyr.
