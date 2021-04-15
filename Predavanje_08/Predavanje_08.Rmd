@@ -81,7 +81,7 @@ ggplot(iris_longer, aes(x = Species, y = value, color = name)) +
 
 # ggplot2 -- errorbar
 
-Na statističnih grafih, ki vsebujejo opisne statistike, kot je npr. povprečje, pogosto prikažemo še negotovost v obliki standardnih odklonov ali standardnih napak. S knjižnico ggplot2 to storimo z uporabo geom-a `errorbar`. Pred tem moramo ustrezno pripraviti podatke tako, da dodamo še stolpec s spodnjo in zgornjo mejo napake. Če je napaka simetrična, potrebujemo le en stolpec.
+Na statističnih grafih, ki vsebujejo opisne statistike, kot je npr. povprečje, pogosto prikažemo še negotovost v obliki standardnih odklonov ali standardnih napak. S knjižnico ggplot2 to storimo z uporabo geom-a `errorbar`. Pred tem moramo ustrezno pripraviti podatke tako, da dodamo še stolpec s spodnjo in zgornjo mejo napake. Če je napaka simetrična, potrebujemo le en stolpec. Poglejmo si odvisnost milj na galono (`mpg`) od števila cilindrov.
 
 ```{r}
 data("mtcars")
@@ -129,8 +129,9 @@ Paket haven ima tudi funkcijo `read_por` ki podpira starejše verzije datotek iz
 Vrnimo se k podatkom o avtih `mtcars`. Poglejmo si, kako urediti `data.frame` glede na neko spremenljivko. Recimo, da nas zanima 10 avtomobilov z najmanj konjskimi močmi.
 
 ```{r}
-cars_decreasing <- mtcars[order(mtcars$hp), ]
-cars_decreasing[1:10, ]
+head(mtcars)
+cars_increasing <- mtcars[order(mtcars$hp), ]
+cars_increasing[1:10, ]
 ```
 
 Kar smo naredili je, da smo najprej uredili `mtcars` glede na stolpec `hp`, ki predstavlja konjske moči. To smo naredili tako, da smo uporabili funkcijo `order`, ki nam vrne urejeno permutacijo indeksov. Na primer
@@ -141,8 +142,8 @@ order(c(5, 2, 3, 1))
 Najmanjše število (1) je na četrtem mestu, torej je prva vrednost, ki jo vrne `order` 4. Drugo najmanjše število (2) je na drugem mestu, torej je druga vrednost, ki jo vrne `order` 2. Če želimo naraščajočo permutacijo, uporabimo argument `decreasing = TRUE`. Poglejmo si sedaj 10 avtomobilov z največ konjskimi močmi.
 
 ```{r}
-cars_increasing <- mtcars[order(mtcars$hp, decreasing = TRUE), ]
-cars_increasing[1:10, ]
+cars_decreasing <- mtcars[order(mtcars$hp, decreasing = TRUE), ]
+cars_decreasing[1:10, ]
 ```
 
 Velikokrat želimo neko podmnožico podatkov, ki ustreza nekemu pogoju. Na primer, želimo vse avtomobile, ki imajo manj kot 100 konjskih moči.
