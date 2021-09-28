@@ -144,12 +144,12 @@ x^2
 
 Ko R zapremo, se izgubijo vse informacije o spremenljivkah. Če bi jih želeli uporabiti tudi kasneje, jih lahko shranimo z ukazom `save.image()` in naložimo z ukazom `load()`. Pokažimo to 
 
-```{r error = T}
+```{r eval = T}
 ls()
-save.image(file = 'd:/spremenljivke.RData')
+save.image(file = 'spremenljivke.RData')
 rm(list = ls(all = T)) # pobrišemo vse spremenljivke
 ls()
-load('d:/spremenljivke.RData')
+load('spremenljivke.RData')
 ls()
 ```
 
@@ -266,4 +266,34 @@ Rešitev za primer zgoraj:
 ```{r echo = FALSE}
 sum(cena)
 sum(cena * (1 + DDV / 100))
+```
+
+3. **Težja naloga** V vektorju `temperatura_max` so zapisane napovedi najvišje dnevne temperature za naslednjih 14 dni, podobno v vektorju `temperatura_min` pa najnižje.
+
+```{r}
+temperatura_max <- c(21.1, 19.4, 18.0, 17.8, NA, 16.2, 16.8, 
+                     18.9, 17.6, 19.2, NA, 21.1, 19.9, 21.7) # najvišja dnevna temperatura
+temperatura_min <- c(10.2, 6.0, 10.3, 11.0, 9.1, 7.8, NA,
+                     9.0, 9.2, 8.6, 8.1, 9.2, 8.3, 7.6) # najnižja dnevna temperatura
+```
+Kot opazimo, v prvem vektorju manjkata vrednosti na 5. in 11. mestu, v drugem pa le ena na 7.
+
+a. Zamenjaj manjkajoče vrednosti v vektorjih s povprečno vrednostjo istega vektorja. (*Hint* z ukazom `?mean` v konzoli poglej čemu služi parameter na.rm fukcije mean.)
+
+Rešitev:
+```{r echo = FALSE}
+temperatura_max[c(5,11)] <- mean(temperatura_max, na.rm = TRUE)
+print(temperatura_max)
+
+temperatura_min[7] <- mean(temperatura_min, na.rm = TRUE)
+print(temperatura_min)
+```
+
+b. Izračunaj minimalen in maksimalen dnevni razpon temperature v naslednjih 14 dneh.
+```{r echo = FALSE}
+razpon <- temperatura_max - temperatura_min
+print("Maksimalen: ")
+print(max(razpon))
+print("Minimalen: ")
+print(min(razpon))
 ```
