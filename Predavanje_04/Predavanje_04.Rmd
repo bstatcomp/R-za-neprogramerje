@@ -306,7 +306,7 @@ V tem primeru pa ne dobimo enako. Funkcijo  `setdiff(mn1, mn3)` si lahko predsta
 
 
 # Domača naloga
-Med podatki o delcih PM10 izberite podatke za Ljubljano.
+1. Med podatki o delcih PM10 izberite podatke za Ljubljano.
 
 
 - Izberite samo tiste, ki imajo vrednost kalcija (Ca) večje od 0.3 in vrednosti natrija (Na) manjše od 0.05.
@@ -329,5 +329,38 @@ print(head(dat))
 apply(da, 1, sum)
 ```
 
+
+2. Naložite tabelo nakupov v trgovini, ki smo jo pridobili iz spletne strani *https://www.kaggle.com/aungpyaeap/supermarket-sales*.
+
+```{r, echo = FALSE}
+sales <- read.csv2(file = "data_raw/supermarket_sales.csv", sep = ',', dec = '.')
+```
+
+- Tabeli odstranite stolpce `branch`, `invoice_ID`, `cogs`, `gross_margin_percentage` in `gross_income`.
+
+```{r, echo = FALSE}
+sales <- sales[, setdiff(colnames(sales),c("branch", "invoice_ID", "cogs", "gross_margin_percentage", "gross_income"))]
+```
+
+- Z uporabo funkcije apply, izračunajte povprečja za stolpce `unit_price`, `quantity`, `total` in `rating`.
+
+```{r, echo = FALSE}
+print(apply(sales[, c("unit_price", "quantity", "total", "rating")], 2, mean, na.rm = T))
+```
+
+- Iz datumov nakupov izvlečite dan nakupa, nato poglejte kako se spreminja število nakupov glede na dan v tednu (*Hint: poglete funkcijo "table"*). Spomnitese, da morate najprej R-ju povedat, da je "date" stolpec datumov.
+
+```{r, echo = FALSE}
+sales$date <- as.Date(sales$date)
+print(table(wday(sales$date)))
+```
+
+- (Težje) Vsem včlanjenim strankam, dodajte 7.5% popust na končni ceni in nove vrednosti shranite v stolpec "price_member_disc".
+
+```{r, echo = FALSE}
+popust <- 0.075 * (sales$customer_type == "Member")
+sales$price_member_disc <- sales$total * (1 - popust)
+print(head(sales))
+```
 
 
