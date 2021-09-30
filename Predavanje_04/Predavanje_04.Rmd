@@ -342,20 +342,20 @@ sales <- read.csv2(file = "data_raw/supermarket_sales.csv", sep = ',', dec = '.'
 sales <- sales[, setdiff(colnames(sales),c("branch", "invoice_ID", "cogs", "gross_margin_percentage", "gross_income"))]
 ```
 
-- Z uporabo funkcije apply, izračunajte povprečja za stolpce `unit_price`, `quantity`, `total` in `rating`.
+- Z uporabo funkcije apply izračunajte povprečja za stolpce `unit_price`, `quantity`, `total` in `rating`.
 
 ```{r, echo = FALSE}
 print(apply(sales[, c("unit_price", "quantity", "total", "rating")], 2, mean, na.rm = T))
 ```
 
-- Iz datumov nakupov izvlečite dan nakupa, nato poglejte kako se spreminja število nakupov glede na dan v tednu (*Hint: poglete funkcijo "table"*). Spomnitese, da morate najprej R-ju povedat, da je "date" stolpec datumov.
+- Iz datumov nakupov izvlečite dan nakupa, nato poglejte, kako se spreminja število nakupov glede na dan v tednu (*Namig: poglejte funkcijo "table"*). Spomnitese, da morate najprej R-ju povedati, da je "date" stolpec datumov.
 
 ```{r, echo = FALSE}
 sales$date <- as.Date(sales$date)
 print(table(wday(sales$date)))
 ```
 
-- (Težje) Vsem včlanjenim strankam, dodajte 7.5% popust na končni ceni in nove vrednosti shranite v stolpec "price_member_disc".
+- (Težje) Vsem včlanjenim strankam dodajte 7.5% popust na končni ceni in nove vrednosti shranite v stolpec "price_member_disc".
 
 ```{r, echo = FALSE}
 popust <- 0.075 * (sales$customer_type == "Member")
