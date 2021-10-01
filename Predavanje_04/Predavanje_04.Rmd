@@ -1,5 +1,5 @@
 ---
-title: "Predavanja 4 -- data.frame, operacije nad vrsticami in stolpci"
+title: "Predavanje 4 -- data.frame, operacije nad vrsticami in stolpci"
 output: pdf_document
 ---
   
