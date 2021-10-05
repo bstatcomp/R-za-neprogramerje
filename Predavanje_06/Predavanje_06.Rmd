@@ -406,7 +406,7 @@ Izrišimo stroške elektrike po mesecih. Najprej naredimo tabelo, ki izloči sam
 ```{r error = T}
 # Ustvarimo prazen data frame.
 mesecni_podatki <- data.frame(mesec = character(0), 
-                              stroski_elektrike = numeric(0))
+                              stroski_elektrike = numeric(0), stringsAsFactors = FALSE)
 vrstica <- 1
 for (imeLista in sheetNames) {
   if (imeLista == "Opozorilo") {
