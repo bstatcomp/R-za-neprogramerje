@@ -7,7 +7,7 @@ output:
 ---
 
 # Uvod
-Cilj zaključne naloge je, da med reševanjem združite znanje, ki ste ga pridobili tekom predavanj, in ga aplicirate na nek praktičen problem. Naloga simulira vsakodnevni izziv pri opravljanju s podatki, kar pomeni, da bo treba podatke pregledati, prečistiti in strukturirati v bolj primeren format.
+Cilj zaključne naloge je, da med reševanjem združite znanje, ki ste ga pridobili tekom predavanj, in ga aplicirate na nek praktičen problem. Naloga simulira vsakodnevni izziv pri delu s podatki, kar pomeni, da bo treba podatke pregledati, prečistiti in strukturirati v bolj primeren format.
 
 # Naloga
 V mapi *data_raw* je datoteka *weatherAUS.csv*, ki vsebuje meterološke podatke za mesto Sydney v Avstraliji med 2. julijem 2008 in 25. junijem 2017. Naloga se deli na dva dela: v prvem boste podatke prečistili in shranili v ".xlsx" format, nato pa boste podatke povzeli z vizualizacijami.
@@ -31,15 +31,16 @@ data <- data[, apply(data, 2, delez_manjkajocih) < 0.1]
 colnames(data)
 ```
 
-2) Ohranite le podatke, ki so bili nabrani vključno med 1. januarjem 2009 in 31. decembrom 2016.
+2) Ohranite le podatke, ki so bili pridobljeni med vključno "2009-01-01" in "2016-12-31".
 ```{r echo = F}
 data$Date <- as.Date(data$Date)
-data <- data[data$Date >= as.Date("2009-01-01") & data$Date <= as.Date("2016-12-31"),]
+data <- data[data$Date >= as.Date("2009-01-01") & 
+                 data$Date <= as.Date("2016-12-31"), ]
 head(data)
 ```
 
 
-3) Napišite funkcijo, ki za poljuben stolpec zamenja manjkajoče vrednosti s povprečjem prejšnjih in naslednjih 2 dni. Če stolpec ne vsebuje numeričnih vrednosti naj funkcija vrne napako. Funkcijo aplicirajte na vse numerične in celoštevilske stolpce v tabeli.
+3) Napišite funkcijo, ki za poljuben stolpec zamenja manjkajoče vrednosti s povprečjem prejšnjih dveh dni. Manjkajoče vrednosti v prvih dveh vrsticah naj funkcija zamenja s povprečjem celotnega stolpca. Če stolpec ne vsebuje numeričnih vrednosti naj funkcija vrne napako. Funkcijo aplicirajte na vse numerične in celoštevilske stolpce v tabeli.
 
 ```{r echo = F}
 zapolni_manjkajoce <- function(x){
@@ -49,18 +50,27 @@ zapolni_manjkajoce <- function(x){
   
   na_loc <- which(is.na(x)) # lokacija manjkajocih vrednosti
   for (i in na_loc){
-    x[i] <- mean(x[i-2 : i+2], na.rm = T)
+    if (i < 3){
+      x[i] <- mean(x, na.rm = T)
+    }else{
+      x[i] <- mean(x[(i-2) : i], na.rm = T)
+    }
   }
   return(x)
 }
 
-num_cols <- which(sapply(data,class) %in% c("numeric", "integer"))
+num_cols <- which(sapply(data, class) %in% c("numeric", "integer"))
 
 data[, num_cols] <- apply(data[, num_cols], 2, zapolni_manjkajoce)
 ```
 
+```{r}
+testni_vector <- c(1, NA, 2, 3, 4, 5, NA)
+zapolni_manjkajoce(testni_vector)
+```
+
 4) 
-  a. Napišite funkcijo, ki poljuben vektor **x** transformira s formulo $y = sin(\frac{2\pi}{53} x)$. Nato iz stolpca `Date` izračunajte stolpec s številom tednov v letu, nad njim ovrednotite prejšnjo funckijo in ga dodajte v tabelo pod imenom `Weeks`. 
+  a. Napišite funkcijo, ki poljuben vektor **x** transformira s formulo $y = sin(\frac{2\pi}{53} x)$. Nato iz stolpca "Date" izračunajte stolpec, ki bo prikazoval zaporedno število tedna v letu, nad njim ovrednotite prejšnjo funkcijo in ga dodajte v tabelo pod imenom "Weeks". 
 
 ```{r echo = F}
 data$Weeks <- sin(2*pi*week(data$Date)/53)
@@ -68,22 +78,23 @@ data$Weeks <- sin(2*pi*week(data$Date)/53)
 ```{r}
 head(data$Weeks, 9)
 ```
-  b. Postopek ponovite z meseci, toda sedaj z novo formulo $y = cos(\frac{\pi}{6} x)$. Nove podatke shranite v stolpec `Months`. 
+  b. Postopek ponovite z meseci, toda sedaj z novo formulo $y = cos(\frac{\pi}{6} x)$. Nove podatke shranite v stolpec "Months". 
 
 ```{r echo=F}
 data$Months <- cos(pi*month(data$Date)/6)
 ```
+
 ```{r}
 head(data$Months, 7)
 ```
 
 5) Nekatere značilke v tabeli imajo dve meritvi, eno ob devetih zjutraj, drugo ob treh popoldne. Meritvi združite v eno tako, da ohranite le največjo vrednost.
 ```{r echo = F}
-znacilke <- c( "WindSpeed", "Humidity", "Pressure", "Temp" )
+znacilke <- c( "WindSpeed", "Humidity", "Pressure", "Temp")
 
 for (z in znacilke){
   z2 <- paste0(z, c("9am", "3pm"))
-  data[,z] <- apply(data[, z2], 1, max)
+  data[, z] <- apply(data[, z2], 1, max)
   data <- data[, - which(colnames(data) %in% z2)]
 }
 head(data)
@@ -92,16 +103,16 @@ head(data)
 6) Izpišite kateri dan je bil najbolj vetroven in hkrati tudi deževen.
 ```{r echo = F}
 # Na grd nacin
-# tmp <- data[data$RainToday == 'Yes',]
-# tmp[which.max(data$WindSpeed[data$RainToday == 'Yes']), "Date"]
+tmp <- data[data$RainToday == 'Yes',]
+tmp[which.max(data$WindSpeed[data$RainToday == 'Yes']), "Date"]
 
 # Lepsi nacin
-data %>% filter(RainToday=='Yes', WindSpeed == max(WindSpeed)) %>% select(Date)
+# data %>% filter(RainToday=='Yes', WindSpeed == max(WindSpeed)) %>% select(Date)
 ```
 
 7) Izpišite kolikokrat se je zgodilo, da sta bila dva dneva zapored deževna.
 ```{r echo = F}
-nrow(data[data$RainToday == 'Yes' &data$RainTomorrow == 'Yes',])
+nrow(data[data$RainToday == 'Yes' & data$RainTomorrow == 'Yes', ])
 ```
 
 8) Shranite tabelo v .xlsx format z imenom `clean_weatherAUS.xlsx`.
@@ -111,20 +122,23 @@ write.xlsx(data, "data_raw/clean_weatherAUS.xlsx", overwrite = T)
 
 ## 2. Del: Vizualizacije
 
-1) Narišite raztrosni graf, ki prikazuje vlažnost v odvisnosti temperature. Točke obarvajte različno glede na to, če je tisti dan deževen ali ne.
+1) Narišite razsevni diagram, ki prikazuje vlažnost v odvisnosti od temperature. Točke obarvajte različno glede na to, če je tisti dan deževen ali ne.
 
 ```{r echo = F, fig.width=4, fig.height= 3}
 ggplot(data, aes(x = Temp, y = Humidity, color = RainToday)) + geom_point()
 ```
 
 
-2) Prikažite s črtnim diagramom vrednosti stolpcov `Weeks` in `Months` za obdobje med "2010-01-01" in "2011-04-01". Graf naj vsebuje obe črti istočasno.
+2) S črtnim diagramom prikažite vrednosti stolpcov "Weeks" in "Months" za obdobje med "2010-01-01" in "2011-04-01". Črti naj bosta obarvani glede na stolpec.
 ```{r echo = F}
-df <- data[(data$Date > as.Date("2010-01-01")) &( data$Date < as.Date("2011-04-01")), c("Date", "Weeks", "Months")]
-df <- pivot_longer(df, cols = c("Weeks", "Months"), names_to = "Data", values_to = "value")
+df <- data[data$Date > as.Date("2010-01-01") & 
+               data$Date < as.Date("2011-04-01"), c("Date", "Weeks", "Months")]
+df <- pivot_longer(df, cols = c("Weeks", "Months"), 
+                   names_to = "Data", values_to = "value")
 ```
 ```{r echo = F, fig.width=5, fig.height= 4}
-ggplot(df, aes(x = Date, y = value, color = Data)) + geom_line() + geom_point() + ylab("")
+ggplot(df, aes(x = Date, y = value, color = Data)) + 
+    geom_line() + geom_point() + ylab("")
 ```
 
 3) 
@@ -134,24 +148,41 @@ df2 <- data[, c("Date", "Rainfall")]
 df2$Quarter <- factor(quarter(df2$Date))
 ```
 ```{r echo = F, fig.width=4, fig.height= 3}
-ggplot(data = df2, aes(x = Quarter, y = Rainfall)) + geom_bar(stat = "summary", fun = mean) + ylab("Rainfall (mm)")
+ggplot(data = df2, aes(x = Quarter, y = Rainfall)) + 
+    geom_bar(stat = "summary", fun = mean) + ylab("Rainfall (mm)")
 ```
 
-  b. (Težje) Stolpcom dodajte tudi `errorbar`, ki predstavlja standardno napako (sd(x)/sqrt(length(x))).
+  b. (Težje) Stolpcem dodajte tudi `geom_errorbar`, ki predstavlja standardno napako `error = sd(x)/sqrt(length(x))`.
 ```{r echo = F}
 se <- function(x) return (sd(x)/sqrt(length(x)))
+
 df3 <- data.frame( mean = tapply(df2$Rainfall, df2$Quarter, mean),
                    sd = tapply(df2$Rainfall, df2$Quarter, se))
 
 df3$Quarter <- levels(df2$Quarter)
 ```
 ```{r echo = F, fig.width=4, fig.height= 3}
-ggplot(data = df3, aes(x = Quarter, y = mean, fill = Quarter)) + geom_bar(stat = "identity", width = 0.5) + geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd), stat = "identity", width = 0.1, size = 1.1) + ylab("Rainfall (mm)")
+ggplot(data = df3, aes(x = Quarter, y = mean, fill = Quarter)) + 
+    geom_bar(stat = "identity", width = 0.5) + 
+    geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd),
+                  stat = "identity", width = 0.1, size = 1.1) +
+    ylab("Rainfall (mm)")
 ```
   
-4. Za stolpce "Pressure", "Humidity" in "Temp" prikažite črtne diagrame s točkami za obdobje med "2012-01-01" in "2013-01-01". Če je bil naslednji dan deževen, točko obarvajte z drugo barvo. Iz preglednosti, vsako meritev prikažite na "pod-grafu" oziroma, če je pretežko, na ločenih grafih.
+4. Za stolpce "Pressure", "Humidity" in "Temp" prikažite črtne diagrame s točkami za obdobje med "2012-01-01" in "2013-01-01". Če je bil naslednji dan deževen, točko obarvajte z drugo barvo.
 
 ```{r echo = F}
-filter(data, Date > "2012-01-01", Date < "2013-01-01" ) %>% pivot_longer(cols = c(Humidity, Temp, Pressure), names_to = "Measurment", values_to = "value") %>% ggplot(aes(x = Date, y = value)) + geom_line() + geom_point(aes(x = Date, y = value, color = RainTomorrow), inherit.aes = T)+
-facet_grid(rows = vars(Measurment), scales = "free")
+# preprosti nacin
+df4 <- data[data$Date > "2012-01-01" & data$Date < "2013-01-01", ]
+df4 <- pivot_longer(df4, cols = c(Humidity, Temp, Pressure),
+                    names_to = "Measurment", values_to = "value")
+
+# boljsi nacin z uporabo pakete dplyr
+#filter(data, Date > "2012-01-01", Date < "2013-01-01" ) %>% pivot_longer(cols = c(Humidity, Temp, Pressure), names_to = "Measurment", values_to = "value") %>% ggplot(aes(x = Date, y = value)) + geom_line() + geom_point(aes(x = Date, y = value, color = RainTomorrow), inherit.aes = T) + facet_grid(rows = vars(Measurment), scales = "free")
+```
+```{r echo = F}
+ggplot(df4, aes(x = Date, y = value)) + 
+    geom_line() + 
+    geom_point(aes(x = Date, y = value, color = RainTomorrow), inherit.aes = T) + 
+    facet_grid(rows = vars(Measurment), scales = "free")
 ```
