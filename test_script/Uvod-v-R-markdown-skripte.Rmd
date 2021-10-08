@@ -9,7 +9,7 @@ Namen te skripte je ta, da od začetka razjasnimo kako je sestavljeno gradivo za
 Od tu naprej bomo predpostavljali, da ste na računalnik uspešno namestili R in RStudio ter da ste uspešno pognali testno skripto.
 
 # Markdown
-Markdown je označevalni jezik, skupek ukazov, ki določajo, v kateri obliki in formatu se bo besedilo prikazal na ekranu. Na razliko od drugih označevalnih jezikov (HTML, LaTex, XML, ...), je Markdown zelo jasen in berljiv tudi v izvorni obliki, zaradi česar je pogosto uporabljen za pisanje blogov, forumov, dokumentacij in README-datotek (za konkretno primerjavo s HTML poglej **[tukaj](https://en.wikipedia.org/wiki/Markdown)**).
+Markdown je označevalni jezik, skupek ukazov, ki določajo, v kateri obliki in formatu se bo besedilo prikazalo na ekranu. Na razliko od drugih označevalnih jezikov (HTML, LaTex, XML, ...), je Markdown zelo jasen in berljiv tudi v izvorni obliki, zaradi česar je pogosto uporabljen za pisanje blogov, forumov, dokumentacij in README-datotek (za konkretno primerjavo s HTML poglej **[tukaj](https://en.wikipedia.org/wiki/Markdown)**).
 
 Poglejmo si, kako izgleda izvorna koda za prvi dve poglavji tega dokumenta:
 
