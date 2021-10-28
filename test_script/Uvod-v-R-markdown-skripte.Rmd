@@ -4,7 +4,7 @@ output: pdf_document
 ---
 
 # Uvod
-Namen te skripte je ta, da od začetka razjasnimo kako je sestavljeno gradivo za predavanja. Gradivo je napisano v programskem jeziku **R Markdown**, kar je mešanica programskega jezika *R* in označevalnega jezika *Markdown* (*ang. markup language*). R bomo bolje spoznali tekom predavanj, saj je temu namenjena delavnica, Markdown pa bomo na kratko povzeli v tem dokumentu. Tako bo potek delavnice in brskanje po originalnih skriptah jasno in razumljivo.
+Namen te skripte je ta, da od začetka razjasnimo kako je sestavljeno gradivo za predavanja. Gradivo je napisano v programskem jeziku **R Markdown**, kar je mešanica programskega jezika *R* in označevalnega jezika *Markdown* (*ang. markup language*). R bomo bolje spoznali tekom predavanj, saj je temu namenjena delavnica, Markdown pa bomo na kratko povzeli v tem dokumentu. Tako bosta potek delavnice in brskanje po originalnih skriptah jasna in razumljiva.
 
 Od tu naprej bomo predpostavljali, da ste na računalnik uspešno namestili R in RStudio ter da ste uspešno pognali testno skripto.
 
@@ -13,7 +13,7 @@ Markdown je označevalni jezik, skupek ukazov, ki določajo, v kateri obliki in 
 
 Poglejmo si, kako izgleda izvorna koda za prvi dve poglavji tega dokumenta:
 
-![Izvorna koda za prvi dve poglavji.](primer_markdown.PNG)
+![Izvorna koda za prvi dve poglavji.](../img/primer_markdown.PNG)
 
 Kot opazimo, izvorna koda je navadno besedilo, ki vsebuje le nekaj "posebnih" znakov, zaradi česar je enostavno berljiva. Če torej na kratko povzamemo, v Markdown-u lahko pišemo besedila na podoben preprost način kot v Word-u ali Notepade-u z izjemo, da z uporabo nekaterih znakov lahko neposredno oblikujemo njihov končen prikaz.
 
@@ -37,7 +37,7 @@ Ko je namestitev končala lahko testiramo, če smo uspešno namestili R Markdown
 ## Kodni odseki
 Spodaj je navedenih nekaj primerov kodnih odsekov (*angl. "code chunks"*) v izvorni kodi (slika) in v končni obliki.
 
-![Izvorna koda za kodne odseke.](kodni_odseki.PNG)
+![Izvorna koda za kodne odseke.](../img/kodni_odseki.PNG)
 
 ```{r primer1}
 ime <- "DataScience@FRI"
