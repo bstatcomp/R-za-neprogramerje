@@ -406,7 +406,7 @@ Izrišimo stroške elektrike po mesecih. Najprej naredimo tabelo, ki izloči sam
 ```{r error = T}
 # Ustvarimo prazen data frame.
 mesecni_podatki <- data.frame(mesec = character(0), 
-                              stroski_elektrike = numeric(0))
+                              stroski_elektrike = numeric(0), stringsAsFactors = FALSE)
 vrstica <- 1
 for (imeLista in sheetNames) {
   if (imeLista == "Opozorilo") {
@@ -526,6 +526,39 @@ mesecni_podatki_longer <- pivot_longer(mesecni_podatki,
 ggplot(mesecni_podatki_longer, aes(x = datum, y = value, color = name)) +
   geom_line() +
   ylab("Stroski")
+```
+
+e) Preberite datoteko `supermarket_sales.csv` v mapi *data_raw*. Za vsak stolpec poglejte kateri tip vrednosti vsebuje in ga ohranite le če ni tipa "numeric". *Namig: za izpis tipa stolpca uporabi funkcijo "class()".*
+```{r echo = F}
+sales <- read.csv2("data_raw/supermarket_sales.csv", sep = ',', dec = '.')
+for (column in colnames(sales)){
+  if (class(sales[, column]) == "numeric"){
+    sales <- sales[, -which(colnames(sales)==column)]
+  }
+}
+
+head(sales)
+```
+
+f) Za vsako kategorijo iz stolpca "product_line" izračunajte delež nakupov, ki so jih opravili moški in ženske. Deleže shranite v seznam.
+```{r echo = F}
+categories <- unique(sales$product_line)
+gender_rates <- list()
+for (category in categories){
+  gender_rates[[category]] <- table(sales[sales$product_line == category, "gender"])
+}
+
+print(gender_rates)
+```
+
+g) Sprehodite se po vrsticah dokler ne najdete nakupa, ki vsebuje 9 ali več artiklov. Nato pa izpišite število vrstice, v kateri se ta nakup nahaja.
+```{r echo = F}
+for (i in seq(nrow(sales))){
+  if (sales[i, "quantity"] >= 9){
+    print(i)
+    break
+  }
+}
 ```
 
 # Reference

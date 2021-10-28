@@ -144,12 +144,12 @@ x^2
 
 Ko R zapremo, se izgubijo vse informacije o spremenljivkah. Če bi jih želeli uporabiti tudi kasneje, jih lahko shranimo z ukazom `save.image()` in naložimo z ukazom `load()`. Pokažimo to 
 
-```{r error = T}
+```{r eval = T}
 ls()
-save.image(file = 'd:/spremenljivke.RData')
+save.image(file = 'spremenljivke.RData')
 rm(list = ls(all = T)) # pobrišemo vse spremenljivke
 ls()
-load('d:/spremenljivke.RData')
+load('spremenljivke.RData')
 ls()
 ```
 
@@ -266,4 +266,52 @@ Rešitev za primer zgoraj:
 ```{r echo = FALSE}
 sum(cena)
 sum(cena * (1 + DDV / 100))
+```
+
+3. **Težja naloga** V vektorju `temperatura_max` so zapisane napovedi najvišje dnevne temperature za naslednjih 14 dni, podobno v vektorju `temperatura_min` pa najnižje.
+
+```{r}
+temperatura_max <- c(21.1, 19.4, 18.0, 17.8, NA, 16.2, 16.8, 
+                     18.9, 17.6, 19.2, NA, 21.1, 19.9, 21.7) # najvišja dnevna temperatura
+temperatura_min <- c(10.2, 6.0, 10.3, 11.0, 9.1, 7.8, NA,
+                     9.0, 9.2, 8.6, 8.1, 9.2, 8.3, 7.6) # najnižja dnevna temperatura
+```
+Kot opazimo, v prvem vektorju na 5. in 11. mestu in v drugem na 7. mestu se pojavi napis "NA". To je oznaka, ki jo R uporabi, da označi manjkajoče vrednosti. Z vektorji, ki vsebujejo manjkajoče vrednosti, malce težje računamo, saj R ne ve kako naj jih upošteva. Primer:
+
+```{r}
+sum(temperatura_max)
+```
+
+Kot vidimo, vsota vrednosti vektorja, ki vsebuje NA, vrne prav tako NA. Da bi se izognili tej nevšečnosti, moramo izrecno povedati funkciji, naj ignorira NA-je. Ravno temu služi parameter "na.rm" v funkciji sum.
+
+```{r}
+sum(temperatura_max, na.rm = TRUE)
+```
+
+Odstranjevanje ali polnjenje manjkajočih vrednosti je pogost problem s katerim se srečujemo pri obdelavi podatkov. V tej nalogi imamo en primer takega problema, ki ga lahko rešimo s znanjem, ki smo ga pridobili med tem predavanjem.
+
+a. Zamenjaj manjkajoče vrednosti v vektorjih s povprečno vrednostjo istega vektorja.
+
+Rešitev:
+```{r echo = FALSE}
+temperatura_max[c(5,11)] <- mean(temperatura_max, na.rm = TRUE)
+print(temperatura_max)
+
+# Alternativa:
+# temperatura_max[is.na(temperatura_max)] <- mean(temperatura_max, na.rm = TRUE)
+# Ta ukaz vstavi povprečje na vsa mesta v vektorju, kjer se nahajajo NA-ji.
+# Tak ukaz je bolj napreden in s trenutnim znanjem ne pričakujemo, da bi nalogo tako rešili.
+# Je pa bolj korekten.
+
+temperatura_min[7] <- mean(temperatura_min, na.rm = TRUE)
+print(temperatura_min)
+```
+
+b. Izračunaj minimalen in maksimalen dnevni razpon temperature v naslednjih 14 dneh.
+```{r echo = FALSE}
+razpon <- temperatura_max - temperatura_min
+print("Maksimalen: ")
+print(max(razpon))
+print("Minimalen: ")
+print(min(razpon))
 ```

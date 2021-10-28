@@ -7,7 +7,7 @@ output:
 ---
 
 ```{r, setup, include = F}
-knitr::opts_knit$set(root.dir = "/home/jana/git/R-za-neprogramerje/Predavanje_07")
+#knitr::opts_knit$set(root.dir = "/home/jana/git/R-za-neprogramerje/Predavanje_07")
 ```
 
 
@@ -278,7 +278,8 @@ shraniPodatke <- function (podatki, datoteka, koncnica = "csv") {
   celotno_ime <- paste(ime, koncnica, sep = ".")
   print(celotno_ime)
   if (koncnica == "csv") {
-    write.table(podatki, file = celotno_ime, dec = ".", sep = ",", row.names = FALSE, col.names = TRUE)
+    write.table(podatki, file = celotno_ime, dec = ".", sep = ",",
+                row.names = FALSE, col.names = TRUE)
     return()
   }
   if (koncnica == "xlsx") {
@@ -349,3 +350,95 @@ razsevni_diagram(c(1, 2, 3, 4, 3), c(4, 3, 2, 4, 4.5), "x os", "y os")
 
 
 3) Napišite funkcijo `nalozi_priljubljene_pakete()`, s katero boste lahko v prihodnje lažje naložili vse pakete, ki jih uporabljate. Npr.: *ggplot2*, *openxlsx*, *tidyr*
+
+```{r echo = F}
+nalozi_priljubljene_pakete<- function(){
+  library(ggplot2)
+  library(tidyr)
+  library(openxlsx)
+}
+
+nalozi_priljubljene_pakete()
+```
+
+4) Preberite podatke v mapi *data_raw* o ameriških volitvah. Podatke smo pobrali 6. novembra 2020 iz: https://www.kaggle.com/unanimad/us-election-2020?select=president_county_candidate.csv.
+  
+  - Napište funkcijo `count_votes`, ki prejme kot parameter celo tabelo in ime kandidata, nato pa izpiše skupno število glasov, ki jih je ta kandidat prejel.
+
+```{r echo = F}
+x <- read.csv("./data_raw/president_county_candidate.csv", dec = '.', sep = ',')
+
+count_votes <- function(ds, name){
+  return(sum(ds[ds$candidate == name, "votes"]))
+}
+
+count_votes(ds = x, name = 'Donald Trump')
+```
+  
+  - Napišite funkcijo `plot_votes`, ki za poljuben vektor imen zveznih držav izriše stolpični diagram s številom glasov za vsako državo za stranke "REP", "DEM" in "LIB".
+```{r echo = F}
+plot_votes <- function(df, states){
+  x <- df[df$state %in% states, ]
+  x <- x[x$party %in% c("DEM", "REP", "LIB"), ]
+  st <- 
+  p <- ggplot(x, aes(x = state, y = votes, fill = party) ) + geom_bar(stat = "summary", fun = sum, position = 'dodge')
+  show(p)
+}
+plot_votes(x, c("California", "Florida", "Iowa", "New York", "Alabama"))
+```
+  
+  - (Težje) Napišite funkcijo `top_3`, ki prejme v vhodu tabelo in ime zvezne države in izpiše prva tri imena kandidatov ali kratice strank, glede na število glasov. Kaj naj izpiše naj določi parameter "output", ki sprejme le niza 'candidate' ali 'party', drugače pa vrne napako.
+  
+```{r echo = F}
+top_3 <- function(df, state, output){
+  # preverimo pravilnost vhoda
+  if(!(output %in% c("candidate", "party"))){
+    stop("Napačna vrednost za parameter 'output'!")
+  }
+  # tabeli odrežemo nepotrebne vrstice:
+  x <- df[df$state == state, c(output, "votes") ]
+  
+  # daljši in manj eleganten pristop:
+  # votes <- NULL
+  # candidates <- unique(x[, output]) # dobimo vektor kandidatov/imen strank
+  # for (cand in candidates){ # v zanki izračunamo vsoto glasov za vsakega kandidata 
+  #   votes <- c(votes, sum(x[x[,output] == cand, "votes"])) # dodamo v končni vektor votes
+  # }
+  # results <- data.frame(candidate = candidates, votes = votes)
+  # 
+  
+  # krajši in bolj eleganten pristop:
+  votes <- as.numeric(tapply(x$votes, factor(x[, output]), sum))
+  results <- data.frame(candidate = levels(factor(x[, output])), votes = votes)
+  return(head(results[order(votes, decreasing = T), ], 3)) # uredimo po vektorju votes in vrnemo le prve 3.
+}
+
+top_3(x, 'Arkansas', 'candidate')
+```
+
+  - Razširite fleksibilnost funkcije `top_3` z dodatnim parametrom n, ki določa koliko vrstic naj funkcija vrne. Če bo n večji od vseh možnih vrstic za dano državo, naj vrne funkcija opozorilo in spremeni n v največje možno število vrstic. Funkcijo imenujte `top_n` in naj bo privzeta vrednost n-ja 5.
+
+```{r echo = F}
+top_n <- function(df, state, output, n = 5){
+  # preverimo pravilnost vhoda
+  if(!(output %in% c("candidate", "party"))){
+    stop("Napačna vrednost za parameter 'output'!")
+  }
+  # tabeli odrežemo nepotrebne vrstice:
+  x <- df[df$state == state, c(output, "votes") ]
+  
+  # Preverimo če n ni napačen:
+  max_length <- length(unique(x[, output]))
+  if (n > max_length){
+    warning(paste0("Prevelik 'n', vrednost spremenjena v: ", max_length))
+    n <- max_length
+  }
+  
+  votes <- as.numeric(tapply(x$votes, factor(x[, output]), sum))
+  results <- data.frame(candidate = levels(factor(x[, output])), votes = votes)
+  return(head(results[order(votes, decreasing = T), ], n)) # uredimo po vektorju votes in vrnemo le prve 3.
+}
+
+top_n(x, 'Arkansas', 'candidate')
+top_n(x, 'Virginia', 'candidate', 100)
+```
