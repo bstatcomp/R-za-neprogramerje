@@ -8,7 +8,6 @@ bibliography: P00.bib
 
 ```{r setup, include=FALSE}
 # knitr::opts_chunk$set(echo = TRUE)
-
 ```
 
 
@@ -24,12 +23,11 @@ Slabosti dela z Excel (v primerjavi z R):
 
 
 ```{r fig.height = 4}
-library(xlsx)
+library(openxlsx)
 library(ggplot2)
-dat <- xlsx::read.xlsx("./data_raw/odsotnosti_R.xlsx", sheetIndex = 1)
-rsn <- xlsx::read.xlsx("./data_raw/odsotnosti_R.xlsx", sheetIndex = 2)
+dat <- openxlsx::read.xlsx("./data_raw/odsotnosti_R.xlsx", sheet = 1)
+rsn <- openxlsx::read.xlsx("./data_raw/odsotnosti_R.xlsx", sheet = 2)
 # Podatki so dostopni na https://archive.ics.uci.edu/ml/datasets/Absenteeism+at+work.
-
 df <- data.frame(rsn, 
                  Stevilo = tapply(dat$Razlog, dat$Razlog, length),
                  Vsota   = tapply(dat$Ure, dat$Razlog, sum))
@@ -58,4 +56,3 @@ ggplot(df, aes(x = Opis, y = Razmerje)) + geom_bar(stat = "identity") +
 Podatki, ki smo jih uporabili v tem poglavju, so del znanstvenega članka @Martiniano2012.
 
 # Reference
-
