@@ -7,6 +7,7 @@ output: pdf_document
   
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+options(stringsAsFactors = FALSE)
 ```
 
 
@@ -301,7 +302,7 @@ Kaj pa če tukaj zamenjamo vrstni red?
 ```{r, error = TRUE}
 print(setdiff(mn3, mn1))
 ```
-V tem primeru pa ne dobimo enako. Funkcijo  `setdiff(mn1, mn3)` si lahko predstavljamo, da vrne elemente, ki so v **nm1** in jih ni v **nm3**. To pa ni enako elementom, ki so v **nm3** in jih ni v **nm1**.
+V tem primeru pa ne dobimo enako. Funkcijo  `setdiff(mn1, mn3)` si lahko predstavljamo, da vrne elemente, ki so v **mn1** in jih ni v **mn3**. To pa ni enako elementom, ki so v **mn3** in jih ni v **mn1**.
 
 
 
