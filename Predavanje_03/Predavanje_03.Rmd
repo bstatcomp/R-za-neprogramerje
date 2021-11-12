@@ -7,6 +7,7 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+options(stringsAsFactors = FALSE)
 ```
 
 
@@ -300,7 +301,7 @@ Stolpec dodamo tako, da najprej ustvarimo vektor, ki je take dolžine, kolikor i
 Vrstico ustvarimo tako, da najprej ustvarimo data.frame, ki ima iste atribute kot `df` in vrstico dodamo na konec `df`:
  
 ```{r, error = TRUE}
-vrstica <- data.frame(spol = "m", visina = 170, teza = 60, imena = "Samo")
+vrstica <- data.frame(spol = "m", visina = 170, teza = 60, imena = 'Samo')
 dim(df)
 df[11, ] <- vrstica
 print(df)
@@ -372,10 +373,10 @@ dat[dat$votes == max(dat[dat$party == "LIB", "votes"]), ]
 ```
 
 
-2. Preberite podatke v mapi *data_raw* o BDP na prebivalca evropskih držav `EU_GDP_per_capita.csv`, ki smo jih pobrali 29. septembra 2021 iz spletne strani Eurostat (https://ec.europa.eu/eurostat/web/national-accounts/data/database). Pri nalaganju tabele uporabite parameter `stringsAsFactors = F`.
+2. Preberite podatke v mapi *data_raw* o BDP na prebivalca evropskih držav `EU_GDP_per_capita.csv`, ki smo jih pobrali 29. septembra 2021 iz spletne strani Eurostat (https://ec.europa.eu/eurostat/web/national-accounts/data/database).
 
 ```{r iclude= FALSE, echo = FALSE}
-BDP <- read.csv("data_raw/EU_GDP_per_capita.csv", sep=',', stringsAsFactors = F)
+BDP <- read.csv("data_raw/EU_GDP_per_capita.csv", sep=',')
 head(BDP)
 ```
 
@@ -402,9 +403,10 @@ print(BDP[BDP$country == 'AT', 20:22] - BDP[BDP$country == 'IT', 20:22])
 print(BDP[BDP$y2005 < 10000 | BDP$y2005 > 40000, 'country'])
 ```
 
-- Preberite tabelo o BDP na prebivalca za Slovenijo in njene vrednosti dodajete v tabelo ostalih EU držav. Tudi tukaj pri nalaganju tabele uporabite parameter `stringsAsFactors = F`.
+- Preberite tabelo o BDP na prebivalca za Slovenijo in njene vrednosti dodajete v tabelo ostalih EU držav. 
+
 ```{r echo = FALSE}
-slo_BDP <- read.csv("data_raw/SLO_GDP_per_capita.csv", sep=',', stringsAsFactors = F)
+slo_BDP <- read.csv("data_raw/SLO_GDP_per_capita.csv", sep=',')
 BDP[nrow(BDP)+1,] <- slo_BDP
 tail(BDP)
 ```
