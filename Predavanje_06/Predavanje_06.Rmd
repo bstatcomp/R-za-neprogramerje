@@ -5,6 +5,9 @@ output:
   html_document: default
 bibliography: P06.bib
 ---
+```{r include=F,echo=FALSE}
+options(stringsAsFactors = FALSE)
+```
 
 # Cilji predavanja {#cilji}
 
