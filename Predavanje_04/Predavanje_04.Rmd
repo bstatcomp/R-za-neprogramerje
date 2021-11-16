@@ -334,7 +334,7 @@ apply(da, 1, sum)
 2. Naložite tabelo nakupov v trgovini, ki smo jo pridobili iz spletne strani *https://www.kaggle.com/aungpyaeap/supermarket-sales*.
 
 ```{r, echo = FALSE}
-sales <- read.csv2(file = "data_raw/supermarket_sales.csv", sep = ',', dec = '.')
+sales <- read.csv(file = "data_raw/supermarket_sales.csv", sep = ',', dec = '.')
 ```
 
 - Tabeli odstranite stolpce `branch`, `invoice_ID`, `cogs`, `gross_margin_percentage` in `gross_income`.
@@ -352,7 +352,7 @@ print(apply(sales[, c("unit_price", "quantity", "total", "rating")], 2, mean, na
 - Iz datumov nakupov izvlečite dan nakupa, nato poglejte, kako se spreminja število nakupov glede na dan v tednu (*Namig: poglejte funkcijo "table"*). Spomnitese, da morate najprej R-ju povedati, da je "date" stolpec datumov.
 
 ```{r, echo = FALSE}
-sales$date <- as.Date(sales$date)
+sales$date <- as.Date(sales$date, format = "%m/%d/%Y")
 print(table(wday(sales$date)))
 ```
 
