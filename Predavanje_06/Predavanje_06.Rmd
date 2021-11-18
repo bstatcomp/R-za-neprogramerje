@@ -21,7 +21,7 @@ V mapi *data\_raw* se nahajajo podatki o spletnih nakupih darilnih in zabavnih i
 
 # Programski tok
 
-Skripte, ki jih napišemo, izvajajo ukaze zaporedno iz vrha navzdol. Včasih želimo nekatere ukaze preskočiti, druge pa ponoviti večkrat. To lahko storimo ročno, če uporabljamo bližnjico **Ctrl** + **Enter**, če pa uporabimo ukaz `source()` se skripta izvede v celoti. Če želimo, da se nekateri deli skripte avtomatsko preskočijo oziroma ponovijo, potrebujemo nekaj ukazov, ki nam bodo to omogočili. Primere, kjer bi to potrebovali, bomo spoznali v nadaljevanju.
+Skripte, ki jih napišemo, izvajajo ukaze zaporedno iz vrha navzdol. Včasih želimo nekatere ukaze preskočiti, druge pa ponoviti večkrat. To lahko storimo ročno z uporabo bližnjice **Ctrl** + **Enter**, če pa uporabimo ukaz `source()` se skripta izvede v celoti. Če želimo, da se nekateri deli skripte avtomatsko preskočijo oziroma ponovijo, potrebujemo ukaze, ki nam to omogočajo. Primere, kjer bi to potrebovali, bomo spoznali v nadaljevanju.
 
 
 # Ukaz if
@@ -53,9 +53,9 @@ logicni_vektor <- podatki$Quantity < 0
 head(logicni_vektor)
 ```
 
-Zgornja ukaza preverita vse vrednosti *Quantity* in za vsako vrednost, ki je negativna, vrneta **TRUE**. Nas pa zanima, če je vsaj ena vrednost **TRUE**. To lahko preprosto naredimo z vgrajeno funkcijo `any()`, ki vrne **TRUE**, če je katerakoli vrednost v podanem vektorju **TRUE**. Sorodno deluje `all()`, ki vrne **TRUE**, če so vse podane vrednosti **TRUE**.
+Zgornja ukaza preverita vse vrednosti *Quantity* in za vsako negativno vrednost, vrneta **TRUE**. Nas pa zanima, če je vsaj ena vrednost **TRUE**. To lahko preprosto naredimo z vgrajeno funkcijo `any()`, ki vrne **TRUE**, če je katerakoli vrednost v podanem vektorju **TRUE**. Sorodno deluje `all()`, ki vrne **TRUE**, če so vse podane vrednosti **TRUE**.
 
-Poglejmo si to na primerih.
+Poglejmo si to na par primerih.
 
 ```{r error = T}
 any(FALSE, FALSE, FALSE)
@@ -128,7 +128,7 @@ head(podatki_ita)
 head(podatki_gre)
 ```
 
-Sedaj imamo 3 `data.frame` z enakimi stolpci. Lahko jih združimo v enoten `data.frame` z ukazom `rbind`.
+Sedaj imamo tri `data.frame` z enakimi stolpci. Z ukazom `rbind` jih lahko združimo v enoten `data.frame`.
 
 ```{r error = T}
 podatki <- rbind(podatki_aus, podatki_ita, podatki_gre)
@@ -143,9 +143,9 @@ podatki <- rbind(podatki_aus, podatki_ita)
 podatki <- rbind(podatki, podatki_gre)
 ```
 
-Tak način nam bo prišel prav kasneje.
+Ta zaporedni način nam bo prišel prav kasneje.
 
-Da smo prebrali vse podatke smo morali ročno zapisati po eno vrstico za vsak list v Excelovi datoteki in primerno poimenovati vsaki spremenljivko. Nato smo morali vse te `data.frame` še zapisati v ukaz `rbind`. Sicer je zaenkrat bila to popolnoma sprejemljiva rešitev. Ampak ali bomo res vse to ponavljali za večjo datoteko, ki ima 37 listov? Kaj pa, če bomo imeli datoteko s 100 listi ali več? Obstajati mora boljša rešitev!
+Da smo prebrali vse podatke smo morali ročno zapisati po eno vrstico za vsak list Excelove datoteke in primerno poimenovati vsako spremenljivko. Nato smo morali vse te `data.frame` še združiti z ukazom `rbind`. To je zaenkrat sicer bila popolnoma sprejemljiva rešitev. Ampak, ali bomo res vse to ponavljali za večjo datoteko, ki ima 37 listov? Kaj pa, če bomo imeli datoteko s 100 listi ali več? Obstajati mora boljša rešitev!
 
 R nam omogoča, da se ponovnemu pisanju lahko izognemo z uporabo **for** zanke. For zanka v R-ju izgleda takole.
 
@@ -172,10 +172,10 @@ for (i in 1:3) {
 }
 ```
 
-Za primer lahko z zanko izračunamo vsoto neke množice števil:
+Za primer z zanko lahko izračunamo vsoto neke množice števil:
 
 ```{r error = T}
-x          <- c(2, 4, 7, 5)
+x <- c(2, 4, 7, 5)
 moja_vsota <- 0
 for (i in x) {
   print("i: ")
@@ -189,15 +189,17 @@ moja_vsota
 sum(x)
 ```
 
-Sicer v R poznamo ukaz `sum`, ki to naredi veliko preprosteje. Ampak v bistvu računalnik v ozadju tudi pri tej funkciji uporabi for zanko, le da je mi ne vidimo. Tako se večina računanja v računalnikih v bistvu izvaja z zankami. Sedaj imamo potrebno znanje, ki ga potrebujemo, da preberemo več listov v Excelu z zanko. Preberimo torej sedaj podatke iz večje datoteke *online-retail-large.xlsx*. Imamo 37 listov. Poizkusimo z
+Sicer v R-ju poznamo ukaz `sum`, ki to naredi veliko preprosteje. Ampak v bistvu računalnik v ozadju tudi pri tej funkciji uporabi for zanko, le da je mi ne vidimo. Večina računanja v računalnikih se v bistvu v ozadju izvaja z zankami. Sedaj imamo potrebno znanje, ki ga potrebujemo, da preberemo več listov v Excelu z uporabo zanke. Poskusimo sedaj prebrati vse podatke iz večje datoteke *online-retail-large.xlsx*. Imamo 37 listov. Poskušajmo z
 
 ```{r error = T, eval = F}
+podatki <- NULL  # To nam samo rezervira mesto za to spremenljivko.
 for (i in 1:37) {
   podatki <- read.xlsx("./data_raw/online-retail-large.xlsx", sheet = i)
 }
+dim(podatki)
 ```
 
-Opazimo težavo. V tem primeru se bodo podatki vedno shranili v isto spremenljivko in jih na koncu ne bomo morali enostavno združiti. Na srečo lahko uporabimo `rbind` kar znotraj zanke! Najprej moramo ustvariti prazen `data.frame`, kateremu nato dodajamo vrstice.
+Opazimo težavo. Videti je, da je samo 58 vrstic v rezultatu, kar je zelo malo glede na 37 listov. V tem primeru se podatki vedno shranijo v isto spremenljivko in jo zanko vedno le prepiše. Na srečo lahko uporabimo `rbind` kar znotraj zanke! Najprej moramo ustvariti prazen `data.frame`, kateremu nato dodajamo vrstice.
 
 ```{r error = T, eval = F}
 podatki <- NULL  # To nam samo rezervira mesto za to spremenljivko.
@@ -205,17 +207,18 @@ for (i in 1:37) {
   podatki_tmp <- read.xlsx("./data_raw/online-retail-large.xlsx", sheet = i)
   podatki     <- rbind(podatki, podatki_tmp)
 }
+dim(podatki)
 ```
 
-S funkcijo `View` lahko preverimo, ali podatki izgledajo v redu.
+S funkcijo `View` lahko tudi preverimo, ali podatki izgledajo v redu.
 
-Naš pristop pa ima še eno pomanjkljivost in sicer to, da moramo vnaprej prešteti število listov v Excelu. S tem se lahko spoprimemo s funkcijo `getSheetNames`, ki nam bo vrnila vektor imen listov v Excelu.
+Naš pristop pa ima še eno pomanjkljivost in sicer to, da moramo vnaprej prešteti število listov v Excelu. S tem se lahko spoprimemo z uporabo funkcije `getSheetNames`, ki nam vrne vektor imen listov v Excelu.
 
 ```{r error = T, eval = T}
 imena_listov <- getSheetNames("./data_raw/online-retail-large.xlsx")
 imena_listov
 ```
-Namesto uporabe številskih indeksov v for zanki, lahko uporabimo tudi vektor besed. V našem primeru bodo to imena listov.
+Namesto uporabe številskih indeksov v **for** zanki, lahko uporabimo tudi vektor besed. V našem primeru bodo to imena listov.
 
 ```{r error = T, eval = F}
 podatki <- NULL
@@ -224,9 +227,10 @@ for (ime_lista in imena_listov) {
                            sheet = ime_lista)
   podatki     <- rbind(podatki, podatki_tmp)
 }
+dim(podatki)
 ```
 
-Včasih želimo kakšno ponovitev zanke izpustiti. Na primer, opazimo, da imamo med listi v Excelu navedeno državo "Unspecified". Recimo, da tega podatka ne želimo v našem `data.frame`. Seveda bi lahko enostavno prebrali vse podatke in nato ustrezne vrstice izbrisali. Lahko pa branje tega lista enostavno izpustimo iz izvajanja zanke. Za to lahko uporabimo kombinacijo pogojnega stavka, ki bo preveril, ali je ime lista enako "Unspecified" in posebnega ukaza `next`, ki preskoči izvedbo ponovitve zanke.
+Včasih želimo kakšno ponovitev zanke izpustiti. Na primer, opazimo, da imamo med listi v Excelu navedeno državo "Unspecified". Recimo, da tega podatka ne želimo v našem `data.frame`. Seveda bi lahko enostavno prebrali vse podatke in nato ustrezne vrstice izbrisali. Lahko pa branje tega lista enostavno izpustimo iz izvajanja zanke. Za to lahko uporabimo kombinacijo pogojnega stavka, ki bo preveril, ali je ime lista enako "Unspecified" in posebnega ukaza `next`, ki preskoči trenutno izvedbo ponovitve zanke.
 
 ```{r error = T, eval = T}
 podatki <- NULL
@@ -249,13 +253,13 @@ podatki[podatki$Country == "Unspecified", ]
 
 Vidimo, da podatkov za to državo nimamo.
 
-Podatke smo primerno naložili v R in sedaj imamo `data.frame` s katerim lahko delamo naprej. Nad tem `data.frame` lahko sedaj izvajamo manipulacije, filtriranje in podobno. Recimo, da nas zanima, koliko prihodka ima podjetje v kateri državi. S tem lahko na primer identificiramo potencialne tržne niše in ustrezno usmerimo marketing in naše vire. Poglejmo si naš `data.frame`.
+Podatke smo primerno naložili v R in sedaj imamo `data.frame` s katerim lahko delamo naprej. Nad tem `data.frame` lahko sedaj izvajamo manipulacije, filtriranje in podobno. Recimo, da nas zanima, koliko prihodka ima podjetje v posamezni državi. S tem lahko na primer identificiramo potencialne tržne niše in ustrezno usmerimo marketing in naše vire. Poglejmo si naš `data.frame`.
 
 ```{r error = T, eval = T}
 head(podatki)
 ```
 
-Vsaka vrstica nam prikazuje število določenega artikla in ceno za enoto artikla. Nas zanima skupen prihodek, tako da moramo najprej ustvariti nov stolpec, kjer bomo pomnožili ti dve vrednosti.
+Vsaka vrstica nam prikazuje količino določenega artikla (`Quantity`) in ceno za enoto artikla (`UnitPrice`). Nas zanima skupen prihodek, tako da moramo najprej ustvariti nov stolpec, kjer bomo pomnožili ti dve vrednosti.
 
 ```{r error = T, eval = T}
 podatki$Total_sales <- podatki$Quantity * podatki$UnitPrice
@@ -264,11 +268,11 @@ head(podatki)
 
 Preostane nam samo še izračun vsote stolpca `Total_sales` za vsako državo. V R obstaja za to funkcija `aggregate`. Tej funkciji moramo podati 3 parametre:
 
-- `x`. Vektor, katerega želimo agregirati. V našem primeru je to stolpec `Total_sales`.
+- `x`. Vektor, katerega vrednosti želimo agregirati. V našem primeru je to stolpec `Total_sales`.
 - `by`. Vektor, glede na katerega želimo agregirati. V našem primeru je to stolpec `Country`. Vrednosti v ta parameter moramo podati v obliki seznama. To naredimo tako, da enostavno uporabimo klic `list(<vektor>)`, kjer je `<vektor>` ime vektorja, po katerem želimo agregirati. Lahko jih uporabimo tudi več naenkrat.
-- `FUN`. Katero funkcijo želimo uporabiti. V našem primeru bo to funkcija `sum`.
+- `FUN`. Katero funkcijo želimo uporabiti. V našem primeru bo to kar funkcija `sum`.
 
-Uporabimo sedaj to funkcijo in rezultate shranimo v novo spremenljivko.
+Uporabimo sedaj opisano funkcijo in rezultate shranimo v novo spremenljivko.
 
 ```{r error = T, eval = T}
 podatki_sum <- aggregate(x = podatki$Total_sales, by = list(podatki$Country), FUN = sum)
@@ -284,7 +288,7 @@ ggplot(data = podatki_sum, aes(x = Country, y = Total_sales)) +
   geom_bar(stat = "identity")
 ```
 
-Za lepši prikaz lahko uporabimo še `coord_flip`, ki ga enostavno dodamo našemu grafu. Ta bo zamenjal osi x in y.
+Za še lepši prikaz uporabimo še funkcijo `coord_flip`, ki ga enostavno dodamo našemu grafu. Ta bo zamenjala osi x in y.
 
 ```{r error = T, eval = T}
 ggplot(data = podatki_sum, aes(x = Country, y = Total_sales)) +
@@ -303,7 +307,7 @@ ggplot(data = podatki_sum, aes(x = reorder(Country, Total_sales), y = Total_sale
 
 # Ukaz break
 
-Namesto, da ponovitev zanke preskočimo, lahko na določeni točki izvajanje zanke tudi prekinemo (na primer če pridemo do kakšnih nesmiselnih vrednosti). V tem primeru namesto `next` uporabimo ukaz `break`. Poglejmo si še to na preprostem primeru. Recimo, da imamo nek vektor pozitivnih in negativnih števil. Najprej izračunajmo vsoto pozitivnih s for zanko.
+Namesto, da ponovitev zanke preskočimo, lahko na določeni točki izvajanje zanke tudi prekinemo (na primer, če pridemo do kakšnih nesmiselnih vrednosti). V tem primeru namesto ukaza `next` uporabimo ukaz `break`. Poglejmo si razliko na preprostem primeru. Recimo, da imamo nek vektor pozitivnih in negativnih števil. Najprej izračunajmo vsoto vseh pozitivnih s for zanko.
 
 ```{r error = T, eval = T}
 x          <- c(2, 5, -2, -4, 3, -1)
@@ -367,7 +371,7 @@ seznam[['niz2']]
 seznam[['bool1']]
 ```
 
-Seznamu lahko tudi preprosto dodajamo nove vredosti.
+Seznamu lahko tudi preprosto dodajamo nove vrednosti.
 
 ```{r error = T}
 seznam[['stevilo2']] <- 5
