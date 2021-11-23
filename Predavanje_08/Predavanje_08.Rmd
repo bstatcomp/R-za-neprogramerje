@@ -118,7 +118,7 @@ podatki
 Da shranimo `data.frame` v sav datoteko, uporabimo funkcijo `write_sav`. Shranimo sedaj `iris` `data.frame` v sav datoteko.
 
 ```{r}
-write_sav(iris, "./data_clean/iris.sav")
+#write_sav(iris, "./data_clean/iris.sav")
 ```
 
 Paket haven ima tudi funkcijo `read_por` ki podpira starejše verzije datotek iz SPSS.

@@ -1,0 +1,295 @@
+---
+title: "Predavanje 08 -- Odgovori na vprašanja"
+output:
+  pdf_document:
+    dev: cairo_pdf
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+# knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+ 
+
+# Statistični testi
+
+Večina klasičnih statističnih testov in modelov je vgrajenih že v osnovni R. Poglejmo si uporabo treh izmed najbolj popularnih, t-testa, ANOVE in linearne regresije.
+
+```{r}
+# Modelirajmo porabo goriva, pri čemer kot neodvisne spremenljivke uporabimo:
+# število cilindrov, konjsko moč in težo.
+lr <- lm(mpg ~ cyl + hp + wt, data = mtcars)
+summary(lr)
+```
+
+
+```{r}
+# t-test uporabimo za statistično primerjavo pričakovane širine listov
+# dveh vrst perunike.
+x_vir <- iris$Sepal.Width[iris$Species == "virginica"]
+x_ver <- iris$Sepal.Width[iris$Species == "versicolor"]
+
+t.test(x_vir, x_ver)
+```
+
+
+```{r}
+# ANOVO uporabimo za statistično primerjavo dolžine listov treh vrst perunike.
+# Primerjamo, ali vrsta perunike vpliva na dolžino listov.
+my_anova <- aov(Sepal.Length ~ Species, data = iris)
+summary(my_anova)
+```
+
+# ggplot2 -- statistična signifikantnost
+Včasih želimo rezultate statističnega testa prikazati kar na grafu. Poglejmo si sedaj primer t-testa v ggplot2. Za to bomo potrebovali še en paket **ggpubr** in funkcijo iz tega paketa `stat_compare_means`. Poleg statističnega testa bomo izrisali tudi boxplot (Diagram s *škatlami in brčicami*).
+
+
+```{r}
+library(ggplot2)
+library(ggpubr)
+ggplot(iris, aes(x = Species, y = Petal.Width)) +
+  geom_boxplot() +
+  stat_compare_means(label = "p.signif", method = "t.test",
+                     ref.group = "setosa")
+```
+
+# Prikaz točk in povprečja na grafu
+Poglejmo si še en zanimiv graf, kjer bomo prikazali točke in povprečja na istem grafu. Pogledali si bomo porazdelitve dolžin in širin čašnih listov različnih perunik. Najprej si pripravimo `data.frame`.
+
+```{r}
+library(tidyr)
+iris_longer <- iris[ , c("Sepal.Length", "Sepal.Width", "Species")]
+iris_longer <- pivot_longer(iris_longer, Sepal.Length:Sepal.Width)
+head(iris_longer)
+```
+
+Za izris povprečij s črto bomo potrebovali geom `hpline` iz paketa **ungeviz** (https://wilkelab.org/ungeviz/index.html). Za izris točk uporabimo pri `geom_point` argument `position = position_jitterdodge()`. To najprej loči dolžine in širine listov (dodge) in potem še nekoliko raztrosi točke (jitter), da je bolj pregledno, kje imamo več točk. Če ne bi uporabili tega, bi enostavno dobili prikazane vse točke v isti liniji.
+
+```{r}
+library(ungeviz)
+ggplot(iris_longer, aes(x = Species, y = value, color = name)) +
+  geom_point(position = position_jitterdodge()) +
+  stat_summary(
+    fun = "mean",
+    position = position_dodge(width = 0.75),
+    geom = "hpline"
+  )
+```
+
+
+# ggplot2 -- errorbar
+
+Na statističnih grafih, ki vsebujejo opisne statistike, kot je npr. povprečje, pogosto prikažemo še negotovost v obliki standardnih odklonov ali standardnih napak. S knjižnico ggplot2 to storimo z uporabo geom-a `errorbar`. Pred tem moramo ustrezno pripraviti podatke tako, da dodamo še stolpec s spodnjo in zgornjo mejo napake. Če je napaka simetrična, potrebujemo le en stolpec. Poglejmo si odvisnost milj na galono (`mpg`) od števila cilindrov.
+
+```{r}
+data("mtcars")
+head(mtcars)
+
+mus <- aggregate(mpg ~ cyl, mtcars, FUN = mean)
+sds <- aggregate(mpg ~ cyl, mtcars, FUN = function(x) {sd(x) / sqrt(length(x))})
+df  <- cbind(mus, SE = sds$mpg)
+df$cyl <- as.character(df$cyl)
+
+head(df)
+```
+
+
+```{r fig.width = 3, fig.height = 3}
+library(ggplot2)
+ggplot(df, aes(x = cyl, y = mpg, colour = cyl)) + 
+  geom_point() + 
+  geom_errorbar(aes(ymin = mpg - SE, ymax = mpg + SE), width = 0.5) +
+  theme(legend.position = "none")
+```
+
+
+# Tortni diagram
+Kako narišemo tortni diagram s pomočjo paketa `ggplot2`? Poglejmo si kako izrišemo delež covid okužb po starostnih skupinah na dan 23.11. 
+```{r}
+covid <- data.frame(Starosti = c("0-4","5-14", "15-24", "25-34", "35-44", "45-54", "55-64", "65-76", "75-84", "85+"),  
+                    Procenti = c(2.4, 21.4, 9.8, 12.6, 18.8, 14.8, 10.4, 5.8, 2.7, 1.4))
+covid$Starosti <- factor(covid$Starosti, levels = covid$Starosti, ordered = T) #mora biti faktor, da ohranimo zaporedje
+
+
+ggplot(covid, aes(x="", y = Procenti, fill=Starosti)) +
+  geom_bar(stat="identity", width=1,  position = position_stack(reverse = TRUE)) +
+  coord_polar("y", start=0) + theme_void()
+
+```
+
+V R je tortni diagram kar  `geom_bar()` z vrednostjo Starost na eni osi in Procenti na drugi osi. Ker si želimo okrogli prikaz, uporabimo polarni koordinatski sistem namesto kartezijskega. Z ukazom `position_stack(reverse = TRUE)` zagotovim, da so skupine urejene v smeri urinega kazalca. Starosti moramo definirati kot faktorje, če ne, nam R uredi deleže po velikosti. 
+
+Z uporabo funcije `theme_void` odstranimo koordinatni sistem.
+V tem primeru vidimo, da je tortni diagram slab prikaz,ko opazujemo večje đtevilo razredov.
+
+
+# Manjkajoče vrednosti
+Velikokrat se pri delu z realnimi podatki srečamo z manjkajočimi vrednostmi. V R so manjkajoče vrednosti označene z `NA` (not available). Poglejmo si vektor, ki vsebuje manjkajoče vrednosti.
+
+```{r}
+x <- c(4, 6, 1, NA, 5, NA, 6)
+```
+
+Ali vektor (enako za stolpce v `data.frame` na primer) vsebuje manjkajoče vrednosti lahko preverimo s funkcijo `anyNA`.
+
+```{r}
+anyNA(x)
+```
+
+Za posamezno vrednost preverimo ali je enaka `NA` z `is.na`.
+
+```{r}
+is.na(x[1])
+is.na(x[4])
+```
+
+Kaj se zgodi, če poizkusimo izračunati povprečje `x`?
+
+```{r}
+mean(x)
+```
+
+Vrne `NA`. Če želimo, da nam R vseeno vrne povprečje vseh vrednosti, ki niso enake `NA`, uporabimo argument `na.rm = TRUE`. Večina funkcij ki povzemajo številske vrednosti ima možnost podati ta argument. Alternativno bi lahko ročno izbrali podmnožico `x`, kjer vrednosti niso `NA`, in izračunali povprečje.
+
+```{r}
+mean(x, na.rm = TRUE)
+mean(x[!is.na(x)])
+```
+
+
+
+# Nekonsistentni podatki
+Poleg manjkajočih vrednosti se pogosto v podatkih pojavijo tudi nekonsistentnosti zaradi ročnega vnašanja. Na primer v numeričnem stolpcu se pojavijo števila ki imajo decimalno piko ali vejico, ali pa se pojavijo celo besede. V takem primeru je potrebnega nekaj ročnega dela s takšnimi stolpci. Poglejmo si datoteko *nekonsistentni_podatki.csv*, ki je v mapi *data_raw*.
+
+```{r}
+podatki <- read.table("./data_raw/nekonsistentni_podatki.csv", dec = ",", sep = ";", 
+                      quote = "", header = TRUE)
+head(podatki)
+```
+
+Z ukazom `str` lahko preverimo tipe stolpcev.
+
+```{r}
+str(podatki)
+```
+
+Opazimo, da je R prebral oba stolpca kot besede (character). Če želimo stolpec `vrednost` spremeniti v numeričen, bomo morali narediti 2 stvari:
+
+1) Ustrezno popraviti decimalne vejice v decimalne pike (saj R uporablja decimalno piko).
+2) Pretvoriti stolpec v numeričnega.
+
+Decimalne vejice bomo spremenili v decimalne pike z ukazom `gsub`. Ta funkcija se uporablja za zamenjavo dela niza znakov (beseda, stavek, ...) z nekim drugim nizom. Na primer:
+
+
+```{r}
+stavek <- "Ne maram R!"
+gsub(pattern = "Ne maram", replacement = "Obozujem", x = stavek)
+```
+
+S tem bomo sedaj zamenjali vejice s pikami v stolpcu `vrednost`:
+
+```{r}
+podatki$vrednost <- gsub(pattern = ",", replacement = ".", x = podatki$vrednost)
+```
+
+Sedaj moramo samo še pretvoriti podatke v numerične s funkcijo `as.numeric`.
+
+```{r}
+podatki$vrednost <- as.numeric(podatki$vrednost)
+head(podatki)
+```
+
+Opazimo, da je R vrstice, ki jih ne zna pretvoriti v številke (na primer tretjo vrstico, kjer imamo besedo v tem stolpcu), avtomatsko pretvoril v `NA` (manjkajoče vrednosti).
+
+
+# Avtomatsko generiranje poročil in shranjevanje tabel v Word
+V tem poglavju bomo potrebovali paketa **rmarkdown** in **knitr**. Predlagamo, da tabelo v Word prenesemo s pomočjo Rmd datotek. Seveda pa se lahko poslužimo tudi bolj preprostih, ampak manj sistematičnih pristopov, kot je na primer shranjevanje tabele v Excel in potem ročno kopiranje v Word. Rmd datoteke so datoteke v katerih lahko združujemo tekst in R, kot izhod pa dobimo dokumente v pdf, docx ali html oblikah. S tem so tudi zelo primerni za avtomatsko generiranje poročil. Da v poročilu izpišemo tabelo, ki jo imamo shranjeno v R, lahko uporabimo ukaz `kable(<ime-tabele-v-R>` (glej *Predavanje_08 - Porocilo.Rmd*). Da poženemo Rmd datoteko znotraj R skripte, lahko uporabimo klic
+
+```{r, eval = FALSE}
+rmarkdown::render("<ime-Rmd-datoteke>", 
+                  output_file = "<ime-izhodne-datoteke-s-koncnico>",
+                  output_format = "<format-izhodne-datoteke>")
+```
+
+Za uporabo tega klica glej *Predavanje_08 - Porocilo.R*. Kadar generiramo datoteko s tem klicem lahko Rmd datoteka, ki jo generiramo, dostopa do vseh spremenljivk, ki jih imamo v trenutni R seji. S tem lahko potem generiramo več poročil znotraj zanke, kot lahko vidimo v prej omenjeni skripti.
+
+
+# Dvojna glava (header)
+Včasih dobimo podatke v kakšnih posebnih oblikah, na primer z dvema headerjema. Takšni podatki se na primer nahajajo v datoteki *dvojni_header.csv*. Kako te podatke pretvorimo v dolgo obliko? Najprej bomo prebrali vsak header posebej in jih združili v enoten header. Nato bomo prebrali podatke in jim priredili skupen header. Takšne podatke potem znamo pretvorit v dolgo obliko. Na koncu moramo samo še razdružiti oba headerja. Potrebovali bomo tudi funkcijo `na.locf` iz paketa **zoo**, ki vse `NA` vrednosti v vektorju nadomesti z zadnjo vrednostjo, ki ni bila enaka `NA`.
+
+```{r, eval = TRUE}
+library(zoo)
+# Preberemo samo prvo vrstico (nrow = 1), ki ima prvi header. Funkcija unlist 
+# data.frame spremeni v vektor.
+head1 <- unlist(read.table("./data_raw/dvojni_header.csv", sep = ";", 
+                           quote = "", nrow = 1))
+head1
+
+# Preberemo samo drugo vrstico (izpustimo prvo -- skip = 1).
+head2 <- unlist(read.table("./data_raw/dvojni_header.csv", sep = ";", 
+                           quote = "", nrow = 1, skip = 1))
+head2
+
+# Nadomestimo NA vrednosti v head2.
+tmp <- na.locf(unlist(head1), na.rm = FALSE)
+tmp
+
+# Združimo oba headerja.
+my_header <- paste(head2, tmp, sep = "_")
+my_header
+
+# Preberemo vrednosti v podatkih, jim priredimo nova imena in pretvorimo v
+# dolgo obliko.
+podatki <- read.table("./data_raw/dvojni_header.csv", sep = ";", quote = "", skip = 2,
+                      header = FALSE)
+colnames(podatki) <- my_header
+podatki_long <- pivot_longer(podatki, m_2018:f_2019)
+head(podatki_long)
+
+# Dodamo nova stolpca za spol in leto, tako da razdružimo stolpec name. To
+# naredim os funkcijo gsub, ki v besedi nadomesti nek vzorec, v našem primeru
+# vse znake za "_" (spol) ali pred "_" (leto). Na koncu izbrišemo še stolpec
+# ime.
+podatki_long$spol <- gsub("\\_.*", "", podatki_long$name)
+podatki_long$leto <- gsub(".*\\_", "", podatki_long$name)
+podatki_long$name <- NULL
+head(podatki_long)
+```
+
+#Vizualizacija zemljevidov
+Uporabljali bomo knjižnico `maps`. Z uporabo knjižnice `ggmap` lahko dostopamo do zemljevidov "Google maps", ki izgledajo res lepo, ampak je samo določeno število dostopov brezplačno. Moramo se registrirati in podati številko kreditne kartice. Knjižnica `maps` je brezplačna.
+
+Lahko izrišemo zemlevid sveta:
+```{r, eval = TRUE}
+library(maps)
+
+svet <- map_data('world')
+print(head(svet))
+ggplot() + 
+  geom_polygon( data=svet, aes(x=long, y=lat, group=group),
+                color="black", fill="lightblue" )
+```
+
+Lahko si izberemo tudi ožje področje, npr. Slovenijo. Na zemljevid lahko narišemo tudi poljubne točke (v napšem primeru jih shranimo v `data.frame` postaje).
+```{r, eval = TRUE}
+slo <- "Slovenia"
+slo.map <- map_data("world", region = slo)
+
+postaje <- data.frame(Mesta = c("Ljubljana", "Celje", "Maribor", "Murska Sobota", "Nova Gorica", "Koper"), lat = c(46.0655, 46.23448, 46.55884, 46.65148, 45.95551, 45.54297), long = c(14.5127,  15.26244, 15.65124, 16.19175, 13.6524, 13.71354))
+
+ggplot() +
+  geom_path(data = slo.map, aes(x = long, y = lat))+  
+  geom_point(data=postaje, aes(x=long, y=lat), colour="Red",pch=1, size=2) +
+theme(legend.position = "none") + geom_text(data = postaje, aes(long, lat, label=Mesta), 
+                                            size=5, vjust = 1) #v just premakne napis, da ne pokriva točke
+
+```
+Funkcija `geom_path` izriše konturo medtem, ko ima polygon tudi notranjost (lahko določimo barvo).
+
+
+
+
+
+
