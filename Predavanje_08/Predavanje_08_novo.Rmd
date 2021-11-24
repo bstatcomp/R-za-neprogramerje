@@ -109,20 +109,52 @@ ggplot(df, aes(x = cyl, y = mpg, colour = cyl)) +
 Kako narišemo tortni diagram s pomočjo paketa `ggplot2`? Poglejmo si kako izrišemo delež covid okužb po starostnih skupinah na dan 23.11. 
 ```{r}
 covid <- data.frame(Starosti = c("0-4","5-14", "15-24", "25-34", "35-44", "45-54", "55-64", "65-76", "75-84", "85+"),  
-                    Procenti = c(2.4, 21.4, 9.8, 12.6, 18.8, 14.8, 10.4, 5.8, 2.7, 1.4))
-covid$Starosti <- factor(covid$Starosti, levels = covid$Starosti, ordered = T) #mora biti faktor, da ohranimo zaporedje
+                    Stevilo = c(80, 725, 334, 426, 637, 504, 352, 197, 91, 48))
+#Starost mora biti faktor, da ohranimo zaporedje
+covid$Starosti <- factor(covid$Starosti, levels = covid$Starosti, ordered = T) 
+
+#Izračunamo procente
+#Za prikaz procentov števila zaokrožimo na cela stevila
+covid$Procenti <- round(100*covid$Stevilo/sum(covid$Stevilo),0)
+
+#Pripnemo znak za procent
+covid$Procenti <- paste(covid$Procenti, '%', sep = '')
 
 
-ggplot(covid, aes(x="", y = Procenti, fill=Starosti)) +
+ggplot(covid, aes(x="", y = Stevilo, fill=Starosti)) +
   geom_bar(stat="identity", width=1,  position = position_stack(reverse = TRUE)) +
-  coord_polar("y", start=0) + theme_void()
+  coord_polar("y", start=0) + theme_void() + 
+  geom_text(aes(label = Procenti), 
+            position = position_stack(vjust = 0.5, reverse=TRUE), 
+                                                       color = "white")
 
 ```
 
-V R je tortni diagram kar  `geom_bar()` z vrednostjo Starost na eni osi in Procenti na drugi osi. Ker si želimo okrogli prikaz, uporabimo polarni koordinatski sistem namesto kartezijskega. Z ukazom `position_stack(reverse = TRUE)` zagotovim, da so skupine urejene v smeri urinega kazalca. Starosti moramo definirati kot faktorje, če ne, nam R uredi deleže po velikosti. 
+V R je tortni diagram kar  `geom_bar()` z vrednostjo Starost na eni osi in Procenti na drugi osi. Ker si želimo okrogli prikaz, uporabimo polarni koordinatski sistem namesto kartezijskega. Z ukazom `position_stack(reverse = TRUE)` zagotovim, da so skupine urejene v smeri urinega kazalca (privzeto so v nasprotni smeri). Starosti moramo definirati kot faktorje, če ne, nam R uredi deleže po velikosti. 
 
 Z uporabo funcije `theme_void` odstranimo koordinatni sistem.
 V tem primeru vidimo, da je tortni diagram slab prikaz,ko opazujemo večje đtevilo razredov.
+
+Prikažemo samo deleže večje od 5%.
+
+```{r}
+covid$Procenti <- round(100*covid$Stevilo/sum(covid$Stevilo),0)
+
+#Izberemo podatke, ki ustrezalo več kot 5% deležu 
+covid_napis <- covid[covid$Procenti > 5, ]
+
+#Oblikujemo izpis
+covid_napis$Procenti <- paste(covid_napis$Procenti, '%', sep = '')
+
+
+ggplot(covid, aes(x="", y = Stevilo, fill=Starosti)) +
+  geom_bar(stat="identity", width=1,  position = position_stack(reverse = TRUE)) +
+  coord_polar("y", start=0) + theme_void() + 
+  geom_text(data= covid_napis, aes(label = Procenti), 
+            position = position_stack(vjust = 0.7, reverse=TRUE),  
+            color = "white")
+
+```
 
 
 # Manjkajoče vrednosti
@@ -288,6 +320,30 @@ theme(legend.position = "none") + geom_text(data = postaje, aes(long, lat, label
 ```
 Funkcija `geom_path` izriše konturo medtem, ko ima polygon tudi notranjost (lahko določimo barvo).
 
+Naslednji primer uporabe zemljevida je barvanje različnih področji glede na neke lastnosti. Poglejmo primer 7-dnevnega povprečja covid primerov na milijon prebivalcev (incidenca). Incidence moramo najprej izračunati. 
+```{r, eval = TRUE}
+okolica <- c('Slovenia','Italy', 'Croatia', 'Austria', 'Hungary') 
+okolica.map <- map_data("world", region = okolica)
+
+#7-dnevno povprečje v torek
+covid_torek <- c(3106, 9866, 4615, 14004, 9435)
+#prebivalci po državah
+prebivalci <- c(2.1, 59.5, 4, 8.9, 9.8)
+incidenca_tabela <- data.frame(Drzava = okolica, Incidenca = (covid_torek/prebivalci))
+
+
+#tabeli okolica.map dodamo prazen stolpec Incidence
+okolica.map <- cbind(okolica.map, Incidenca=rep(NA, nrow(okolica.map)))
+# Vnesemo incidence v tabelo okolica.map po državah
+for (d in okolica){
+  okolica.map[okolica.map$region == d, 'Incidenca'] <- 
+    incidenca_tabela[incidenca_tabela$Drzava == d, 'Incidenca']
+}
+
+ggplot(data = okolica.map, aes(x = long, y = lat)) +
+  geom_polygon(aes(group=group, fill=Incidenca))
+
+```
 
 
 
