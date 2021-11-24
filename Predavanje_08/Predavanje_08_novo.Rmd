@@ -78,7 +78,6 @@ ggplot(iris_longer, aes(x = Species, y = value, color = name)) +
   )
 ```
 
-
 # ggplot2 -- errorbar
 
 Na statističnih grafih, ki vsebujejo opisne statistike, kot je npr. povprečje, pogosto prikažemo še negotovost v obliki standardnih odklonov ali standardnih napak. S knjižnico ggplot2 to storimo z uporabo geom-a `errorbar`. Pred tem moramo ustrezno pripraviti podatke tako, da dodamo še stolpec s spodnjo in zgornjo mejo napake. Če je napaka simetrična, potrebujemo le en stolpec. Poglejmo si odvisnost milj na galono (`mpg`) od števila cilindrov.
@@ -139,19 +138,19 @@ Prikažemo samo deleže večje od 5%.
 
 ```{r}
 covid$Procenti <- round(100*covid$Stevilo/sum(covid$Stevilo),0)
-
-#Izberemo podatke, ki ustrezalo več kot 5% deležu 
-covid_napis <- covid[covid$Procenti > 5, ]
-
+covid$Procenti_label <- covid$Procenti
 #Oblikujemo izpis
-covid_napis$Procenti <- paste(covid_napis$Procenti, '%', sep = '')
+covid$Procenti_label <- paste(covid$Procenti, '%', sep = '')
 
+
+#Izberemo podatke, ki ustrezalo več kot 5% deležu, ostale pobrišemo
+covid$Procenti_label[covid$Procenti < 5] <- ""
 
 ggplot(covid, aes(x="", y = Stevilo, fill=Starosti)) +
   geom_bar(stat="identity", width=1,  position = position_stack(reverse = TRUE)) +
   coord_polar("y", start=0) + theme_void() + 
-  geom_text(data= covid_napis, aes(label = Procenti), 
-            position = position_stack(vjust = 0.7, reverse=TRUE),  
+  geom_text(aes(label = Procenti_label), 
+            position = position_stack(vjust = 0.5, reverse=TRUE),  
             color = "white")
 
 ```
@@ -188,6 +187,28 @@ Vrne `NA`. Če želimo, da nam R vseeno vrne povprečje vseh vrednosti, ki niso 
 ```{r}
 mean(x, na.rm = TRUE)
 mean(x[!is.na(x)])
+```
+
+Velikokrat, ko imamo manjkajoče podatke želimo te vrstice obravnavati drugače. Poglejmo si naprimer že vgrajene podatke *airquality*, ki imajo manjkajoče vrednosti.
+
+```{r}
+head(airquality)
+```
+
+Vrstice z manjkajočimi vrednostimi lahko preprosto odstranimo.
+
+```{r}
+head(na.omit(airquality))
+```
+
+Lahko pa recimo manjkajoče vrednosti zamenjamo z povprečnimi.
+
+```{r}
+df <- airquality
+for(i in 1:ncol(df)){
+  df[is.na(df[,i]), i] <- mean(df[,i], na.rm = TRUE)
+}
+head(df)
 ```
 
 
@@ -290,7 +311,7 @@ podatki_long$name <- NULL
 head(podatki_long)
 ```
 
-#Vizualizacija zemljevidov
+# Vizualizacija zemljevidov
 Uporabljali bomo knjižnico `maps`. Z uporabo knjižnice `ggmap` lahko dostopamo do zemljevidov "Google maps", ki izgledajo res lepo, ampak je samo določeno število dostopov brezplačno. Moramo se registrirati in podati številko kreditne kartice. Knjižnica `maps` je brezplačna.
 
 Lahko izrišemo zemlevid sveta:
@@ -345,7 +366,152 @@ ggplot(data = okolica.map, aes(x = long, y = lat)) +
 
 ```
 
+# Bioconductor
+
+Bioconductor je odprtikodni projekt, ki vsebuje funkcije in pakete za analizo bioloških testov. Celoten projekt je razvit v R-ju in se posodablja dvakrat letno. Trenutna verzija (3.14) vsebuje okoli [3000 paketov](https://www.bioconductor.org/packages/3.14/BiocViews.html#___Software). Ti paketi niso na voljo preko funkcije `install.packages()`, saj ima projekt svoj repozitorij.
+
+Za instalacijo paketov za Bioconductor verzija 3.8 potrebujete najprej paket `BiocManager` z uradnega cran repozitorija. Tega najprej namestite z naslednjim ukazom. Funkcija `requireNamespace` preveri, če je paket že naložen. Če je, se bo instalacija preskočila. If stavek sicer ni potreben, bomo pa v tem dokumentu pustili sintakso, kakršno boste dobili tudi na njihovi uradni strani, da se boste v prihodnje lažje razumeli namen teh dodatnih ukazov.
+
+```{r}
+if (!requireNamespace("BiocManager"))
+    install.packages("BiocManager")
+```
+
+Za instalacijo Bioconductorja in ostalih paketov, ki so na voljo pa od sedaj naprej uporabljate paket BiocManager. Instalirajmo najprej Bioconductor.
+
+```{r}
+BiocManager::install()
+```
+
+Zgornji ukaz instalira najnovejšo verzijo Bioconductorja. Če iz kakršnega koli razloga potrebujete starejšo verzijo uporabite parameter `version`. Primer: 
+
+```{r eval=FALSE}
+BiocManager::install(version = "3.12")
+```
+
+Opazite še novo sintakso *ime paketa*::*ime funkcije*. S dvojnim dvopičjem lahko uporabimo funkcijo nekega paketa brez, da bi ga predhodno naložili z ukazom `library()`, kar je uporabno, če potrebujemo funkcijo paketa le enkrat.
+
+Če imate paket BiocManager in Bioconductor že naložen lahko preverite naloženo verzijo z naslednjima ukazoma.
+
+```{r}
+#verzija paketa
+packageVersion("BiocManager")
+#verzija bioconductorja
+BiocManager::version() 
+```
+
+Sedaj si poglejmo, kako naložimo pakete. Najprej si na [uradni strani](https://www.bioconductor.org/packages/release/bioc/) poglejmo seznam paketov, ki so nam na voljo. Recimo, da nas po opisu *Quasispecies Diversity* zanima paket `QSutils`. Za podrobnejši opis kliknite na ime paketa in odprla se vam bo stran z osnovnimi podatki. Na tej strani so pod naslovom Documentation tudi zelo uporabni HTML in PDF dokumenti, ki vedno vključujejo tudi osnovni primer uporabe teh paketov.
+
+Paket namestimo z ukazom:
+```{r}
+BiocManager::install("QSutils")
+```
+
+Nekaj osnovnih napotkov paketa lahko dobite tudi z ukazom `browseVignettes()`. Ta ukaz deluje tudi za ostale pakete, ki niso del Bioconduktorja.
+
+```{r eval=FALSE}
+browseVignettes("QSutils")
+```
+
+Naložimo paket.
+
+```{r echo=FALSE}
+library(QSutils)
+```
+
+Sedaj naredimo en svoj primer s tem paketom. Najprej naložimo podatke o genih, ki so zapisani v .fasta obliki.
+
+```{r}
+gene <- ReadAmplSeqs("./data_raw/nucleus_gene.fast", type="DNA")
+gene$hseqs
+```
+Prebrani podatki so tipa `list`, ki vsebuje vektor `nr` in 40 vzorcev gena v `hseqs`. 
+
+Ker je podatkov relativno malo jih poskušamo združiti v gruče s hierarhičnim gručenjem in prikažimo rezultat v obliki dendrograma.
+
+```{r}
+# Izračunamo razdalje med sekvencami
+dist <- DNA.dist(gene$hseqs, pairwise.deletion = T, model = "K80")
+# Hirarhično gručenje
+clusters <- hclust(dist)
+# Prikažemo razdalje z dendrogramom
+plot(clusters)
+# Na dendogramu obkrožimo štiri skupine
+rect.hclust(clusters, k=4, border="red")
+```
+Rezultati so tukaj različni glede na uporabljeno mero za izračun razdalj, ki jo podamo z parametrom `model`. Ostale možnosti si lahko pogledate v dokumentaciji z ukazom `?DNA.dist`. Naredimo še vizualizacijo gruč v 2d prostoru za štiri skupine. Če želite dendogram porezati na neki določeni višini v spodnji kodi namesto `k = 4` uporabite `h = višina`.
+
+```{r}
+# Razdelimo na štiri skupine
+cluster_ids <- cutree(clusters, k = 4)
+
+#Pripravimo podatke v obliki tabele
+podatki <- as.data.frame(cmdscale(dist)) #predstavimo podatke v 2d obliki
+names(podatki) <- c("X", "Y")
+podatki$Indeks <- as.factor(cluster_ids) #dodamo indekse
+
+#Izrišemo  vzorce na graf 
+ggplot(podatki, aes(x = X, y = Y, colour = Indeks)) +
+  geom_point()
+```
+
+Nekaj krajših sekvenc vsebuje tudi sam paket. Naložimo jih:
+
+```{r}
+filepath<-system.file("extdata","ToyData_RVReads.fna", package="QSutils")
+sekvenca <- ReadAmplSeqs(filepath,type="DNA")
+head(sekvenca$nr)
+sekvenca$hseqs
+```
+Paket *QSutils* ponuja tudi funkcije za analizo teh podatkov. *Opozorilo:* Spodaj opisani stavki mogoče vsebujejo napake, glede na nepozavanje domene :)
+
+Poglejmo si mero negotovosti Shannon in verjetnost (GiniSimpson), da dva naključna vzorca iz populacije pripadata različnim haplotipom.
+
+```{r}
+Shannon(sekvenca$nr)
+GiniSimpson(sekvenca$nr)
+```
+Z analizo razdalj med haplotipi lahko izračunamo tudi druge statistike. Poglejmo povprečno frekvenco mutacije in povprečno diverziteto nukleotidov.
+
+```{r}
+razdalje <- DNA.dist(sekvenca$hseqs,model="K80")
+MutationFreq(razdalje)
+NucleotideDiversity(razdalje)
+```
+# Razhroščevanje (debugging)
+Omenili smo že, da lahko opazujemo dogajanje v zanki tako, da si z ukazom `print` sproti izpisujemo vrednosti spremenljivk v telesu zanke. Obstaja pa še en ukaz, ki nam omogoča zaustaviti delovanje zanke in pogledati vrednosti v zanki v določeni ponovitvi. To je ukaz `browser`, ki ga pokličemo znotraj zanke. Na primer:
+
+```{r, eval = FALSE}
+for (i in 1:10) {
+  x <- 2 * i
+  y <- x + 5
+  if (y > 10) {
+    browser()
+  }
+}
+```
+
+Ko tako zaustavimo zanko, se znajdemo v okolju browserja, in lahko dostopamo do spremenljivk, ki so znotraj zanke. V kolikor browserju v konzoli podamo vrednost `n` (*next*) se browser pomakne na naslednji ukaz, ki se bo izvajal. Z ukazom `c` (*continue*) mu povemo naj nadaljuje izvajanje do konca oz. dokler ne pride do naslednjega klica `browser()`. Iz browserja lahko prekinemo izvajanje zanke in se vrnemo v osnovno konzolo s tipko **escape** ali če napišemo `Q` (*Quit*).
+
+Če nam težava dela določena funkcija in jo ne želimo spreminjati z dodajanjem ukazov `browser()` lahko v browser preidemo tudi ob klicu funkcije z ukazom `debug()`. 
 
 
+```{r, eval = FALSE}
+mnozi <- function(a, b){
+  return(a*b)
+}
+deli <- function(a, b){
+  return(a/b)
+}
+debug(deli) #označimo funkcijo deli za razhroščevanje
+mnozi(2, 3) #se izvede normalno
+deli(2, 3) #na prvi vrstici funkcije se pokliče browser()
+```
+
+Če želimo sprostiti funkcije iz razhroščevalnika uporabimo `undebug()`.
+
+```{r, eval = FALSE}
+undebug(deli)
+```
 
 
