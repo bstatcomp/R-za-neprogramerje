@@ -8,6 +8,7 @@ output:
 
 ```{r setup, include=FALSE}
 # knitr::opts_chunk$set(echo = TRUE)
+options(stringsAsFactors = FALSE)
 ```
 
 
@@ -65,7 +66,7 @@ iris_longer <- pivot_longer(iris_longer, Sepal.Length:Sepal.Width)
 head(iris_longer)
 ```
 
-Za izris povprečij s črto bomo potrebovali geom `hpline` iz paketa **ungeviz** (https://wilkelab.org/ungeviz/index.html). Za izris točk uporabimo pri `geom_point` argument `position = position_jitterdodge()`. To najprej loči dolžine in širine listov (dodge) in potem še nekoliko raztrosi točke (jitter), da je bolj pregledno, kje imamo več točk. Če ne bi uporabili tega, bi enostavno dobili prikazane vse točke v isti liniji.
+Za izris povprečij s črto bomo potrebovali geom `hpline` iz paketa **ungeviz** (https://wilkelab.org/ungeviz/index.html). Za izris točk uporabimo pri `geom_point` argument `position = position_jitterdodge()`. To najprej loči dolžine in širine listov (dodge) in potem še nekoliko raztrosi točke (jitter), da je bolj pregledno, kjer imamo več točk. Če ne bi uporabili tega, bi enostavno dobili prikazane vse točke v isti liniji.
 
 ```{r}
 library(ungeviz)
@@ -132,7 +133,7 @@ ggplot(covid, aes(x="", y = Stevilo, fill=Starosti)) +
 V R je tortni diagram kar  `geom_bar()` z vrednostjo Starost na eni osi in Procenti na drugi osi. Ker si želimo okrogli prikaz, uporabimo polarni koordinatski sistem namesto kartezijskega. Z ukazom `position_stack(reverse = TRUE)` zagotovim, da so skupine urejene v smeri urinega kazalca (privzeto so v nasprotni smeri). Starosti moramo definirati kot faktorje, če ne, nam R uredi deleže po velikosti. 
 
 Z uporabo funcije `theme_void` odstranimo koordinatni sistem.
-V tem primeru vidimo, da je tortni diagram slab prikaz,ko opazujemo večje đtevilo razredov.
+V tem primeru vidimo, da je tortni diagram slab prikaz, ko opazujemo večje število razredov.
 
 Prikažemo samo deleže večje od 5%.
 
@@ -182,7 +183,7 @@ Kaj se zgodi, če poizkusimo izračunati povprečje `x`?
 mean(x)
 ```
 
-Vrne `NA`. Če želimo, da nam R vseeno vrne povprečje vseh vrednosti, ki niso enake `NA`, uporabimo argument `na.rm = TRUE`. Večina funkcij ki povzemajo številske vrednosti ima možnost podati ta argument. Alternativno bi lahko ročno izbrali podmnožico `x`, kjer vrednosti niso `NA`, in izračunali povprečje.
+Vrne `NA`. Če želimo, da nam R vseeno vrne povprečje vseh vrednosti, ki niso enake `NA`, uporabimo argument `na.rm = TRUE`. Večina funkcij, ki povzemajo številske vrednosti, ima možnost podati ta argument. Alternativno bi lahko ročno izbrali podmnožico `x`, kjer vrednosti niso `NA`, in izračunali povprečje.
 
 ```{r}
 mean(x, na.rm = TRUE)
@@ -201,7 +202,7 @@ Vrstice z manjkajočimi vrednostimi lahko preprosto odstranimo.
 head(na.omit(airquality))
 ```
 
-Lahko pa recimo manjkajoče vrednosti zamenjamo z povprečnimi.
+Lahko pa recimo manjkajoče vrednosti zamenjamo s povprečnimi.
 
 ```{r}
 df <- airquality
@@ -266,8 +267,9 @@ rmarkdown::render("<ime-Rmd-datoteke>",
                   output_format = "<format-izhodne-datoteke>")
 ```
 
-Za uporabo tega klica glej *Predavanje_08 - Porocilo.R*. Kadar generiramo datoteko s tem klicem lahko Rmd datoteka, ki jo generiramo, dostopa do vseh spremenljivk, ki jih imamo v trenutni R seji. S tem lahko potem generiramo več poročil znotraj zanke, kot lahko vidimo v prej omenjeni skripti.
+Za uporabo tega klica glej *Predavanje_08 - Porocilo.R*. Kadar generiramo datoteko s tem klicem lahko Rmd datoteka, ki jo generiramo, dostopa do vseh spremenljivk, ki jih imamo v trenutni R seji. S tem lahko potem generiramo več poročil znotraj zanke, kot lahko vidimo v prej omenjeni skripti. 
 
+Če bi se želeli poglobiti v dinamična poročila z R Markdown-om, predlagamo, da si v mapi _test_script_ preberete datoteko _Uvod-v-R-markdown-skripte.pdf_. Nato vam svetujemo, da poskusite R Markdown tutorial, ki ga najdete na [povezavi](https://rmarkdown.rstudio.com/lesson-1.html).
 
 # Dvojna glava (header)
 Včasih dobimo podatke v kakšnih posebnih oblikah, na primer z dvema headerjema. Takšni podatki se na primer nahajajo v datoteki *dvojni_header.csv*. Kako te podatke pretvorimo v dolgo obliko? Najprej bomo prebrali vsak header posebej in jih združili v enoten header. Nato bomo prebrali podatke in jim priredili skupen header. Takšne podatke potem znamo pretvorit v dolgo obliko. Na koncu moramo samo še razdružiti oba headerja. Potrebovali bomo tudi funkcijo `na.locf` iz paketa **zoo**, ki vse `NA` vrednosti v vektorju nadomesti z zadnjo vrednostjo, ki ni bila enaka `NA`.
@@ -312,7 +314,7 @@ head(podatki_long)
 ```
 
 # Vizualizacija zemljevidov
-Uporabljali bomo knjižnico `maps`. Z uporabo knjižnice `ggmap` lahko dostopamo do zemljevidov "Google maps", ki izgledajo res lepo, ampak je samo določeno število dostopov brezplačno. Moramo se registrirati in podati številko kreditne kartice. Knjižnica `maps` je brezplačna.
+Uporabljali bomo knjižnico `maps`. Z uporabo knjižnice `ggmap` lahko dostopamo do zemljevidov "Google maps", ki izgledajo res lepo, ampak je samo določeno število dostopov brezplačno. Google Maps zahteva registriracijo in številko kreditne kartice. Knjižnica `maps` pa je v celoti brezplačna.
 
 Lahko izrišemo zemlevid sveta:
 ```{r, eval = TRUE}
@@ -325,7 +327,7 @@ ggplot() +
                 color="black", fill="lightblue" )
 ```
 
-Lahko si izberemo tudi ožje področje, npr. Slovenijo. Na zemljevid lahko narišemo tudi poljubne točke (v napšem primeru jih shranimo v `data.frame` postaje).
+Lahko si izberemo tudi ožje področje, npr. Slovenijo. Na zemljevid lahko narišemo tudi poljubne točke (v našem primeru jih shranimo v `data.frame` postaje).
 ```{r, eval = TRUE}
 slo <- "Slovenia"
 slo.map <- map_data("world", region = slo)
@@ -370,14 +372,14 @@ ggplot(data = okolica.map, aes(x = long, y = lat)) +
 
 Bioconductor je odprtikodni projekt, ki vsebuje funkcije in pakete za analizo bioloških testov. Celoten projekt je razvit v R-ju in se posodablja dvakrat letno. Trenutna verzija (3.14) vsebuje okoli [3000 paketov](https://www.bioconductor.org/packages/3.14/BiocViews.html#___Software). Ti paketi niso na voljo preko funkcije `install.packages()`, saj ima projekt svoj repozitorij.
 
-Za instalacijo paketov za Bioconductor verzija 3.8 potrebujete najprej paket `BiocManager` z uradnega cran repozitorija. Tega najprej namestite z naslednjim ukazom. Funkcija `requireNamespace` preveri, če je paket že naložen. Če je, se bo instalacija preskočila. If stavek sicer ni potreben, bomo pa v tem dokumentu pustili sintakso, kakršno boste dobili tudi na njihovi uradni strani, da se boste v prihodnje lažje razumeli namen teh dodatnih ukazov.
+Za namestitev paketov za Bioconductor verzijo 3.8 potrebujete najprej paket `BiocManager` z uradnega cran repozitorija. Tega najprej namestite z naslednjim ukazom. Funkcija `requireNamespace` preveri, če je paket že naložen. Če je, se bo instalacija preskočila. If stavek sicer ni potreben, bomo pa v tem dokumentu pustili sintakso, kakršno boste dobili tudi na njihovi uradni strani, da boste v prihodnje lažje razumeli namen teh dodatnih ukazov.
 
 ```{r}
 if (!requireNamespace("BiocManager"))
     install.packages("BiocManager")
 ```
 
-Za instalacijo Bioconductorja in ostalih paketov, ki so na voljo pa od sedaj naprej uporabljate paket BiocManager. Instalirajmo najprej Bioconductor.
+Za za namestitev Bioconductorja in ostalih paketov, ki so na voljo pa od sedaj naprej uporabljate paket BiocManager. Instalirajmo najprej Bioconductor.
 
 ```{r}
 BiocManager::install()
