@@ -70,13 +70,16 @@ Za izris povprečij s črto bomo potrebovali geom `hpline` iz paketa **ungeviz**
 
 ```{r}
 library(ungeviz)
-ggplot(iris_longer, aes(x = Species, y = value, color = name)) +
+pl_means <- 
+  ggplot(iris_longer, aes(x = Species, y = value, color = name)) +
   geom_point(position = position_jitterdodge()) +
   stat_summary(
     fun = "mean",
     position = position_dodge(width = 0.75),
-    geom = "hpline"
+
+        geom = "hpline"
   )
+pl_means
 ```
 
 # ggplot2 -- errorbar
@@ -104,6 +107,22 @@ ggplot(df, aes(x = cyl, y = mpg, colour = cyl)) +
   theme(legend.position = "none")
 ```
 
+
+# Oblikovanje grafov
+## Spreminjanje barv
+Poglejmo si, kako lahko s knjižnico `ggplot2` spreminjamo barve na grafih. Vzemimo za primer graf iz dveh primerov nazaj. Barve grafa lahko spremenimo s funkcijami `+ scale_color_...` ali `+ scale_fill_...`, glede na to če smo barve uporabljali na robovih (color) ali v notranjosti (fill) izrisanih objektov. Tropičje v imenu funkcij smo uporabili z namenom, da poudarimo, da imamo različne funkcije, ki nam določajo različne barvne palete. Pomembno je, da za diskretne podatke (cela števila, imena skupin, enakomerno oddaljena števila, ...) uporabimo diskretne palete, in za zvezne (števila, ki lahko zajamejo poljubno vrednost) pa zvezne palete.
+
+Privzeta barvna paleta, ki jo ggplot uporablja je `scale_color_hue()`. Če jo želimo spremeniti, lahko le spremenimo njene parametre, kot so začetna barva `start` (glede na barvnni krog), svetlost `l` in "kromacijo" `c`. Lahko pa uporabimo drugo paleto, kot na primer `scale_color_viridis_d()`, ki je vsebuje take barve, ki jih barvno slepe osebe lažje razločajo. Lahko uporabimo tudi ročno določene barve s funkcijo `scale_color_manual()`, kjer kode barv (v šestnajstiškem številskem sistemu) podamo v parameter `values`. Poglejmo primer:
+
+```{r out.width='33%', fig.show='hold'}
+pl_means + scale_color_hue(l = 35, c = 60) + ggtitle("Spremenjena 'hue' paleta")
+pl_means + scale_color_viridis_d(end = .85) + ggtitle("'Viridis' paleta")
+pl_means + scale_color_manual(values=c("#999999", "#E69F00")) + 
+    ggtitle("Ročno definirane barve")
+
+```
+
+## Oblikovanje osi
 
 # Tortni diagram
 Kako narišemo tortni diagram s pomočjo paketa `ggplot2`? Poglejmo si kako izrišemo delež covid okužb po starostnih skupinah na dan 23.11. 
