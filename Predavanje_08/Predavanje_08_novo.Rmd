@@ -81,7 +81,6 @@ pl_means <-
   )
 pl_means
 ```
-
 # ggplot2 -- errorbar
 
 Na statističnih grafih, ki vsebujejo opisne statistike, kot je npr. povprečje, pogosto prikažemo še negotovost v obliki standardnih odklonov ali standardnih napak. S knjižnico ggplot2 to storimo z uporabo geom-a `errorbar`. Pred tem moramo ustrezno pripraviti podatke tako, da dodamo še stolpec s spodnjo in zgornjo mejo napake. Če je napaka simetrična, potrebujemo le en stolpec. Poglejmo si odvisnost milj na galono (`mpg`) od števila cilindrov.
@@ -106,23 +105,6 @@ ggplot(df, aes(x = cyl, y = mpg, colour = cyl)) +
   geom_errorbar(aes(ymin = mpg - SE, ymax = mpg + SE), width = 0.5) +
   theme(legend.position = "none")
 ```
-
-
-# Oblikovanje grafov
-## Spreminjanje barv
-Poglejmo si, kako lahko s knjižnico `ggplot2` spreminjamo barve na grafih. Vzemimo za primer graf iz dveh primerov nazaj. Barve grafa lahko spremenimo s funkcijami `+ scale_color_...` ali `+ scale_fill_...`, glede na to če smo barve uporabljali na robovih (color) ali v notranjosti (fill) izrisanih objektov. Tropičje v imenu funkcij smo uporabili z namenom, da poudarimo, da imamo različne funkcije, ki nam določajo različne barvne palete. Pomembno je, da za diskretne podatke (cela števila, imena skupin, enakomerno oddaljena števila, ...) uporabimo diskretne palete, in za zvezne (števila, ki lahko zajamejo poljubno vrednost) pa zvezne palete.
-
-Privzeta barvna paleta, ki jo ggplot uporablja je `scale_color_hue()`. Če jo želimo spremeniti, lahko le spremenimo njene parametre, kot so začetna barva `start` (glede na barvnni krog), svetlost `l` in "kromacijo" `c`. Lahko pa uporabimo drugo paleto, kot na primer `scale_color_viridis_d()`, ki je vsebuje take barve, ki jih barvno slepe osebe lažje razločajo. Lahko uporabimo tudi ročno določene barve s funkcijo `scale_color_manual()`, kjer kode barv (v šestnajstiškem številskem sistemu) podamo v parameter `values`. Poglejmo primer:
-
-```{r out.width='33%', fig.show='hold'}
-pl_means + scale_color_hue(l = 35, c = 60) + ggtitle("Spremenjena 'hue' paleta")
-pl_means + scale_color_viridis_d(end = .85) + ggtitle("'Viridis' paleta")
-pl_means + scale_color_manual(values=c("#999999", "#E69F00")) + 
-    ggtitle("Ročno definirane barve")
-
-```
-
-## Oblikovanje osi
 
 # Tortni diagram
 Kako narišemo tortni diagram s pomočjo paketa `ggplot2`? Poglejmo si kako izrišemo delež covid okužb po starostnih skupinah na dan 23.11. 
@@ -175,6 +157,66 @@ ggplot(covid, aes(x="", y = Stevilo, fill=Starosti)) +
 
 ```
 
+# Spreminjanje barv in oblikovanje grafov
+
+Paket ggplot privzeto uporabi barvno paleto, ki se mu zdi najbolj primerna. Če želimo barve na grafu spremeniti lahko uporabimo eno od že privzetih palet, ki so na voljo že v osnovnih paketih ali pa dodamo barvne sheme iz paketa *RColorBrewer*. 
+
+```{r}
+library(RColorBrewer)
+covid$Procenti <- round(100*covid$Stevilo/sum(covid$Stevilo),0)
+covid$Procenti_label <- covid$Procenti
+#Oblikujemo izpis
+covid$Procenti_label <- paste(covid$Procenti, '%', sep = '')
+
+#Izberemo podatke, ki ustrezalo več kot 5% deležu, ostale pobrišemo
+covid$Procenti_label[covid$Procenti < 5] <- ""
+
+ggplot(covid, aes(x="", y = Stevilo, fill=Starosti)) +
+  geom_bar(stat="identity", width=1,  position = position_stack(reverse = TRUE)) +
+  coord_polar("y", start=0) + theme_void() + 
+  geom_text(aes(label = Procenti_label), 
+            position = position_stack(vjust = 0.5, reverse=TRUE),  
+            color = "white") +
+  scale_fill_brewer(palette="Spectral")
+
+```
+Funkcije za menjavo barv se začnejo z `scale_`, nato sledi objekt v našem primeru barva za označitev območji (fill) `scale_fill_` in nazadnje povemo še uporabljeno metodo, v našem primeru že pripravljeno paleto `scale_fill_brewer`. Poglejmo kako si barve lahko nastavimo še ročno.
+
+```{r}
+library(RColorBrewer)
+covid$Procenti <- round(100*covid$Stevilo/sum(covid$Stevilo),0)
+covid$Procenti_label <- covid$Procenti
+#Oblikujemo izpis
+covid$Procenti_label <- paste(covid$Procenti, '%', sep = '')
+
+#Izberemo podatke, ki ustrezalo več kot 5% deležu, ostale pobrišemo
+covid$Procenti_label[covid$Procenti < 5] <- ""
+
+ggplot(covid, aes(x="", y = Stevilo, fill=Starosti)) +
+  geom_bar(stat="identity", width=1,  position = position_stack(reverse = TRUE)) +
+  coord_polar("y", start=0) + theme_void() + 
+  geom_text(aes(label = Procenti_label), 
+            position = position_stack(vjust = 0.5, reverse=TRUE),  
+            color = "white") +
+  scale_fill_manual(values = c("LightBlue", "Blue", "DarkBlue","LightGreen", "Green", "DarkGreen","Black", rgb(255, 128, 50, maxColorValue = 255), "#A6CEE3","#A6CEE3"))
+
+```
+
+V spodnjem primeru lahko vidimo, da atribut `fill` določa le indeks barve, dejansko barvo pa podamo z `scale_fill_brewer`. S funkcijo `scale_y_continous` lahko poljubno kontroliramo izris y osi. V `geom_point` smo dodali tudi oblike, ki jih želimo, da jih uporabljajo vse točke (shape, color, size). Pri večjih točkah je `color` barva obrobe točke, `fill` pa barva znotraj obrobe.
+
+```{r}
+ggplot(iris_longer, aes(x = Species, y = value, fill = name)) +
+  geom_point(position = position_jitterdodge(),
+             shape=23, 
+             color="black",
+             size=2.5) +
+  scale_fill_brewer(palette = "Paired") +
+  scale_y_continuous(breaks=c(0, 2, 4, 6, 8, 10), 
+                     labels=c("low", "2", "4", "6", "8", "high"),
+                     minor_breaks = c(4.5, 5, 5.5),
+                     limits = c(0,10)) 
+  
+```
 
 # Manjkajoče vrednosti
 Velikokrat se pri delu z realnimi podatki srečamo z manjkajočimi vrednostmi. V R so manjkajoče vrednosti označene z `NA` (not available). Poglejmo si vektor, ki vsebuje manjkajoče vrednosti.
