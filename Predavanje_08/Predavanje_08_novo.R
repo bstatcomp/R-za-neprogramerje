@@ -1,4 +1,4 @@
-setwd("F:/r za neprogramerje/R-za-neprogramerje/Predavanje_08")
+#setwd("F:/r za neprogramerje/R-za-neprogramerje/Predavanje_08") #nastavite na svojo mapo
 
 ## t-test
 ## --------------------------------------------------------------------------------------------------------
