@@ -109,7 +109,8 @@ ggplot(df, aes(x = cyl, y = mpg, colour = cyl)) +
 # Tortni diagram
 Kako narišemo tortni diagram s pomočjo paketa `ggplot2`? Poglejmo si kako izrišemo delež covid okužb po starostnih skupinah na dan 23.11. 
 ```{r}
-covid <- data.frame(Starosti = c("0-4","5-14", "15-24", "25-34", "35-44", "45-54", "55-64", "65-76", "75-84", "85+"),  
+covid <- data.frame(Starosti = c("0-4","5-14", "15-24", "25-34", "35-44",
+                                 "45-54", "55-64", "65-76", "75-84", "85+"),  
                     Stevilo = c(80, 725, 334, 426, 637, 504, 352, 197, 91, 48))
 #Starost mora biti faktor, da ohranimo zaporedje
 covid$Starosti <- factor(covid$Starosti, levels = covid$Starosti, ordered = T) 
@@ -198,7 +199,16 @@ ggplot(covid, aes(x="", y = Stevilo, fill=Starosti)) +
   geom_text(aes(label = Procenti_label), 
             position = position_stack(vjust = 0.5, reverse=TRUE),  
             color = "white") +
-  scale_fill_manual(values = c("LightBlue", "Blue", "DarkBlue","LightGreen", "Green", "DarkGreen","Black", rgb(255, 128, 50, maxColorValue = 255), "#A6CEE3","#A6CEE3"))
+  scale_fill_manual(values = c("LightBlue", 
+                               "Blue", 
+                               "DarkBlue",
+                               "LightGreen", 
+                               "Green", 
+                               "DarkGreen",
+                               "Black", 
+                               rgb(255, 128, 50, maxColorValue = 255), 
+                               "#A6CEE3",
+                               "#A6CEE3"))
 
 ```
 
