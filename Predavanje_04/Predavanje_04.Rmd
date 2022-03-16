@@ -304,7 +304,55 @@ print(setdiff(mn3, mn1))
 ```
 V tem primeru pa ne dobimo enako. Funkcijo  `setdiff(mn1, mn3)` si lahko predstavljamo, da vrne elemente, ki so v **mn1** in jih ni v **mn3**. To pa ni enako elementom, ki so v **mn3** in jih ni v **mn1**.
 
+#Delo s faktorji
 
+Kategorične spremenljivke so spremenljivke, ki lahko zavzamejo samo končno mnogo vnaprej določenih vrednosti. Najbolj pogoste so:
+
+ **Nominalne spremenljivke**. To so spremenljivke brez ureditve: tip izdelka ali znamka avtomobila.
+- **Ordinalne spremenljivke**. To so spremenljivke, ki imajo smiselno ureditev: stopnja izobrazbe ali šolski uspeh.
+
+V R uporabljamo za delo s kategoričnimi spremenljivkami t. i. **faktorje** (ang. **factor**). Ti se od spremenljivk tipa niz razlikujejo v tem, da se v spremenljivki hrani informacija o vseh možnih vrednostih. Faktorju ni mogoče dodati vrednosti, ki je ni v množici možnih vrednosti, kar služi kot varovalka pred napakami pri vnosu podatkov.
+
+Poglejmo si uporabo faktorja na dveh preprostih primerih, kjer bomo sami ustvarili spremenljivki. Kasneje si bomo pogledali še delo s faktorji na primeru realnih podatkov, kjer bomo ponovno uporabili podatke o zaposlitvah na področju podatkovnih ved.
+
+Kot primer nominalne spremenljivke si oglejmo vreme. Obstajajo 4 možne vrednosti za oceno oblačnost (oblačno, pretežno_oblačno, zmerno_oblačno, jasno). Ustvarimo vektor oblačnosti za pet dni:
+```{r}
+vreme <- c("oblačno", "pretežno_oblačno", "jasno", 
+           "pretežno_oblačno", "pretečno_oblačno")
+```
+
+Sedaj je ta vektor shranjen kot niz. Kaj so slabosti takšnega shranjevanja kategoričnih podatkov? Prvič, nimamo nobenega varovala pred tipkarskimi napakami -- R je zadnji vnos prebral kot *pretečno_oblačno* in ga tako tudi shranil, čeprav ta beseda ne obstaja:
+
+```{r}
+vreme
+```
+
+Če imamo spremenljivko, za katero vemo, da bo zasedla eno od vnaprej določenih vrednosti, je bolje, da jo shranimo kot faktor. V R za to uporabimo funkcijo `factor()`. Naredimo faktor iz spremenljivke `vreme`:
+
+```{r}
+vreme_fac <- factor(vreme)
+vreme_fac
+```
+
+Opazimo, da je sedaj spremenljivka drugačnega tipa, saj hrani tudi informacijo o možnih vrednostih oziroma ravneh (ang. levels). Ampak v tem primeru so te ravni napačne (ne zajame vseh 4 možnih vrednosti, poleg tega pa vsebuje tudi eno napačno vrednost). Funkcija `factor()` privzeto kot ravni nastavi vse vrednosti v podani spremenljivki. Če želimo, ji lahko podamo dodaten argument `levels`, kjer ročno določimo, katere ravni bodo v spremenljivki. V kolikor to vemo vnaprej, je dobra praksa, da podamo tudi ta argument:
+
+```{r}
+vreme_fac <- factor(vreme, levels = c("oblačno", "pretežno_oblačno", "zmerno_oblačno", "jasno"))
+vreme_fac
+```
+
+V kolikor želimo, da faktor hrani tudi informacijo o tem, da obstaja smiselna razvrstitev po velikosti, dodamo argument `ordered = TRUE`.
+```{r}
+vreme_fac2 <- factor(vreme, levels = c( "jasno", "zmerno_oblačno","pretežno_oblačno","oblačno"), 
+                     ordered = TRUE)
+vreme_fac2
+```
+
+V zgornjem primeru (podakti o PM10) bi bilo pametno shraniti kraj kot **faktor**.
+```{r}
+dat$kraj <- factor(dat$kraj)
+summary(dat)
+```
 
 # Domača naloga
 1. Med podatki o delcih PM10 izberite podatke za Ljubljano.
