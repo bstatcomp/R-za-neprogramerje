@@ -308,7 +308,7 @@ V tem primeru pa ne dobimo enako. Funkcijo  `setdiff(mn1, mn3)` si lahko predsta
 
 Kategorične spremenljivke so spremenljivke, ki lahko zavzamejo samo končno mnogo vnaprej določenih vrednosti. Delimo jih na:
 
- **Nominalne spremenljivke**. To so spremenljivke brez ureditve: tip izdelka ali znamka avtomobila.
+- **Nominalne spremenljivke**. To so spremenljivke brez ureditve: tip izdelka ali znamka avtomobila.
 - **Ordinalne spremenljivke**. To so spremenljivke, ki imajo smiselno ureditev: stopnja izobrazbe ali šolski uspeh.
 
 V R uporabljamo za delo s kategoričnimi spremenljivkami t. i. **faktorje** (ang. **factor**). Ti se od spremenljivk tipa niz razlikujejo v tem, da se spremenljivka hrani tudi informacijo o vseh možnih vrednostih. Spremenljivki tipa faktor ni mogoče dodati vrednosti, ki je ni v množici možnih vrednosti, kar služi kot varovalka pred napakami pri vnosu podatkov.
