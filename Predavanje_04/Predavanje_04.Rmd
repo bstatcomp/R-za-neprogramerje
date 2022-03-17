@@ -306,22 +306,22 @@ V tem primeru pa ne dobimo enako. Funkcijo  `setdiff(mn1, mn3)` si lahko predsta
 
 #Delo s faktorji
 
-Kategorične spremenljivke so spremenljivke, ki lahko zavzamejo samo končno mnogo vnaprej določenih vrednosti. Najbolj pogoste so:
+Kategorične spremenljivke so spremenljivke, ki lahko zavzamejo samo končno mnogo vnaprej določenih vrednosti. Delimo jih na:
 
  **Nominalne spremenljivke**. To so spremenljivke brez ureditve: tip izdelka ali znamka avtomobila.
 - **Ordinalne spremenljivke**. To so spremenljivke, ki imajo smiselno ureditev: stopnja izobrazbe ali šolski uspeh.
 
-V R uporabljamo za delo s kategoričnimi spremenljivkami t. i. **faktorje** (ang. **factor**). Ti se od spremenljivk tipa niz razlikujejo v tem, da se v spremenljivki hrani informacija o vseh možnih vrednostih. Faktorju ni mogoče dodati vrednosti, ki je ni v množici možnih vrednosti, kar služi kot varovalka pred napakami pri vnosu podatkov.
+V R uporabljamo za delo s kategoričnimi spremenljivkami t. i. **faktorje** (ang. **factor**). Ti se od spremenljivk tipa niz razlikujejo v tem, da se spremenljivka hrani tudi informacijo o vseh možnih vrednostih. Spremenljivki tipa faktor ni mogoče dodati vrednosti, ki je ni v množici možnih vrednosti, kar služi kot varovalka pred napakami pri vnosu podatkov.
 
 Poglejmo si uporabo faktorja na dveh preprostih primerih, kjer bomo sami ustvarili spremenljivki. Kasneje si bomo pogledali še delo s faktorji na primeru realnih podatkov, kjer bomo ponovno uporabili podatke o zaposlitvah na področju podatkovnih ved.
 
-Kot primer nominalne spremenljivke si oglejmo vreme. Obstajajo 4 možne vrednosti za oceno oblačnost (oblačno, pretežno_oblačno, zmerno_oblačno, jasno). Ustvarimo vektor oblačnosti za pet dni:
+Kot primer nominalne spremenljivke si oglejmo vreme. Obstajajo 4 možne vrednosti za oceno oblačnosti (oblačno, pretežno_oblačno, zmerno_oblačno, jasno). Ustvarimo vektor oblačnosti za pet dni:
 ```{r}
 vreme <- c("oblačno", "pretežno_oblačno", "jasno", 
            "pretežno_oblačno", "pretečno_oblačno")
 ```
 
-Sedaj je ta vektor shranjen kot niz. Kaj so slabosti takšnega shranjevanja kategoričnih podatkov? Prvič, nimamo nobenega varovala pred tipkarskimi napakami -- R je zadnji vnos prebral kot *pretečno_oblačno* in ga tako tudi shranil, čeprav ta beseda ne obstaja:
+Sedaj je vektor `vreme` shranjen kot niz. Kaj so slabosti takšnega shranjevanja kategoričnih podatkov? Prvič, nimamo nobenega varovala pred tipkarskimi napakami -- R je zadnji vnos prebral kot *pretečno_oblačno* in ga tako tudi shranil, čeprav ta beseda ne obstaja:
 
 ```{r}
 vreme
@@ -334,14 +334,14 @@ vreme_fac <- factor(vreme)
 vreme_fac
 ```
 
-Opazimo, da je sedaj spremenljivka drugačnega tipa, saj hrani tudi informacijo o možnih vrednostih oziroma ravneh (ang. levels). Ampak v tem primeru so te ravni napačne (ne zajame vseh 4 možnih vrednosti, poleg tega pa vsebuje tudi eno napačno vrednost). Funkcija `factor()` privzeto kot ravni nastavi vse vrednosti v podani spremenljivki. Če želimo, ji lahko podamo dodaten argument `levels`, kjer ročno določimo, katere ravni bodo v spremenljivki. V kolikor to vemo vnaprej, je dobra praksa, da podamo tudi ta argument:
+Opazimo, da je sedaj spremenljivka drugačnega tipa, saj hrani tudi informacijo o možnih vrednostih oziroma **ravneh** (ang. **levels**). Ampak v tem primeru so te ravni napačne (ne zajame vseh 4 možnih vrednosti, poleg tega pa vsebuje tudi eno napačno vrednost). Funkcija `factor()` privzeto kot ravni nastavi vse vrednosti v podani spremenljivki. Če želimo, ji lahko podamo dodaten argument `levels`, kateri ročno določimo ravni spremenljivke. V kolikor poznamo ravni vnaprej, je dobra praksa, da podamo tudi ta argument:
 
 ```{r}
 vreme_fac <- factor(vreme, levels = c("oblačno", "pretežno_oblačno", "zmerno_oblačno", "jasno"))
 vreme_fac
 ```
 
-V kolikor želimo, da faktor hrani tudi informacijo o tem, da obstaja smiselna razvrstitev po velikosti, dodamo argument `ordered = TRUE`.
+V kolikor želimo, da faktor hrani tudi informacijo o smiselni razvrstitev po velikosti, dodamo argument `ordered = TRUE`.
 ```{r}
 vreme_fac2 <- factor(vreme, levels = c( "jasno", "zmerno_oblačno","pretežno_oblačno","oblačno"), 
                      ordered = TRUE)
