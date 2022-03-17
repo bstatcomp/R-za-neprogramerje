@@ -304,7 +304,7 @@ print(setdiff(mn3, mn1))
 ```
 V tem primeru pa ne dobimo enako. Funkcijo  `setdiff(mn1, mn3)` si lahko predstavljamo, da vrne elemente, ki so v **mn1** in jih ni v **mn3**. To pa ni enako elementom, ki so v **mn3** in jih ni v **mn1**.
 
-#Delo s faktorji
+# Delo s faktorji
 
 Kategorične spremenljivke so spremenljivke, ki lahko zavzamejo samo končno mnogo vnaprej določenih vrednosti. Delimo jih na:
 
@@ -340,8 +340,7 @@ Opazimo, da je sedaj spremenljivka drugačnega tipa, saj hrani tudi informacijo 
 vreme_fac <- factor(vreme, levels = c("oblačno", "pretežno_oblačno", "zmerno_oblačno", "jasno"))
 vreme_fac
 ```
-
-V kolikor želimo, da faktor hrani tudi informacijo o smiselni razvrstitev po velikosti, dodamo argument `ordered = TRUE`.
+Ker element seznama *pretečno_oblačno* ni na seznamu ravni spremenljivke, se ta samodejno spremeni v manjkajočo vrednost (*<NA>*). V kolikor želimo, da faktor hrani tudi informacijo o smiselni razvrstitev po velikosti, dodamo argument `ordered = TRUE`.
 ```{r}
 vreme_fac2 <- factor(vreme, levels = c( "jasno", "zmerno_oblačno","pretežno_oblačno","oblačno"), 
                      ordered = TRUE)
