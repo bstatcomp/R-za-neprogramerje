@@ -337,12 +337,14 @@ vreme_fac
 Opazimo, da je sedaj spremenljivka drugačnega tipa, saj hrani tudi informacijo o možnih vrednostih oziroma **ravneh** (ang. **levels**). Ampak v tem primeru so te ravni napačne (ne zajame vseh 4 možnih vrednosti, poleg tega pa vsebuje tudi eno napačno vrednost). Funkcija `factor()` privzeto kot ravni nastavi vse vrednosti v podani spremenljivki. Če želimo, ji lahko podamo dodaten argument `levels`, kateri ročno določimo ravni spremenljivke. V kolikor poznamo ravni vnaprej, je dobra praksa, da podamo tudi ta argument:
 
 ```{r}
-vreme_fac <- factor(vreme, levels = c("oblačno", "pretežno_oblačno", "zmerno_oblačno", "jasno"))
+vreme_fac <- factor(vreme, levels = c("oblačno", "pretežno_oblačno", "zmerno_oblačno", 
+                                      "jasno"))
 vreme_fac
 ```
 Ker element seznama *pretečno_oblačno* ni na seznamu ravni spremenljivke, se ta samodejno spremeni v manjkajočo vrednost (*<NA>*). V kolikor želimo, da faktor hrani tudi informacijo o smiselni razvrstitev po velikosti, dodamo argument `ordered = TRUE`.
 ```{r}
-vreme_fac2 <- factor(vreme, levels = c( "jasno", "zmerno_oblačno","pretežno_oblačno","oblačno"), 
+vreme_fac2 <- factor(vreme, levels = c( "jasno", "zmerno_oblačno","pretežno_oblačno",
+                                        "oblačno"), 
                      ordered = TRUE)
 vreme_fac2
 ```
