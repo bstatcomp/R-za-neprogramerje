@@ -369,7 +369,7 @@ Izpisanih je prvih 6 vrstic.
 
 - (Težje) Izberi vstico, kjer so Libertariani dobili največ glasov. Namig: vrstico **party** == "LIB", kjer je **votes** največji izmed vseh vrstic **party** == "LIB".
 ```{r echo = FALSE}
-dat[dat$votes == max(dat[dat$party == "LIB", "votes"]), ]
+dat[dat$party =="LIB" & dat$votes == max(dat[dat$party == "LIB", "votes"]), ]
 ```
 
 

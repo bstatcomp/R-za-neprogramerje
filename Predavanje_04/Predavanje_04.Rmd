@@ -219,7 +219,7 @@ print(as.Date(datPM10$Datum))
 
 Datum mora biti v ISO formatu, če ni, moramo format definirati.
 ```{r, error = TRUE}
-datPM10$Datum <- as.Date(datPM10$Datum, format = "%m/%d/%y")
+datPM10$Datum <- as.Date(datPM10$Datum, format = "%m/%d/%Y")
 print(head(datPM10,10))
 ```
 
