@@ -261,7 +261,7 @@ ggplot(df.osebe, aes(x = Visina, y = Teza, colour = Spol)) + geom_point() +
   ggtitle("Visina in teza petih udelezencev nase raziskave.")
 ```
 
-Čeprav razsevni, stolpični in črtni diagram predstavljajo večino grafov, s katerim se srečamo pri tipičnih analizah, obstaja še mnogo drugih tipov grafov. Knjižnica ggplot2 pokriva praktično vse dvorazsežne grafe, ki jih bomo potrebovali, in kopico možnosti, da jih prilagodimo svojim potrebam. Med te možnosti spadajo prilagajanje osi, barvne palete, anotacija grafa. Vse, kar boste verjetno potrebovali (in še več), najdete tudi v zgoščenem povzetku na [\textcolor{blue}{tej povezavi}](https://rstudio.com/wp-content/uploads/2016/11/ggplot2-cheatsheet-2.1.pdf).
+Čeprav razsevni, stolpični in črtni diagram predstavljajo večino grafov, s katerim se srečamo pri tipičnih analizah, obstaja še mnogo drugih tipov grafov. Knjižnica ggplot2 pokriva praktično vse dvorazsežne grafe, ki jih bomo potrebovali, in kopico možnosti, da jih prilagodimo svojim potrebam. Med te možnosti spadajo prilagajanje osi, barvne palete, anotacija grafa. Vse, kar boste verjetno potrebovali (in še več), najdete tudi v zgoščenem povzetku na [\textcolor{blue}{tej povezavi}](https://www.maths.usyd.edu.au/u/UG/SM/STAT3022/r/current/Misc/data-visualization-2.1.pdf).
 
 # Domača naloga
 
