@@ -1,0 +1,602 @@
+---
+title: "Predavanje 08 -- Odgovori na vprašanja - Marec 22"
+output:
+  pdf_document:
+    dev: cairo_pdf
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+# knitr::opts_chunk$set(echo = TRUE)
+options(stringsAsFactors = FALSE)
+```
+
+
+ 
+
+# Statistični testi
+
+Večina klasičnih statističnih testov in modelov je vgrajenih že v osnovni R. Poglejmo si uporabo treh izmed najbolj popularnih, t-testa, ANOVE in linearne regresije.
+
+```{r}
+# Modelirajmo porabo goriva, pri čemer kot neodvisne spremenljivke uporabimo:
+# število cilindrov, konjsko moč in težo.
+lr <- lm(mpg ~ cyl + hp + wt, data = mtcars)
+summary(lr)
+```
+
+
+```{r}
+# t-test uporabimo za statistično primerjavo pričakovane širine listov
+# dveh vrst perunike.
+x_vir <- iris$Sepal.Width[iris$Species == "virginica"]
+x_ver <- iris$Sepal.Width[iris$Species == "versicolor"]
+
+t.test(x_vir, x_ver)
+```
+
+
+```{r}
+# ANOVO uporabimo za statistično primerjavo dolžine listov treh vrst perunike.
+# Primerjamo, ali vrsta perunike vpliva na dolžino listov.
+my_anova <- aov(Sepal.Length ~ Species, data = iris)
+summary(my_anova)
+```
+
+# ggplot2 -- statistična signifikantnost
+Včasih želimo rezultate statističnega testa prikazati kar na grafu. Poglejmo si sedaj primer t-testa v ggplot2. Za to bomo potrebovali še en paket **ggpubr** in funkcijo iz tega paketa `stat_compare_means`. Poleg statističnega testa bomo izrisali tudi boxplot (Diagram s *škatlami in brčicami*).
+
+
+```{r}
+library(ggplot2)
+library(ggpubr)
+ggplot(iris, aes(x = Species, y = Petal.Width)) +
+  geom_boxplot() +
+  stat_compare_means(label = "p.signif", method = "t.test",
+                     ref.group = "setosa")
+```
+
+# Prikaz točk in povprečja na grafu
+Poglejmo si še en zanimiv graf, kjer bomo prikazali točke in povprečja na istem grafu. Pogledali si bomo porazdelitve dolžin in širin čašnih listov različnih perunik. Najprej si pripravimo `data.frame`.
+
+```{r}
+library(tidyr)
+iris_longer <- iris[ , c("Sepal.Length", "Sepal.Width", "Species")]
+iris_longer <- pivot_longer(iris_longer, Sepal.Length:Sepal.Width)
+head(iris_longer)
+```
+
+Za izris povprečij s črto bomo potrebovali geom `hpline` iz paketa **ungeviz** (https://wilkelab.org/ungeviz/index.html). Za izris točk uporabimo pri `geom_point` argument `position = position_jitterdodge()`. To najprej loči dolžine in širine listov (dodge) in potem še nekoliko raztrosi točke (jitter), da je bolj pregledno, kjer imamo več točk. Če ne bi uporabili tega, bi enostavno dobili prikazane vse točke v isti liniji.
+
+```{r}
+library(ungeviz)
+pl_means <- 
+  ggplot(iris_longer, aes(x = Species, y = value, color = name)) +
+  geom_point(position = position_jitterdodge()) +
+  stat_summary(
+    fun = "mean",
+    position = position_dodge(width = 0.75),
+
+        geom = "hpline"
+  )
+pl_means
+```
+# ggplot2 -- errorbar
+
+Na statističnih grafih, ki vsebujejo opisne statistike, kot je npr. povprečje, pogosto prikažemo še negotovost v obliki standardnih odklonov ali standardnih napak. S knjižnico ggplot2 to storimo z uporabo geom-a `errorbar`. Pred tem moramo ustrezno pripraviti podatke tako, da dodamo še stolpec s spodnjo in zgornjo mejo napake. Če je napaka simetrična, potrebujemo le en stolpec. Poglejmo si odvisnost milj na galono (`mpg`) od števila cilindrov.
+
+```{r}
+data("mtcars")
+head(mtcars)
+
+mus <- aggregate(mpg ~ cyl, mtcars, FUN = mean)
+sds <- aggregate(mpg ~ cyl, mtcars, FUN = function(x) {sd(x) / sqrt(length(x))})
+df  <- cbind(mus, SE = sds$mpg)
+df$cyl <- as.character(df$cyl)
+
+head(df)
+```
+
+
+```{r fig.width = 3, fig.height = 3}
+library(ggplot2)
+ggplot(df, aes(x = cyl, y = mpg, colour = cyl)) + 
+  geom_point() + 
+  geom_errorbar(aes(ymin = mpg - SE, ymax = mpg + SE), width = 0.5) +
+  theme(legend.position = "none")
+```
+
+# Ponovitev grafov skozi četrto nalogo petega predavanja
+
+Besedilo naloge:
+
+Naloga 4 je težka, saj zahteva uporabo možnosti knjižnice ggplot2, ki jih nismo obravnavali na predavanju. Uporabite prej omenjeni zgoščen povzetek in iskalnik Google in se poskusite čim bolj približati narisanemu grafu. Tudi če vam ne uspe povsem in boste na koncu pogledali rešitev, se boste pri tem zagotovo naučili veliko novih uporabnih možnosti, ki jih ponuja knjižnica ggplot. Še en namig, da se ne bomo ukvarjali še z R: uporabite funkcijo `weekdays()` in podatek, da je vikend dan, ki je sobota ali nedelja.
+
+Za to nalogo bomo naložili podatke o meritvah onesnaženosti iz datoteke *PM10mesta.csv* in izbrali podmnožico meritev za Koper, Celje in Ljubljano. Pred risanjem tudi pretvorimo datum iz niza znakov v podatkovni tip Date.
+
+Narišimo ta graf:
+
+```{r echo = FALSE, fig.width = 11, fig.height = 8, warning = FALSE}
+df <- read.table("./data_raw/PM10mesta.csv", header = TRUE, sep=",", quote = "\"", dec = '.')
+df$Datum <- as.Date(df$Datum)
+ggplot(df, aes(x = Datum, y = PM10)) + 
+  geom_line(colour = "black") +
+  geom_area(alpha = 0.1, fill = "orange") + ylim(0, 100) +
+  xlab("") + 
+  theme_bw() +
+  geom_hline(yintercept = 50, lty = "dashed", colour = "red") + 
+  geom_point(data = df, aes(colour = weekdays(Datum) == "sobota" | weekdays(Datum) == "nedelja")) +
+  ggtitle("Vrednosti meritev PM10 za tri slovenska mesta. Rdeca crta predstavlja kriticno mejo dnevne onesnazenosti.") +
+  labs(color = "Vikend?") + theme(legend.position = "bottom",
+                                  axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1)) +
+  facet_wrap(. ~ kraj, ncol = 1)
+```
+
+Sedaj poglejmo, kako lahko pridemo do te rešitve korak po koraku.
+
+Najprej preberemo podatke in spremenimo datume v pravilno obliko.
+
+```{r}
+df <- read.table("./data_raw/PM10mesta.csv", header = TRUE, sep=",", quote = "\"", dec = '.')
+#spremenimo datum
+df$Datum <- as.Date(df$Datum)
+```
+
+Namesto izrisa treh grafov se bomo za začetek osredotočili za izris vsebnosti delcev PM10 samo za Ljubljano. Izrišimo samo to črto.
+
+```{r}
+ggplot(df[df$kraj == "Ljubljana",], aes(x = Datum, y = PM10)) + 
+  geom_line(colour = "black") 
+```
+Z ukazom `geom_area` lahko na grafu podamo ploščino. S spodnjim geomom jo pobarvamo oranžno in naredimo skoraj transparentno. Dodali smo še skalo y osi od 0 do 100 in izbrisali labelo na x osi.
+
+```{r}
+ggplot(df[df$kraj == "Ljubljana",], aes(x = Datum, y = PM10)) + 
+  geom_line(colour = "black") +
+  geom_area(alpha = 0.1, fill = "orange") + ylim(0, 100) +
+  xlab("")
+```
+Paket **ggplot2** ima že prednastavljene teme za izris grafov. Ena izmed teh je `theme_bw()`, ki jo bomo uporabili. Z ukazom `?theme_bw()` lahko v zavihku help vidite tudi ostale prednastavljene teme. Z ukazom `theme()` pa jih lahko tudi sami definirate.
+
+```{r}
+ggplot(df[df$kraj == "Ljubljana",], aes(x = Datum, y = PM10)) + 
+  geom_line(colour = "black") +
+  geom_area(alpha = 0.1, fill = "orange") + ylim(0, 100) +
+  xlab("") +
+  theme_bw()
+```
+Dodamo še rdečo horizontalno črto za označitev kritične vrednosti. Parameter `lty` pomeni line type, ostalo pa že poznate.
+
+```{r}
+ggplot(df[df$kraj == "Ljubljana",], aes(x = Datum, y = PM10)) + 
+  geom_line(colour = "black") +
+  geom_area(alpha = 0.1, fill = "orange") + ylim(0, 100) +
+  xlab("") +
+  theme_bw() +
+  geom_hline(yintercept = 50, lty = "dashed", colour = "red")
+```
+
+Sedaj bomo naredili nekaj korakov naenkrat, ker so vmesni izrisi dokaj grdi. Na črto z geomom `geom_point` dodamo še točke, ki jih obarvamo glede na vikende in delavnike. Z `ggtitle` spremenimo naslov izrisa. Z ukazom `labs` spremenimo izpis legende in s svojo dodatnimi ukazi za temo `theme` pa legende z privzete desne strani premaknemo na spodnjo stran in z parametrom `axis.text.x` zarotiramo tekst na x osi.
+
+```{r}
+ggplot(df[df$kraj == "Ljubljana",], aes(x = Datum, y = PM10)) + 
+  geom_line(colour = "black") +
+  geom_area(alpha = 0.1, fill = "orange") + ylim(0, 100) +
+  xlab("") +
+  theme_bw() +
+  geom_hline(yintercept = 50, lty = "dashed", colour = "red") +
+  geom_point(data = df[df$kraj == "Ljubljana",], 
+            aes(colour = weekdays(Datum) == "sobota" | 
+                  weekdays(Datum) == "nedelja")) +
+  ggtitle("Vrednosti meritev PM10 za tri slovenska mesta.") +
+  labs(color = "Vikend?") + 
+  theme(legend.position = "bottom",
+          axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))
+```
+Na koncu uporabimo še funkcijo `facet_wrap`, kateri podamo spodaj podamo skupine v obliki **enačbe**. Enačba je poseben tip spremenljivke, s katerim povemo, da so vrednosti na levi strani '~' odvisne od desne strani. Pika '.' v kontekstu spodnje enačbe pomeni *vsi ostali stolpci*. Nekako lahko beremo izriši vse podatke glede na kraj. Facet_wrap iziriše za vsako skupino svoj graf, `ncol = 1` pa pove, da želimo vse skupne izrisati v samo enem stoplcu.
+
+
+```{r}
+ggplot(df, aes(x = Datum, y = PM10)) + 
+  geom_line(colour = "black") +
+  geom_area(alpha = 0.1, fill = "orange") + ylim(0, 100) +
+  xlab("") + 
+  theme_bw() +
+  geom_hline(yintercept = 50, lty = "dashed", colour = "red") + 
+  geom_point(data = df, 
+             aes(colour = weekdays(Datum) == "sobota" | 
+                   weekdays(Datum) == "nedelja")) +
+  ggtitle("Vrednosti meritev PM10 za tri slovenska mesta.") +
+  labs(color = "Vikend?") + 
+  theme(legend.position = "bottom",
+          axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1)) +
+  facet_wrap(. ~ kraj, ncol = 1)
+```
+Tako smo prišli do končnega grafa.
+
+# Vzorci in slike na grafih
+
+Uporabimo podatke o delcih, da izrišemo stolpični graf, ki prikazuje povprečno onesnaženost glede na mesto.
+
+```{r}
+d <- aggregate(x = df$PM10, by = list(df$kraj), FUN = mean, na.rm = TRUE)
+names(d) <- c("mesto", "povprecje")
+ggplot(d, aes(x = mesto, y = povprecje)) +
+  geom_bar(stat = "identity")
+```
+Za risanje vzorcev na stolpce lahko uporabimo paket **ggpattern**. Ta paket vsebuje skoraj vse geome, ki so v paketu ggplot2, s to razliko, da je imenom dodan še **_pattern**. Poglejmo si, kaj se zgodi, če samo zamenjamo geom.
+
+```{r}
+library(ggpattern)
+ggplot(d, aes(x = mesto, y = povprecje)) +
+  geom_bar_pattern(stat = "identity")
+```
+Opazimo, da avtomatsko izriše črte (stripes).
+
+Dodajmo še barve in nekaj drugih privzetih vzorcev.
+
+```{r}
+ggplot(d, aes(x = mesto, y = povprecje)) +
+  geom_bar_pattern(stat = "identity", aes(fill = mesto, pattern = mesto, 
+                                          pattern_fill = "green"),
+                   pattern = c("crosshatch", "circle", "stripe"),
+                   pattern_fill = "orange",
+                   pattern_colour = "lightgrey")
+```
+Vzorce lahko damo na skoraj katerokoli obarvano površino. Poglejmo si na primer dodajanja vzorca na kompleksen graf iz domače naloge.
+
+```{r}
+ggplot(df[df$kraj == "Ljubljana",], aes(x = Datum, y = PM10)) + 
+  geom_line(colour = "black") +
+  geom_area_pattern(alpha = 0.1, fill = "orange", pattern = "crosshatch", pattern_alpha = 0.5) + ylim(0, 100) +
+  xlab("") + 
+  theme_bw() +
+  geom_hline(yintercept = 50, lty = "dashed", colour = "red") + 
+  geom_point(data = df[df$kraj == "Ljubljana",], 
+             aes(colour = weekdays(Datum) == "sobota" | 
+                   weekdays(Datum) == "nedelja")) +
+  ggtitle("Vrednosti meritev PM10 za tri slovenska mesta.") +
+  labs(color = "Vikend?") + 
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))
+```
+
+Na grafe lahko s paketom **ggimage** dodamo tudi slike. Paket uporablja drug paket **magick**, ki ga po potrebi predhodno naložite.
+
+Prikažimo, kaj se zgodi, če uporabimo `geom_image` na stolpičnem diagramu.
+
+```{r}
+library(ggimage)
+ggplot(d, aes(x = mesto, y = povprecje, image="./img/small.png")) +
+  geom_bar(stat = "identity") + geom_image()
+```
+Vidimo, da slikico izriše na vrhu. Podobno lahko tudi namesto točk izrisujemo slike. Mi pa si poglejmo, kako bi celoten stolpec zamenjali s poljubim vzorcem (sliko). Najprej si naredimo vektor s potmi do vzorcev na računalniku ali spletu.
+
+```{r}
+vzorci <- c("./img/kamen.png",
+            "./img/cloud.png",
+            "./img/small.png")
+```
+
+Parameter `pattern_filename` nam omogoča, da izbiramo različne spremenljivke glede na vrednosti stolpca `mesto`. Če uporabimo ta parameter moramo podati poti do slik s funkcijo `scale_pattern_filename_discrete`. Zadnja beseda te funkcije se lahko spreminja, glede na to kateri geom smo predhodno uporabili.
+
+```{r}
+ggplot(d, aes(x = mesto, y = povprecje)) +
+  geom_bar_pattern(stat = "identity", 
+                   aes(pattern_filename = mesto),
+                   pattern = "image") +
+  scale_pattern_filename_discrete(choices = vzorci)
+```
+Na sliki vidimo, da je slika centrirana na sredino stoplca. Z dodatnimi parametri jo lahko raztegnemo oziroma razmnožimo cez celotno območje stolpca.
+
+```{r}
+ggplot(d, aes(x = mesto, y = povprecje)) +
+  geom_bar_pattern(stat = "identity", 
+                   aes(pattern_filename = mesto),
+                   pattern = "image",
+                   pattern_type    = 'tile',
+                   pattern_filter  = 'box',
+                   pattern_scale   = -1) +
+  scale_pattern_filename_discrete(choices = vzorci)
+```
+# Dodajanje črte povprečja
+
+```{r}
+ggplot(d, aes(x = mesto, y = povprecje)) +
+  geom_bar_pattern(stat = "identity", 
+                   aes(pattern_filename = mesto),
+                   pattern = "image",
+                   pattern_type    = 'tile',
+                   pattern_filter  = 'box',
+                   pattern_scale   = -1) +
+  scale_pattern_filename_discrete(choices = vzorci)+
+  geom_hline(yintercept = mean(d$povprecje), color="blue")
+```
+
+
+
+# Branje poljubnih tekstovnih datotek
+
+Včasih, ko se srečamo s podatki, ki so podani na nek nestandarden način si pomagamo s tem, da datoteko preberemo vrstico po vrstico in nato poskušamo zapis razčleniti na razumljivejše dele. V priloženi datoteki *VZOREC ODMERNI SEZNAM DOBIČEK.txt* opazimo, da so podatki ločeni na strani, ki so ločene z znaki '=' in '-'. Opazimo lahko tudi, da je zapis nenavaden, ker je smiselen zapis za en element raztegnjen čez dve vrstici.
+
+Pri tej nalogi si bomo pomagali s paketom **stringr**, ki je del skupka paketov **tidyverse** za lažje delo z R-jem. Paket **stringr** nam olajša delo z nizi.
+
+Najprej preberimo vse vrstice datotke v spremenljivko `dat`:
+
+```{r}
+library(stringr)
+fl <- file("./data_raw/VZOREC ODMERNI SEZNAM DOBICEK.txt", "r")
+dat <- readLines(fl)
+close(fl) #zapremo povezavo do datoteke
+head(dat) #izpis prvih par vrstic
+```
+
+Najprej poskušajmo zaznati v katerih vrsticah se začne nova stran. To je seveda vrstica 1, ter nato vsaka, ki vsebuje niz '==='. Na koncu dodajmo še indeks zadnje vrstice.
+
+```{r}
+strani <- c(1, grep("===", dat), length(dat))
+strani
+```
+
+Glava ideja je sedaj, da preberemo stran za stranjo in te podatke združimo. Za to lahko uporabimo zanko:
+
+```{r, eval = FALSE}
+for (i in 1:(length(strani)-1)){
+  tmp <- preberi_stran(dat[strani[i]:strani[i + 1]])
+  dokument <- rbind(dokument, tmp)
+}
+```
+
+V zgornji zanki smo napisali funkcijo `uredi_stran`, ki ji podamo indeks prve in zadnje vrstice te strani. Nato te podatke združimo z `rbind`.
+
+Poglejmo si sedaj, kako bi sprogramirali to funkcijo. Za nekoliko bolj podrobno razlago glejte komentarje v kodi:
+
+```{r}
+preberi_stran <- function(stran){
+  glava <- grep(pattern = "---", x = stran)
+  # Locimo podvojene vrstce
+  vrstice_1 <- stran[seq(from = glava[2]+1, to = length(stran)-2, by = 2)]
+  vrstice_2 <- stran[seq(from = glava[2]+2, to = length(stran)-1, by = 2)]
+  
+  # Popravimo prve vrstico
+  vrstice_1 <- str_squish(vrstice_1) # odstranemo odvecne presledke
+  # locimo glede na presledke, pustimo neurejeno zadnjo kolono
+  vrstice_1 <- str_split(vrstice_1, " ", simplify = T,n = 4)
+  # popravimo zadnjo kolono, locimo glede na vejico in pustimo neurejeno zadnjo
+  vrstice_1 <- cbind(vrstice_1[, -4], 
+                     str_split(vrstice_1[, 4], ",", simplify = T, 2))
+  # locimo preostale stolpce  in ohranimo locilo (oprostitev ali izguba)
+  tmp <- str_split(vrstice_1[, 5], "Oprostitev|Izguba", simplify = T,  n =2)
+  tmp2 <- str_match(vrstice_1[, 5], "Oprostitev|Izguba")
+  # zdruzimo skupaj
+  vrstice_1 <- cbind(vrstice_1[, -5], 
+                     tmp[, 1], tmp2, tmp[, -1])
+  vrstice_1 <- as.data.frame(vrstice_1)
+  colnames(vrstice_1) <- c("St", "st_odmere", "davcna", "naslovnik", "naslovnik_naslov", "odmera", "odmerjeni_davek")
+  
+  vrstice_2 <- str_squish(vrstice_2) # odstranemo odvecne presledke
+  # Izvozimo tekstovne stoplce 
+  #\\d+ je ujemanje s katerokoli števko
+  tmp <- str_split(vrstice_2, "\\d+", simplify = T, 4)[, 2:3]
+  # Izvozimo numericne stolpce 
+  #\\D+ je ujemanje s katerikolim znakom razen števk
+  tmp2 <- str_split(vrstice_2, "\\D+", simplify = T, 4)[,1:2] 
+  vrstice_2 <- cbind(tmp2[,1], tmp[,1], tmp2[,2], tmp[,2])
+  vrstice_2 <- as.data.frame(vrstice_2)
+  colnames(vrstice_2) <- c("st_odlocbe","naslovnik_kraj", 
+                           "naslovnik_posta_st", "naslovnik_posta")
+  return(cbind(vrstice_1, vrstice_2))
+}
+```
+
+V tej funkciji je uporabljenih še nekaj funkcij za delo z nizi, ki jih nismo obravnavali, kot so:
+
+* `grep`: Vrne indekse, vzorec `pattern` pojavi v besedilu.
+* `str_split`: Razdeli niz v več podnizov z podanim vzorcem.
+* `str_match`: Izpiše ujemanja z podanim vzorcem.
+* `str_squish`: Odstrani vse odvečne presledke, pusti največ enega med besedami.
+
+Vsi vzorci so podani s tako imenovanim regularnim izrazom, ki omogoča iskanje poljubnega niza ali skupino nizov v besedilu. Področje regularnih izrazov je obširno v tem primeru pa uporabljamo le osnovne oblike le tega.
+
+```{r, eval = FALSE}
+dokument <- NULL
+for (i in 1:(length(strani)-1)){
+  tmp <- preberi_stran(dat[strani[i]:strani[i + 1]])
+  dokument <- rbind(dokument, tmp)
+}
+head(dokument)
+```
+
+Po potrebi bi lahko na podoben način dodali tudi stolpca *stran* za številko strani in *datum*, ki ga lahko preberemo iz vsake strani. 
+
+# Osnovno delo s časovnimi vrstami
+
+Vzemimo podatke *delci2.csv* iz petega predavanja. Ti podatki predstavljajo časovno vrsto. Za vsak dan imamo narejene različne meritve.
+
+Naložimo te podatke in popravimo tip spremenljivke datum.
+
+```{r}
+delci <- read.csv("./data_raw/delci2.csv")
+delci$Datum <- base::as.Date(delci$Datum, format = c("%m/%e/%Y"))
+head(delci)
+```
+
+Kar veliko uporabnih funkcij za delo z časovnimi vrstami lahko najdete v paketu **zoo** (Z's Ordered Observations). To je paket za delu z regularnimi in iregularnimi časovnimi vrstami.
+
+Recimo, da želimo izračunati povprečje sedem dnevnih oken delcev PM10 v zraku. Za to lahko uporabimo funkcijo `rollmean`. Funkcija sprejme podatke, parameter `k` za izbiro števila sosednjih vrednosti na katereih se računa povprečje in parameter `fill` s katerim lahko zamenjamo začetne, končne in vmesne manjkajoče vrednosti. V tem primeru bomo tem vrednosti priredili kar vrednost NA - not available.
+
+```{r}
+library(zoo)
+okna <- rollmean(delci$PM10, k = 7, fill = 'NA')
+head(okna, n = 10)
+```
+Obstaja še nekaj podobnih funkcij, kot je recimo `rollmax`, ki izračuna maksimalno vrednost okna. V primeru, da želite svoj izračun pa lahko uporabite `rollapply`, ki 'applicira' podano funkcijo na izbrane podatke. Poglejmo si te funkcije na spodnjem grafu.
+
+```{r}
+ggplot(delci, aes(x = Datum, y = PM10)) +
+  geom_line(color = "lightblue") +
+  geom_line(color = "red", aes(y = rollmean(PM10, k = 7, fill = 'NA'))) + 
+  geom_line(color = "darkgreen", aes(y = rollmax(PM10, k = 7, fill = 'NA'))) +
+  geom_line(color = "darkgreen", aes(y = rollapply(PM10, width = 7, FUN = min, fill = 'NA')))
+
+```
+
+Velikokrat uporabna funkcija je tudi `diff`, ki nam vrne razliko med dvema meritvama. Privzeto je ta razlika (lag) ena meritev, lahko pa jo nastavite tudi na večjo. Spodnji primer kaže izris razlik.
+
+```{r}
+#zalika od prejšnjega dne
+ggplot(delci, aes(x = Datum, y = PM10 )) +
+  geom_line(color = "lightblue") +
+  geom_line(color = "red", aes(y = c(0,diff(PM10)))) 
+```
+Preskočimo sedaj tudi nekoliko naprej v poglavje strojnega učenja in na časovnih podatkih uporabimo znan model **arima** (autoregressive integrated moving average). 
+
+Paket, ki vsebuje zmogljivo implementacije arime za R je **forecast**. Tukaj bomo prikazali samo preprost primer, da vidimo delovanje, podrobnejši opis pa lahko dobite v [spletni knjigi](https://otexts.com/fpp2/arima-r.html#fig:ee1).
+
+Paket ima že nekaj vgrajenih funkcij, ki so lahko poznavalcem v pomoč. Poglejmo si razliko med meritvami.
+
+```{r}
+library(forecast)
+ggtsdisplay(diff(delci$PM10), main = "")
+```
+V našem primeru ni videti očitnega dobrega modela, vendar bomo izbrali za prvi parameter vrednost 7, saj je ACF tam najvišji. Ogledamo si lahko tudi distribucijo residiualov.
+
+```{r}
+fit <- arima(delci$PM10, order = c(7, 1, 0))
+checkresiduals(fit)
+```
+
+Ustvarjen model lahko tudi uporabimo za napovedovanje prihodnjih vrednosti.
+
+```{r}
+autoplot(forecast(fit))
+```
+Pogljemo si samo še tablarični izpis: 
+
+```{r}
+forecast(fit)
+```
+
+Paket vsebuje tudi funkcijo `auto.arima`,ki sama poskuša optimizirati parametre metode.
+
+```{r}
+fit <- auto.arima(delci$PM10)
+autoplot(forecast(fit))
+```
+
+
+# Strojno učenje
+
+Metod strojnega učenja je veliko in ponavadi jih dobite že vgrajene v raznih paketih. Tukaj si bomo pogledali en primer linearne regresije in modela z naključnim gozdom.
+
+Uporabili bomo podatke `iris`, ki so že priloženi R-ju. Gre za preprost primer, kjer imamo podatke o velikosti listov in cvetnih listov preunik, želimo pa napovedati vrsto rože.
+```{r}
+head(iris)
+```
+
+Poglejmo si izris dveh stolpcev in razreda.
+
+```{r}
+ggplot(iris, aes(x = Petal.Width, y = Petal.Length, colour = Species)) +
+  geom_point()
+```
+
+Kot smo videli v uvodnem delu lahko zgradimo linearni model.
+
+```{r}
+linearni_model <- lm(Species ~ ., iris)
+linearni_model
+```
+Kot vidimo, nam je R sporočil opozorilo, da ima težave napovedovati vrednost *Species*, ker je tipa faktor. Poskušajmo zato raje najprej napovedati širino cvetnih listov (Petal.Width) in uporabiti linearni model kot regresijo.
+
+Pri strojnem učenju moramo podatke najprej razdeliti na učno in testno množico, da lahko preverimo ali model dobro deluje. Razdelimo naše podatke na 105 učnih primerov in 45 testnih.
+
+```{r}
+set.seed(1234)
+sel <- sample(1:nrow(iris), 45, F)
+train <- iris[-sel,]
+test <- iris[sel,]
+```
+
+Zgradimo želeni linearni model:
+
+```{r}
+linearni_model <- lm(Petal.Width ~ Petal.Length + Sepal.Width + Sepal.Length, train)
+linearni_model
+```
+
+Skoraj vsi paketi za strojno učenje imajo na voljo tudi funkcijo `predict` s katero lahko napovedujemo neznane vrednosti.
+
+```{r}
+napovedi <- predict(linearni_model, test)
+head(napovedi)
+```
+
+Za oceno napovednega modela bomo kar sami spisali nekaj osnovnih funkcij.
+
+```{r}
+# srednja absolutna napaka
+mae <- function(obs, pred){
+  mean(abs(obs - pred))
+}
+
+# srednja kvadratna napaka
+mse <- function(obs, pred){
+  mean((obs - pred)^2)
+}
+
+# relativna srednja kvadratna napaka
+rmse <- function(obs, pred, mean.val){  
+  sum((obs - pred)^2)/sum((obs - mean.val)^2)
+}
+```
+
+Preverimo rezultate.
+
+```{r}
+mae(test$Petal.Width, napovedi)
+mse(test$Petal.Width, napovedi)
+rmse(test$Petal.Width, napovedi, mean(train$Petal.Width))
+```
+
+Poskušajmo še z metodo naključnega gozda.
+
+```{r}
+#naključno drevo
+library(randomForest)
+
+#regresija
+rf <- randomForest(Petal.Width ~ Petal.Length + Sepal.Width + Sepal.Length, 
+                   data = train)
+napovedi <- predict(rf, test)
+head(napovedi)
+```
+
+Primerjajmo rezultate:
+
+```{r}
+mae(test$Petal.Width, napovedi)
+mse(test$Petal.Width, napovedi)
+rmse(test$Petal.Width, napovedi, mean(train$Petal.Width))
+```
+
+Metoda naključnega gozda se lahko prilagodi tudi za iskanje faktorjev (klasifikacija).
+
+```{r}
+rf <- randomForest(Species ~ ., 
+                   data = train)
+napovedi_r <- predict(rf, test, type = "class")
+napovedi_v <- predict(rf, test, type = "prob")
+head(napovedi_r) #napovedi razredov
+head(napovedi_v) #verjetnosti napovedi
+```
+
+Preverimo še odstotek pravilno napovedanih vrst.
+
+```{r}
+sum(test$Species == napovedi_r) / length(test$Species)
+rbind(test$Species, napovedi_r)
+```
+
+
+V R-ju je še veliko paketov za delo z metodami strojnega učenja. Pogledate si lahko naprimer še **rpart**, **e1071**, **kknn**, **naiveBayes**, **nnet**, **coreLearn**.

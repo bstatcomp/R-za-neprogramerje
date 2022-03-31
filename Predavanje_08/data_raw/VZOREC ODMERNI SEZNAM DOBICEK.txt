@@ -1,0 +1,71 @@
+  
+ DURS - Izpostava: MARIBOR                                                                                        Stran:          1
+                                                    O D M E R N I   S E Z N A M                                   Datum: 31/07/2019
+                                                                     ZA LETO 
+
+ ----------------------------------------------------------------------------------------------------------------------------------
+ Zap.  [t.odmere   Odm.<10EUR    Dav~na       Naslovnik                                        Odmera                    Odmerjeni
+ {t.   [t.odlo~be               {tevilka                                                    Naslovna po{ta                 davek
+ ----------------------------------------------------------------------------------------------------------------------------------
+     1 01000200                 11103473   PRIIMEK1 IME1, ULICA JELEN^EVIH  4            Oprostitev
+            1189                           PEKRE                                        2341  LIMBU[
+     2 01000270                12495787   PRIIMEK2 IME2, CESTA PROLETARSKIH BRIGAD  60 Izguba
+            1190                           MARIBOR                                      2000  MARIBOR
+     3 01000280                 75607730   PRIIMEK3 IME3, KNIFI^EVA ULICA   1          Oprostitev
+            1191                           RU[E                                         2342  RU[E
+     4 01000290                26297660   PRIIMEK4 IME4, NAD DRAVO  1                  Oprostitev
+            1192                           BRESTERNICA                                  2354  BRESTERNICA
+     5 01000300                 23025556   PRIIMEK5 IME5, KORO[KA CESTA 22               Oprostitev
+            1193                           KAMNICA                                      2351  KAMNICA
+     6 01000310                 55251488   PRIIMEK6 JO@EF, DOBRAVSKA CESTA  15          Oprostitev                         2.995,24
+            1194                           SELNICA OB DRAVI                             2352  SELNICA OB DRAVI
+     7 01000320                 67078493   PRIIMEK8 KATA, DOBRAVSKA CESTA  105       Oprostitev                         2.995,24
+            1195                           SELNICA OB DRAVI                             2352  SELNICA OB DRAVI
+     8 01000330                88995716   PRIIMEK9 IME9, GAJ NAD MARIBOROM  44 A        Oprostitev                         1.123,00
+            1196                                                                        2354  BRESTERNICA
+     9 01000340                65571673  PRIIMEK10 IME10, ULICA ROBERTA KUKOVCA   8A      Oprostitev
+            1197                           MARIBOR                                      2000  MARIBOR
+    10 01000350                 46295364  PRIIMEK11 IME11, ULICA ROBERTA KUKOVCA   8A    Oprostitev
+            1198                           MARIBOR                                      2000  MARIBOR
+    
+ ==================================================================================================================================
+  
+ DURS - Izpostava: MARIBOR                                                                                        Stran:          2
+                                                    O D M E R N I   S E Z N A M                                   Datum: 31/07/2019
+                                                                     ZA LETO 
+
+ ----------------------------------------------------------------------------------------------------------------------------------
+ Zap.  [t.odmere   Odm.<10EUR    Dav~na       Naslovnik                                        Odmera                    Odmerjeni
+ {t.   [t.odlo~be               {tevilka                                                    Naslovna po{ta                 davek
+ ----------------------------------------------------------------------------------------------------------------------------------
+    26 12011340                 86571151   PRIIMEK12 IME12, ULICA BRATOV BERGLEZ  12       Izguba
+            1214                           PRAGERSKO                                    2331  PRAGERSKO
+    27 12011350                 23531494  PRIIMEK13 IME13, KOGOJEVA ULICA   89           Izguba
+            1215                           LJUBLJANA                                    1000  LJUBLJANA
+    28 12011360                 50407389   PRIIMEK14 IME14, PIONIRSKA ULICA  22         Izguba
+            1216                           PRAGERSKO                                    2331  PRAGERSKO
+    29 12011370                 90853622   PRIIMEK15 IME15, HRENCA  1                  Izguba
+            1217                                                                        2229  MALE^NIK
+    30 12011390                90370691   PRIIMEK16 IME16, ZGORNJI @ERJAVCI  145  Izguba
+            1218                                                                        2230  LENART V SLOVENSKIH GO
+    31 12011400                 29670842   PRIIMEK17 IME17, SMETANOVA ULICA  105A         Oprostitev                         2.068,50
+            1219                           MARIBOR                                      2000  MARIBOR
+    32 12011410                 72503089   PRIIMEK18 IME18, KOZJAK NAD PESNICO  110 B    Izguba
+            1220                                                                        2201  ZGORNJA KUNGOTA
+    33 12011420                 43420924  PRIIMEK19 IME19, RAPO^EVA ULICA  85              Oprostitev                         6.092,63
+            1221                           MARIBOR                                      2000  MARIBOR
+    34 12011430                 63047721   PRIIMEK20 IME20, SERN^EVA ULICA   66          Oprostitev
+            1222                           MARIBOR                                      2000  MARIBOR
+    35 12011440                 49512475   PRIIMEK21 IME21, VERDALNIK   88                      Oprostitev
+            1223                           VERD                                         1360  VRHNIKA
+    36 12011450                 51487806   PRIIMEK22 IME22, [PINDLERJEVA ULICA  139         Oprostitev
+            1224                           SLOVENSKA BISTRICA                           2310  SLOVENSKA BISTRICA
+    37 12011460                 25678890  PRIIMEK23 IME23, PRU[NIKOVA ULICA  266      Oprostitev                         1.265,00
+            1225                           MARIBOR                                      2000  MARIBOR
+    38 12011470                 69470887  PRIIMEK24 IME24, LEONHARD STR.707               Oprostitev
+            1226                           AVSTRIJA                                     AT-80 0   GRAZ
+    39 12011480                16447805   PRIIMEK25 IME25, GORICA   58 B       Oprostitev
+            1227                                                                        2317  OPLOTNICA
+    40 12011490                 55269262   PRIIMEK26 IME26@, ZGORNJA SELNICA  58            Oprostitev
+            1228                                                                        2352  SELNICA OB DRAVI
+  
