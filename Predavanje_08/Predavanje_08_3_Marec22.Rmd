@@ -7,12 +7,9 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-# knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning = F)
 options(stringsAsFactors = FALSE)
 ```
-
-
- 
 
 # Statistični testi
 
@@ -43,7 +40,7 @@ my_anova <- aov(Sepal.Length ~ Species, data = iris)
 summary(my_anova)
 ```
 
-# ggplot2 -- statistična signifikantnost
+# ggplot2 -- statistična značilnost
 Včasih želimo rezultate statističnega testa prikazati kar na grafu. Poglejmo si sedaj primer t-testa v ggplot2. Za to bomo potrebovali še en paket **ggpubr** in funkcijo iz tega paketa `stat_compare_means`. Poleg statističnega testa bomo izrisali tudi boxplot (Diagram s *škatlami in brčicami*).
 
 
@@ -148,7 +145,7 @@ Namesto izrisa treh grafov se bomo za začetek osredotočili za izris vsebnosti 
 ggplot(df[df$kraj == "Ljubljana",], aes(x = Datum, y = PM10)) + 
   geom_line(colour = "black") 
 ```
-Z ukazom `geom_area` lahko na grafu podamo ploščino. S spodnjim geomom jo pobarvamo oranžno in naredimo skoraj transparentno. Dodali smo še skalo y osi od 0 do 100 in izbrisali labelo na x osi.
+Z ukazom `geom_area` lahko na grafu podamo ploščino. S spodnjim ukazom jo pobarvamo oranžno in naredimo skoraj transparentno. Grafu še omejimo y os med 0 in 100 ter izbrišemo ime osi x.
 
 ```{r}
 ggplot(df[df$kraj == "Ljubljana",], aes(x = Datum, y = PM10)) + 
@@ -156,6 +153,7 @@ ggplot(df[df$kraj == "Ljubljana",], aes(x = Datum, y = PM10)) +
   geom_area(alpha = 0.1, fill = "orange") + ylim(0, 100) +
   xlab("")
 ```
+
 Paket **ggplot2** ima že prednastavljene teme za izris grafov. Ena izmed teh je `theme_bw()`, ki jo bomo uporabili. Z ukazom `?theme_bw()` lahko v zavihku help vidite tudi ostale prednastavljene teme. Z ukazom `theme()` pa jih lahko tudi sami definirate.
 
 ```{r}
@@ -165,7 +163,7 @@ ggplot(df[df$kraj == "Ljubljana",], aes(x = Datum, y = PM10)) +
   xlab("") +
   theme_bw()
 ```
-Dodamo še rdečo horizontalno črto za označitev kritične vrednosti. Parameter `lty` pomeni line type, ostalo pa že poznate.
+Dodamo še rdečo vodoravno črtkano črto, s katero označimo kritičen prag. Parameter `lty` označuje _line type_ oziroma obliko črte, ostalo pa že poznate.
 
 ```{r}
 ggplot(df[df$kraj == "Ljubljana",], aes(x = Datum, y = PM10)) + 
@@ -176,7 +174,7 @@ ggplot(df[df$kraj == "Ljubljana",], aes(x = Datum, y = PM10)) +
   geom_hline(yintercept = 50, lty = "dashed", colour = "red")
 ```
 
-Sedaj bomo naredili nekaj korakov naenkrat, ker so vmesni izrisi dokaj grdi. Na črto z geomom `geom_point` dodamo še točke, ki jih obarvamo glede na vikende in delavnike. Z `ggtitle` spremenimo naslov izrisa. Z ukazom `labs` spremenimo izpis legende in s svojo dodatnimi ukazi za temo `theme` pa legende z privzete desne strani premaknemo na spodnjo stran in z parametrom `axis.text.x` zarotiramo tekst na x osi.
+Sedaj bomo naredili nekaj korakov naenkrat, ker so vmesni izrisi dokaj grdi. Z `geom_point` dodamo na črto točke, ki jih obarvamo glede na to, če je dan delavnik ali dan v vikendu. S funkcijo `ggtitle` spremenimo naslov izrisa in s funkcijo `labs` spremenimo nalov legende. Nato legendo, ki se privzeto nahaja na desni strani grafa, premaknemo na spodnjo stran in zarotiramo tekst na x osi za 45 stopinj. To storimo tako, da znotraj funkcije `theme` podamo nove vrednosti parametrom `legend.position` in `axis.text.x`.
 
 ```{r}
 ggplot(df[df$kraj == "Ljubljana",], aes(x = Datum, y = PM10)) + 
@@ -193,7 +191,7 @@ ggplot(df[df$kraj == "Ljubljana",], aes(x = Datum, y = PM10)) +
   theme(legend.position = "bottom",
           axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))
 ```
-Na koncu uporabimo še funkcijo `facet_wrap`, kateri podamo spodaj podamo skupine v obliki **enačbe**. Enačba je poseben tip spremenljivke, s katerim povemo, da so vrednosti na levi strani '~' odvisne od desne strani. Pika '.' v kontekstu spodnje enačbe pomeni *vsi ostali stolpci*. Nekako lahko beremo izriši vse podatke glede na kraj. Facet_wrap iziriše za vsako skupino svoj graf, `ncol = 1` pa pove, da želimo vse skupne izrisati v samo enem stoplcu.
+Na koncu uporabimo še funkcijo `facet_wrap`, kateri podamo skupine v obliki **enačbe**. Enačba je poseben tip spremenljivke, s katerim povemo, da so vrednosti na levi strani tilde '~' odvisne od tistih na desni. Pika '.' v kontekstu spodnje enačbe pomeni *vsi ostali stolpci*. Nekako lahko beremo izriši vse podatke glede na kraj. `facet_wrap` iziriše za vsako skupino svoj graf, `ncol = 1` pa pove, da želimo vse skupne izrisati v samo enem stoplcu.
 
 
 ```{r}
@@ -243,7 +241,7 @@ ggplot(d, aes(x = mesto, y = povprecje)) +
                    pattern_fill = "orange",
                    pattern_colour = "lightgrey")
 ```
-Vzorce lahko damo na skoraj katerokoli obarvano površino. Poglejmo si na primer dodajanja vzorca na kompleksen graf iz domače naloge.
+Vzorce lahko damo na skoraj katerokoli obarvano površino. Poglejmo si na primer koako lahko dodamo vzorec na kompleksen graf iz domače naloge.
 
 ```{r}
 ggplot(df[df$kraj == "Ljubljana",], aes(x = Datum, y = PM10)) + 
@@ -263,14 +261,14 @@ ggplot(df[df$kraj == "Ljubljana",], aes(x = Datum, y = PM10)) +
 
 Na grafe lahko s paketom **ggimage** dodamo tudi slike. Paket uporablja drug paket **magick**, ki ga po potrebi predhodno naložite.
 
-Prikažimo, kaj se zgodi, če uporabimo `geom_image` na stolpičnem diagramu.
+Prikažemo kaj se zgodi, če uporabimo `geom_image` na stolpičnem diagramu.
 
 ```{r}
 library(ggimage)
 ggplot(d, aes(x = mesto, y = povprecje, image="./img/small.png")) +
   geom_bar(stat = "identity") + geom_image()
 ```
-Vidimo, da slikico izriše na vrhu. Podobno lahko tudi namesto točk izrisujemo slike. Mi pa si poglejmo, kako bi celoten stolpec zamenjali s poljubim vzorcem (sliko). Najprej si naredimo vektor s potmi do vzorcev na računalniku ali spletu.
+Vidimo, da slikico izriše na vrhu. Podobno lahko tudi namesto točk izrisujemo slike. Poglejmo si, kako bi celoten stolpec zamenjali s poljubim vzorcem (sliko). Najprej si naredimo vektor s potmi do vzorcev na računalniku ali spletu.
 
 ```{r}
 vzorci <- c("./img/kamen.png",
@@ -317,11 +315,11 @@ ggplot(d, aes(x = mesto, y = povprecje)) +
 
 # Branje poljubnih tekstovnih datotek
 
-Včasih, ko se srečamo s podatki, ki so podani na nek nestandarden način si pomagamo s tem, da datoteko preberemo vrstico po vrstico in nato poskušamo zapis razčleniti na razumljivejše dele. V priloženi datoteki *VZOREC ODMERNI SEZNAM DOBIČEK.txt* opazimo, da so podatki ločeni na strani, ki so ločene z znaki '=' in '-'. Opazimo lahko tudi, da je zapis nenavaden, ker je smiselen zapis za en element raztegnjen čez dve vrstici.
+Včasih, ko se srečamo s podatki, ki so podani na nek nestandarden način si lahko pomagamo tako, da datoteko preberemo vrstico po vrstico in nato poskušamo zapis razčleniti na razumljivejše dele. V priloženi datoteki *VZOREC ODMERNI SEZNAM DOBIČEK.txt* opazimo, da so podatki ločeni po straneh, ki so med sabo ločene z znaki '=' in '-'. Opazimo lahko tudi, da je zapis nenavaden, oziroma, da se vsaka vrstica tabele raztegne čez dve vrstici dokumenta.
 
-Pri tej nalogi si bomo pomagali s paketom **stringr**, ki je del skupka paketov **tidyverse** za lažje delo z R-jem. Paket **stringr** nam olajša delo z nizi.
+Pri tej nalogi si bomo pomagali s paketom **stringr**, ki je del skupka paketov **tidyverse**, in nam olajša delo z nizi.
 
-Najprej preberimo vse vrstice datotke v spremenljivko `dat`:
+Najprej preberemo vse vrstice datotke v spremenljivko `dat`:
 
 ```{r}
 library(stringr)
@@ -338,7 +336,7 @@ strani <- c(1, grep("===", dat), length(dat))
 strani
 ```
 
-Glava ideja je sedaj, da preberemo stran za stranjo in te podatke združimo. Za to lahko uporabimo zanko:
+Glavna ideja je, da preberemo stran za stranjo in te podatke združimo. Za to lahko uporabimo zanko:
 
 ```{r, eval = FALSE}
 for (i in 1:(length(strani)-1)){
@@ -347,7 +345,7 @@ for (i in 1:(length(strani)-1)){
 }
 ```
 
-V zgornji zanki smo napisali funkcijo `uredi_stran`, ki ji podamo indeks prve in zadnje vrstice te strani. Nato te podatke združimo z `rbind`.
+V zgornji zanki smo napisali funkcijo `preberi_stran`, ki ji podamo indeks prve in zadnje vrstice te strani. Nato te podatke združimo z `rbind`.
 
 Poglejmo si sedaj, kako bi sprogramirali to funkcijo. Za nekoliko bolj podrobno razlago glejte komentarje v kodi:
 
@@ -358,7 +356,7 @@ preberi_stran <- function(stran){
   vrstice_1 <- stran[seq(from = glava[2]+1, to = length(stran)-2, by = 2)]
   vrstice_2 <- stran[seq(from = glava[2]+2, to = length(stran)-1, by = 2)]
   
-  # Popravimo prve vrstico
+  # Popravimo prve vrstice
   vrstice_1 <- str_squish(vrstice_1) # odstranemo odvecne presledke
   # locimo glede na presledke, pustimo neurejeno zadnjo kolono
   vrstice_1 <- str_split(vrstice_1, " ", simplify = T,n = 4)
@@ -389,7 +387,7 @@ preberi_stran <- function(stran){
 }
 ```
 
-V tej funkciji je uporabljenih še nekaj funkcij za delo z nizi, ki jih nismo obravnavali, kot so:
+V tej funkciji je uporabljenih nekaj funkcij za delo z nizi, ki jih še nismo obravnavali. Te so:
 
 * `grep`: Vrne indekse, vzorec `pattern` pojavi v besedilu.
 * `str_split`: Razdeli niz v več podnizov z podanim vzorcem.
@@ -449,9 +447,9 @@ ggplot(delci, aes(x = Datum, y = PM10 )) +
   geom_line(color = "lightblue") +
   geom_line(color = "red", aes(y = c(0,diff(PM10)))) 
 ```
-Preskočimo sedaj tudi nekoliko naprej v poglavje strojnega učenja in na časovnih podatkih uporabimo znan model **arima** (autoregressive integrated moving average). 
+Preskočimo sedaj nekoliko naprej v poglavje strojnega učenja in na časovnih podatkih uporabimo znan model **arima** (autoregressive integrated moving average). 
 
-Paket, ki vsebuje zmogljivo implementacije arime za R je **forecast**. Tukaj bomo prikazali samo preprost primer, da vidimo delovanje, podrobnejši opis pa lahko dobite v [spletni knjigi](https://otexts.com/fpp2/arima-r.html#fig:ee1).
+Paket, ki vsebuje zmogljivo implementacijo arime za R je **forecast**. Tukaj bomo prikazali samo preprost primer, da vidimo delovanje, podrobnejši opis pa lahko dobite v [spletni knjigi](https://otexts.com/fpp2/arima-r.html#fig:ee1).
 
 Paket ima že nekaj vgrajenih funkcij, ki so lahko poznavalcem v pomoč. Poglejmo si razliko med meritvami.
 
@@ -471,7 +469,7 @@ Ustvarjen model lahko tudi uporabimo za napovedovanje prihodnjih vrednosti.
 ```{r}
 autoplot(forecast(fit))
 ```
-Pogljemo si samo še tablarični izpis: 
+Pogljemo si samo še tabularični izpis: 
 
 ```{r}
 forecast(fit)
@@ -487,9 +485,9 @@ autoplot(forecast(fit))
 
 # Strojno učenje
 
-Metod strojnega učenja je veliko in ponavadi jih dobite že vgrajene v raznih paketih. Tukaj si bomo pogledali en primer linearne regresije in modela z naključnim gozdom.
+Metod strojnega učenja je veliko in ponavadi jih dobite že vgrajene v raznih paketih. Tukaj si bomo pogledali en primer linearne regresije in modela z naključnim gozdom (Random Forest).
 
-Uporabili bomo podatke `iris`, ki so že priloženi R-ju. Gre za preprost primer, kjer imamo podatke o velikosti listov in cvetnih listov preunik, želimo pa napovedati vrsto rože.
+Uporabili bomo podatke `iris`, ki so že priloženi R-ju. Gre za preprost primer, kjer imamo podatke o velikosti čašnih in cvetnih listov preunik, želimo pa napovedati vrsto rože.
 ```{r}
 head(iris)
 ```
@@ -513,12 +511,12 @@ Pri strojnem učenju moramo podatke najprej razdeliti na učno in testno množic
 
 ```{r}
 set.seed(1234)
-sel <- sample(1:nrow(iris), 45, F)
+sel <- sample(1:nrow(iris), 45, replace =  F)
 train <- iris[-sel,]
 test <- iris[sel,]
 ```
 
-Zgradimo želeni linearni model:
+Zgradimo linearni model:
 
 ```{r}
 linearni_model <- lm(Petal.Width ~ Petal.Length + Sepal.Width + Sepal.Length, train)
@@ -599,4 +597,5 @@ rbind(test$Species, napovedi_r)
 ```
 
 
-V R-ju je še veliko paketov za delo z metodami strojnega učenja. Pogledate si lahko naprimer še **rpart**, **e1071**, **kknn**, **naiveBayes**, **nnet**, **coreLearn**.
+V R-ju je še veliko paketov za delo z metodami strojnega učenja. Pogledate si lahko naprimer še pakete **rpart**, **e1071**, **kknn**, **naiveBayes**, **nnet**, **coreLearn**.
+
