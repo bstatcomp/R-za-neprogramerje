@@ -1,0 +1,95 @@
+
+---
+title: "Predavanje 08 -- GRASS GIS"
+output:
+  pdf_document:
+    dev: cairo_pdf
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+# knitr::opts_chunk$set(echo = TRUE)
+```
+
+##GRASS GIS z RGrass7
+Začenemo **grassgis** iz konzole v Linuxu je to z ukazom grass7.
+
+Potrebujemo dve R knjižnici, **rgrass7** in **rgdal**.
+```{r results='hide'}
+library(rgrass7)
+library(rgdal)
+```
+
+Beremo vzorčni primer iz podatkov pridobljenih na <https://grassbook.org/datasets/datasets-3rd-edition/>.
+
+Lahko si pogledamo metapodatke za svojo lokacijo z:
+
+```{r}
+G <- gmeta()
+str(G)
+```
+Prikaže vektorske zemljevide, ki so na voljo:
+```{r}
+execGRASS("g.list", parameters = list(type = "vector"))
+```
+
+Prikaži mrežne zemljevide
+```{r}
+execGRASS("g.list", parameters = list(type = "raster"))
+```
+
+Preberemo dva GRASS mrežna zemljevida ("geology_30m" in "elevation" iz vzorčne podatkovne zbirke 
+North Carolina) v R kot "ncdata".
+```{r, results='hide', echo=FALSE, message = FALSE, warning=FALSE, error = FALSE}
+use_sp()
+ncdata <- read_RAST(c("geology_30m", "elevation"), cat=c(TRUE, FALSE))
+```
+Lahko pogledamo kaj smo prebrali.
+
+```{r}
+str(ncdata)
+```
+Pogledamo lahko srukturo podatkov:
+```{r}
+str(ncdata@data)
+
+summary(ncdata)
+```
+
+
+
+Tako izrišemo mrežne zemljevide
+```{r, results='hide', echo=FALSE, message = FALSE, warning=FALSE, error = FALSE}
+execGRASS("g.region", raster = "elevation", flags = "p")
+ncdata <- readRAST("elevation", cat=FALSE)
+spplot(ncdata, col = terrain.colors(20))
+```
+
+Pregledmo vektorske podatke:
+```{r}
+library(sf)
+use_sf()
+execGRASS("v.info", map="hospitals", layer="1")
+vInfo("hospitals")
+myschools <- readVECT("hospitals")
+print(summary(myschools))
+```
+
+
+Povzemanje podatkov: Naredimo tabelo kolikokrat se posamezna vrednost pojavi.
+```{r}
+table(ncdata$geology_30m)
+```
+
+Primerjamo z GRASS izpisom:
+```{r}
+execGRASS("r.stats", flags=c("c", "l"), parameters=list(input="geology_30m"), ignore.stderr=TRUE)
+```
+
+Lahko narišemo "škatle z brki" različnih geoloških tipov po višinah
+```{r}
+ncdata <- read_RAST(c("geology_30m", "elevation"), cat=c(TRUE, FALSE))
+da <- data.frame(elevation = ncdata$elevation, geology_30m = ncdata$geology_30m)
+library(ggplot2)
+ggplot(da, aes(x = geology_30m, y= elevation)) + geom_boxplot()
+```
