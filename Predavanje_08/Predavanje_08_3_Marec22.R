@@ -78,7 +78,7 @@ ggplot(df, aes(x = cyl, y = mpg, colour = cyl)) +
   theme(legend.position = "none")
 
 ##delo z grafi
-#------------------------------------------------------------------------------
+## --------------------------------------------------------------------------------------------------------
 #ponovitev 4 naloge petega tedna
 
 df <- read.table("./data_raw/PM10mesta.csv", header = TRUE, sep=",", quote = "\"", dec = '.')
@@ -139,7 +139,8 @@ ggplot(df, aes(x = Datum, y = PM10)) +
           axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1)) +
   facet_wrap(. ~ kraj, ncol = 1)
 
-# Vzorci in slike na grafih-------------------------------------------------
+## --------------------------------------------------------------------------------------------------------
+# Vzorci in slike na grafih
 d <- aggregate(x = df$PM10, by = list(df$kraj), FUN = sum, na.rm = TRUE)
 names(d) <- c("mesto", "povprecje")
 d
@@ -174,7 +175,8 @@ ggplot(df[df$kraj == "Ljubljana",], aes(x = Datum, y = PM10)) +
   labs(color = "Vikend?") + 
   theme(legend.position = "bottom",
         axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))
-
+## --------------------------------------------------------------------------------------------------------
+#dodajanje slik
 #install.packages("ggimage")
 library(ggimage)
 #slikica na vrhu
@@ -203,6 +205,8 @@ ggplot(d, aes(x = mesto, y = povprecje)) +
                    pattern_scale   = -1) +
   scale_pattern_filename_discrete(choices = vzorci)
 
+## --------------------------------------------------------------------------------------------------------
+#extra
 #dodajmo poljuben vzorec domači nalogi
 ggplot(df[df$kraj == "Ljubljana",], aes(x = Datum, y = PM10, pattern_filename = 1)) + 
   geom_line(colour = "black") +
@@ -223,9 +227,9 @@ ggplot(df[df$kraj == "Ljubljana",], aes(x = Datum, y = PM10, pattern_filename = 
   labs(color = "Vikend?") + 
   theme(legend.position = "bottom",
         axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1)) 
-
+#extra
           
-
+## --------------------------------------------------------------------------------------------------------
 #Dodajmo še črto povprečja
 ggplot(d, aes(x = mesto, y = povprecje)) +
   geom_bar_pattern(stat = "identity", 
@@ -238,7 +242,7 @@ ggplot(d, aes(x = mesto, y = povprecje)) +
   geom_hline(yintercept = mean(d$povprecje), color="blue")
 
 
-
+## --------------------------------------------------------------------------------------------------------
 ##Branje specifičnih tekstovnih datotek
 library(stringr)
 
@@ -287,7 +291,7 @@ for (i in 1:(length(strani)-1)){
 dokument <- dokument[, c(1, 2, 8, 3, 4, 5, 9, 10, 11, 6,7 )]
 dokument
 
-
+## --------------------------------------------------------------------------------------------------------
 #časovne vrste
 library(forecast)
 #glajenje(7 dnevno povprečje) in arima
@@ -311,7 +315,7 @@ ggplot(delci, aes(x = Datum, y = PM10 )) +
   geom_line(color = "red", aes(y = c(0,diff(PM10)))) 
 
 
-
+## --------------------------------------------------------------------------------------------------------
 #forcasts
 library(forecast) #auto.arima
 #https://otexts.com/fpp2/arima-r.html#fig:ee1
@@ -329,6 +333,7 @@ autoplot(forecast(fit))
 fit <- auto.arima(delci$PM10)
 autoplot(forecast(fit))
 
+## --------------------------------------------------------------------------------------------------------
 #strojno učenje
 
 head(iris)
@@ -336,11 +341,9 @@ head(iris)
 ggplot(iris, aes(x = Petal.Width, y = Petal.Length, colour = Species)) +
   geom_point()
 
-?lm
-
 linearni_model <- lm(Species ~ ., iris)
 linearni_model
-
+## --------------------------------------------------------------------------------------------------------
 #deljenje podatkov na uÄŤno in testno mnoĹľico
 set.seed(1234)
 sel <- sample(1:nrow(iris), 20, F)
@@ -349,11 +352,20 @@ test <- iris[sel,]
 
 train
 test
-
+## --------------------------------------------------------------------------------------------------------
 #veÄŤinski klasifikator
 table(train$Species)
 
 
+maj_class <- "virginica"
+sum(test$Species == maj_class) / length(test$Species)
+
+#linearni model
+linearni_model <- lm(Petal.Width ~ Petal.Length + Sepal.Width + Sepal.Length, train)
+linearni_model
+napovedi <- predict(linearni_model, test)
+
+## --------------------------------------------------------------------------------------------------------
 mae <- function(obs, pred){
   mean(abs(obs - pred))
 }
@@ -366,18 +378,13 @@ mse <- function(obs, pred){
 rmse <- function(obs, pred, mean.val){  
   sum((obs - pred)^2)/sum((obs - mean.val)^2)
 }
+## --------------------------------------------------------------------------------------------------------
 
-maj_class <- "virginica"
-sum(test$Species == maj_class) / length(test$Species)
-
-#linearni model
-linearni_model <- lm(Petal.Width ~ Petal.Length + Sepal.Width + Sepal.Length, train)
-linearni_model
-napovedi <- predict(linearni_model, test)
 mae(test$Petal.Width, napovedi)
 mse(test$Petal.Width, napovedi)
 rmse(test$Petal.Width, napovedi, mean(train$Petal.Width))
 
+## --------------------------------------------------------------------------------------------------------
 #nakljuÄŤno drevo
 library(randomForest)
 
@@ -389,6 +396,7 @@ mae(test$Petal.Width, napovedi)
 mse(test$Petal.Width, napovedi)
 rmse(test$Petal.Width, napovedi, mean(train$Petal.Width))
 
+## --------------------------------------------------------------------------------------------------------
 #klasifikacija
 rf <- randomForest(Species ~ ., 
                    data = train)
@@ -400,21 +408,5 @@ napovedi_v
 sum(test$Species == napovedi_r) / length(test$Species)
 rbind(test$Species, napovedi_r)
 
-#naklkjuÄŤna drevesa - randomForest
-#CoreLearn - paket z implementacijami razliÄŤnih modelov
 
-#normalizacija - za nekatere metode
-scale(iris$Sepal.Length)
-normalize <- function(x){
-  return((x - min(x))/(max(x) - min(x)))
-}
-norm <- normalize(iris$Sepal.Length)
-head(norm)
-
-#osnove statistike
-cor(iris$Petal.Length, iris$Petal.Width)
-sd(iris$Petal.Length)
-mean(iris$Petal.Length)
-
-summary(iris)
 
