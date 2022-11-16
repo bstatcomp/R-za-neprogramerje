@@ -46,7 +46,7 @@ mn2 <- c('spol', 'imena')
 print(mn2)
 ```
 
-Sedaj pogledamo, katera imena so v množici **mn1** in jih v **mn2** ni. V bistvu nekako iz množice **mn1** odstranimo imena, ki so **mn2**.
+Sedaj pogledamo, katera imena so v množici **mn1** in jih v **mn2** ni. V bistvu nekako iz množice **mn1** odstranimo imena, ki so v **mn2**.
 ```{r, error = TRUE}
 mnd <- setdiff(mn1, mn2)
 print(mnd)
@@ -55,6 +55,48 @@ Prikažemo data.frame brez stolpcev **spol** in **imena**.
 ```{r, error = TRUE}
 print(df[,mnd])
 ```
+
+# Operacije nad množicami
+Poleg funkcije `setdiff()` poznamo še nekaj funkcij za delo z množicami kot so `union()` (unija) in `intersec()` (presek). 
+
+Vzamemo množico **mn1**, ki vsebuje vsa imena stolpcev data.frame-a `df`. 
+Naredimo še množico **mn3**, ki je enaka:
+```{r, error = TRUE}
+mn3 <- c('spol', 'imena', 'starost', 'st_noge')
+```
+
+Če naredimo unijo množic  **mn1** in **mn3**, dobimo:
+```{r, error = TRUE}
+print(union(mn1, mn3))
+```
+Kaj pa če vrstni red obrnemo?
+```{r, error = TRUE}
+print(union(mn3, mn1))
+```
+Dobimo enako.
+
+Ča naredimo presek, dobimo:
+```{r, error = TRUE}
+print(intersect(mn1, mn3))
+```
+
+Kaj pa če vrstni red obrnemo?
+```{r, error = TRUE}
+print(intersect(mn3, mn1))
+```
+Dobimo enako.
+
+Če pogledamo razliko, dobimo:
+```{r, error = TRUE}
+print(setdiff(mn1, mn3))
+```
+
+Kaj pa če tukaj zamenjamo vrstni red?
+```{r, error = TRUE}
+print(setdiff(mn3, mn1))
+```
+V tem primeru pa ne dobimo enako. Funkcijo  `setdiff(mn1, mn3)` si lahko predstavljamo, da vrne elemente, ki so v **mn1** in jih ni v **mn3**. To pa ni enako elementom, ki so v **mn3** in jih ni v **mn1**.
+
 
 # Operacije nad vrsticami ali stolpci data.frame-a
 Numerične vrstice ali stoplce lahko med seboj seštevamo, odštevamo, množimo ali delimo.
@@ -261,48 +303,11 @@ Primer izbire podatkov od septembra do začetka decembra:
 datPM10[month(datPM10$Datum) >= 9 & month(datPM10$Datum)<= 11, ]
 ```
 
+Če nas zanima, koliko je primer po posameznih mesecih, lahko uporabimo funkcijo **table**. Ta nam prikaže frekvenco pojavitev.
 
-
-# Operacije nad množicami
-Poleg funkcije `setdiff()` poznamo še nekaj funkcij za delo z množicami kot so `union()` (unija) in `intersec()` (presek). 
-
-Vzamemo množico **mn1**, ki vsebuje vsa imena stolpcev data.frame-a `df`. 
-Naredimo še množico **mn3**, ki je enaka:
 ```{r, error = TRUE}
-mn3 <- c('spol', 'imena', 'starost', 'st_noge')
+table(month(datPM10$Datum))
 ```
-
-Če naredimo unijo množic  **mn1** in **mn3**, dobimo:
-```{r, error = TRUE}
-print(union(mn1, mn3))
-```
-Kaj pa če vrstni red obrnemo?
-```{r, error = TRUE}
-print(union(mn3, mn1))
-```
-Dobimo enako.
-
-Ča naredimo presek, dobimo:
-```{r, error = TRUE}
-print(intersect(mn1, mn3))
-```
-
-Kaj pa če vrstni red obrnemo?
-```{r, error = TRUE}
-print(intersect(mn3, mn1))
-```
-Dobimo enako.
-
-Če pogledamo razliko, dobimo:
-```{r, error = TRUE}
-print(setdiff(mn1, mn3))
-```
-
-Kaj pa če tukaj zamenjamo vrstni red?
-```{r, error = TRUE}
-print(setdiff(mn3, mn1))
-```
-V tem primeru pa ne dobimo enako. Funkcijo  `setdiff(mn1, mn3)` si lahko predstavljamo, da vrne elemente, ki so v **mn1** in jih ni v **mn3**. To pa ni enako elementom, ki so v **mn3** in jih ni v **mn1**.
 
 # Delo s faktorji
 
@@ -353,6 +358,8 @@ dat$kraj <- factor(dat$kraj)
 summary(dat)
 ```
 
+
+
 # Domača naloga
 1. Med podatki o delcih PM10 izberite podatke za Ljubljano.
 
@@ -372,7 +379,7 @@ apply(da, 2, mean)
 dat2$CaCl <- dat2$Ca + dat2$Cl
 print(head(dat))
 ```
-- Za vsako vrstico izračunajte seštevek vseh meritev.
+- Za vsako vrstico izračunajte seštevek vseh meritev (numeričnih vrednosti).
 ```{r, echo = FALSE}
 apply(da, 1, sum)
 ```
@@ -396,7 +403,7 @@ sales <- sales[, setdiff(colnames(sales),c("branch", "invoice_ID", "cogs", "gros
 print(apply(sales[, c("unit_price", "quantity", "total", "rating")], 2, mean, na.rm = T))
 ```
 
-- Iz datumov nakupov izvlečite dan nakupa, nato poglejte, kako se spreminja število nakupov glede na dan v tednu (*Namig: poglejte funkcijo "table"*). Spomnitese, da morate najprej R-ju povedati, da je "date" stolpec datumov.
+- Iz datumov nakupov izvlečite dan nakupa, nato poglejte, kako se spreminja število nakupov glede na dan v tednu (*Namig: poglejte funkcijo "table"*). Ne pozabite, da je potrebno R-ju povedati, da je "date" stolpec datumov.
 
 ```{r, echo = FALSE}
 sales$date <- as.Date(sales$date, format = "%m/%d/%Y")
