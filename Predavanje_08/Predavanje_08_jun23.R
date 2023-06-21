@@ -13,15 +13,15 @@ for(d in datoteke){
   #obdeljaj datoteko
 }
 
+library(tidyverse)
 
 pokosih <- strsplit("mapa1/mapa2/datoteka.txt", split = "/")
 pokosih
 pokosih <- unlist(pokosih)
 pokosih[length(pokosih)]
 
-substr("moj neznan niz znakov", 5, 9)
+podniz <- substr("moj neznan niz znakov", 5, 9)
 
-library(tidyverse)
 ?grep
 
 grep("a", c("ah", "oh", "eh", "aha", "pa res"))
@@ -34,16 +34,18 @@ gsub("[aeiou]", "", c("ah", "oh", "eh", "aha", "pa res"))
 gsub("[^aeiou]", "", c("ah", "oh", "eh", "aha", "pa res"))
 
 
-gsub("[0-9]+", "", "crk3in5tev1lk3")
+gsub("[0-9]+", "$", "crk36in5tev1lk3")
 gsub("[^0-9]+", "", "crk3in5tev1lk3")
 
 datum <- gsub(".*([0-9]+-[0-9]+-[0-9]+).*","\\1","4-1-2012_S2B.txt")
 datum
+
 as.Date(datum, format = "%d-%m-%Y")
 class(as.Date(datum, format = "%d-%m-%Y"))
 
-as.Date(datum, format = "%d-%m-%Y") > as.Date("2013-1-1")
-#izberimo vse z končnico .txt, ki vsebuje S2A a ne S2B in vsebuje datum Januar 2012
+as.Date(datum, format = "%d-%m-%Y") > as.Date("2011-1-1")
+#izberimo vse datoteke s končnico .txt, 
+#ki vsebuje S2A a ne S2B in vsebuje datum Januar 2012
 izbrane <- data.frame(file=character(), date=Date(), S2A=logical())
 for(d in datoteke){
   print("--------------------------")
@@ -117,11 +119,13 @@ corr <- cor(data[,c("Leg.length", "Males", "Kleptos", "Nearest.web",
                 "Above.ground", "Web.diameter")])
 corr
 library(corrplot)
-corrplot(corr, method="circle")
+corrplot(corr, method="square")
 
 model <- lm(Males ~ Kleptos + Nearest.web + Leg.length, data)
 model
 summary(model)
+
+
 
 #poljubne funkcije
 g1 + stat_smooth(method = "loess") +
@@ -171,19 +175,22 @@ head(df)
 
 ggplot(df, aes(x = cyl, y = mpg, colour = cyl)) + 
   geom_point() + 
-  geom_errorbar(aes(ymin = mpg - SE, ymax = mpg + SE), width = 0.5) +
+  geom_errorbar(aes(ymin = mpg - SE, ymax = mpg + SE), width = 0.5) #+
   theme(legend.position = "none")
 
 #heatmap
 pod <- read.table('./data_raw/PM10_heat.csv', sep=',', header = T)
 pod
-pod_l <- pivot_longer(pod, cols = 2:7, names_to = "Meseci", values_to = "Koncentracije")
-pod_l$Meseci <- factor(pod_l$Meseci, levels = c("Jan", "Feb", "Mar", "Apr", "Maj", "Jun"))
+pod_l <- pivot_longer(pod, cols = 2:7, 
+                      names_to = "Meseci", values_to = "Koncentracije")
+pod_l$Meseci <- factor(pod_l$Meseci, 
+                       levels = c("Jan", "Feb", 
+                                  "Mar", "Apr", "Maj", "Jun"))
 ggplot(pod_l, aes(Mesto, Meseci, fill= Koncentracije)) +
   geom_tile()
 
 ggplot(pod_l, aes(Mesto, Meseci, fill= Koncentracije)) +
-  geom_tile(linejoin = "bevel") + theme(legend.position = "none")
+  geom_tile() + theme(legend.position = "none")
 
 
 ggplot(faithfuld, aes(waiting, eruptions)) +
@@ -196,22 +203,30 @@ ggplot(faithfuld, aes(waiting, eruptions)) +
   geom_raster(aes(fill = density), interpolate = TRUE) +
   scale_fill_gradient(low = rgb(0.1, 0.0, 0.5), 
                       high = rgb(0.8, 0, 0)) 
-
 #primeri za grafiko
 #https://girke.bioinformatics.ucr.edu/GEN242/tutorials/rgraphics/rgraphics/
 
 
+#risanje genomov -------------------------------------------------------
+
 #pixel way
-df <- data.frame(vrednosti = seq(0, 5000000, by=10000), gen1 = rep(0,501), gen2 = rep(0, 501), gen3=rep(0, 501), gen4 = rep(0, 501), gen5= rep(0,501))
+df <- data.frame(vrednosti = seq(0, 5000000, by=10000), 
+                 gen1 = rep(0,501), 
+                 gen2 = rep(0, 501), 
+                 gen3=rep(0, 501), 
+                 gen4 = rep(0, 501), 
+                 gen5= rep(0,501))
 df$gen1[350:358] <- 1
 df$gen2[300:310] <- 1
 df$gen3[380:420] <- 1
 df$gen4[250:270] <- 1
 df$gen5[350:380] <- 1
 
-df_l <- pivot_longer(df, cols=2:ncol(df), names_to = "geni", values_to = "vr")
+df_l <- pivot_longer(df, cols=2:ncol(df), 
+                     names_to = "geni", values_to = "vr")
 df_l$vr <- factor(df_l$vr)
-ggplot(df_l, aes(x = geni, y = vrednosti, color = vr)) + geom_point() + coord_flip()
+ggplot(df_l, aes(x = geni, y = vrednosti, color = vr)) + 
+  geom_point() + coord_flip()
 
 #stolpični diagrami
 blocks <- data.frame(
@@ -243,15 +258,14 @@ ggplot(blocks, aes(gens, value, group = group)) +
   coord_flip() +
   theme(legend.position = "none")
 
-
-
 #install.packages("Gviz")
 #install.packages("GenomicRanges")
-#pozor zahtevna
+#pozor zahtevna instalacija
 #if (!require("BiocManager", quietly = TRUE))
 #  install.packages("BiocManager")
 
 #BiocManager::install("Gviz")
+#BiocManager::install("GenomicRanges")
 
 
 #based on
@@ -288,6 +302,7 @@ grtrack <- GeneRegionTrack(geneModels, genome = gen,
 plotTracks(list(itrack, gtrack, atrack, grtrack))
 
 
+
 #nalaganje rasterskih slik
 
 library(terra)
@@ -322,7 +337,8 @@ ggplot() +
 
 ggsave("./img/inverz.png")
 
-writeRaster(terra::rast(slika_df), "./img/inverz.tif")
+writeRaster(terra::rast(slika_df), "./img/inverz.tif",
+            overwrite = TRUE)
 
 writeRaster(terra::rast(slika_df), "./img/inverz.tif", 
             wopt= list(gdal=c("COMPRESS=NONE"), datatype='INT1U'),
